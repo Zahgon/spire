@@ -7,7 +7,6 @@ import (
 	"github.com/andres-erbsen/clock"
 	"github.com/sirupsen/logrus"
 	"github.com/spiffe/spire/pkg/common/telemetry"
-	telemetry_server "github.com/spiffe/spire/pkg/common/telemetry/server"
 	"github.com/spiffe/spire/pkg/server/datastore"
 )
 
@@ -33,44 +32,13 @@ type Manager struct {
 }
 
 // NewManager creates a new registration manager
-func NewManager(c ManagerConfig) *Manager {
-	if c.Clock == nil {
-		c.Clock = clock.New()
-	}
-
-	return &Manager{
-		c:       c,
-		log:     c.Log.WithField(telemetry.RetryInterval, _pruningCadence),
-		metrics: c.Metrics,
-	}
-}
+func NewManager(c ManagerConfig) *Manager { _ = "STUB: not implemented"; return nil }
 
 // Run runs the registration manager
-func (m *Manager) Run(ctx context.Context) error {
-	return m.pruneEvery(ctx)
-}
+func (m *Manager) Run(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
-func (m *Manager) pruneEvery(ctx context.Context) error {
-	ticker := m.c.Clock.Ticker(_pruningCadence)
-	defer ticker.Stop()
+func (m *Manager) pruneEvery(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
-	for {
-		select {
-		case <-ticker.C:
-			// Log an error on failure unless we're shutting down
-			if err := m.prune(ctx); err != nil && ctx.Err() == nil {
-				m.log.WithError(err).Error("Failed pruning registration entries")
-			}
-		case <-ctx.Done():
-			return nil
-		}
-	}
-}
+// Log an error on failure unless we're shutting down
 
-func (m *Manager) prune(ctx context.Context) (err error) {
-	counter := telemetry_server.StartRegistrationManagerPruneEntryCall(m.c.Metrics)
-	defer counter.Done(&err)
-
-	err = m.c.DataStore.PruneRegistrationEntries(ctx, m.c.Clock.Now())
-	return err
-}
+func (m *Manager) prune(ctx context.Context) (err error) { _ = "STUB: not implemented"; return nil }

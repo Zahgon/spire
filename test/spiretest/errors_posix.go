@@ -6,14 +6,8 @@ const (
 	fileNotFound = "no such file or directory"
 )
 
-func PathNotFound() string {
-	return fileNotFound
-}
+func PathNotFound() string { _ = "STUB: not implemented"; return "" }
 
-func FileNotFound() string {
-	return fileNotFound
-}
+func FileNotFound() string { _ = "STUB: not implemented"; return "" }
 
-func SocketFileNotFound() string {
-	return fileNotFound
-}
+func SocketFileNotFound() string { _ = "STUB: not implemented"; return "" }

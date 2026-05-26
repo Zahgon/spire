@@ -2,8 +2,6 @@ package telemetry
 
 import (
 	"context"
-
-	"github.com/hashicorp/go-metrics/datadog"
 )
 
 type dogStatsdRunner struct {
@@ -11,33 +9,18 @@ type dogStatsdRunner struct {
 }
 
 func newDogStatsdRunner(c *MetricsConfig) (sinkRunner, error) {
-	runner := &dogStatsdRunner{}
-
-	for _, dc := range c.FileConfig.DogStatsd {
-		sink, err := datadog.NewDogStatsdSink(dc.Address, "")
-		if err != nil {
-			return nil, err
-		}
-
-		runner.loadedSinks = append(runner.loadedSinks, sink)
-	}
-
-	return runner, nil
+	_ = "STUB: not implemented"
+	return *new(sinkRunner), nil
 }
 
-func (d *dogStatsdRunner) isConfigured() bool {
-	return len(d.loadedSinks) > 0
-}
+func (d *dogStatsdRunner) isConfigured() bool { _ = "STUB: not implemented"; return false }
 
-func (d *dogStatsdRunner) sinks() []Sink {
-	return d.loadedSinks
-}
+func (d *dogStatsdRunner) sinks() []Sink { _ = "STUB: not implemented"; return nil }
 
 func (d *dogStatsdRunner) run(context.Context) error {
+	_ = "STUB: not implemented"
 	// Nothing to do here
 	return nil
 }
 
-func (d *dogStatsdRunner) requiresTypePrefix() bool {
-	return false
-}
+func (d *dogStatsdRunner) requiresTypePrefix() bool { _ = "STUB: not implemented"; return false }

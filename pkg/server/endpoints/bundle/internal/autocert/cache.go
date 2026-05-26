@@ -31,8 +31,6 @@ package autocert
 import (
 	"context"
 	"errors"
-	"os"
-	"path/filepath"
 )
 
 // ErrCacheMiss is returned when a certificate is not found in cache.
@@ -64,96 +62,28 @@ type DirCache string
 
 // Get reads a certificate data from the specified file name.
 func (d DirCache) Get(ctx context.Context, name string) ([]byte, error) {
-	name = filepath.Join(string(d), name)
-	var (
-		data []byte
-		err  error
-		done = make(chan struct{})
-	)
-	go func() {
-		data, err = os.ReadFile(name)
-		close(done)
-	}()
-	select {
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	case <-done:
-	}
-	if os.IsNotExist(err) {
-		return nil, ErrCacheMiss
-	}
-	return data, err
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Put writes the certificate data to the specified file name.
 // The file will be created with 0600 permissions.
 func (d DirCache) Put(ctx context.Context, name string, data []byte) error {
-	if err := os.MkdirAll(string(d), 0700); err != nil {
-		return err
-	}
-
-	done := make(chan struct{})
-	var err error
-	go func() {
-		defer close(done)
-		var tmp string
-		if tmp, err = d.writeTempFile(name, data); err != nil {
-			return
-		}
-		defer os.Remove(tmp)
-		select {
-		case <-ctx.Done():
-			// Don't overwrite the file if the context was canceled.
-		default:
-			newName := filepath.Join(string(d), name)
-			err = os.Rename(tmp, newName)
-		}
-	}()
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case <-done:
-	}
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Don't overwrite the file if the context was canceled.
 
 // Delete removes the specified file name.
 func (d DirCache) Delete(ctx context.Context, name string) error {
-	name = filepath.Join(string(d), name)
-	var (
-		err  error
-		done = make(chan struct{})
-	)
-	go func() {
-		err = os.Remove(name)
-		close(done)
-	}()
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case <-done:
-	}
-	if err != nil && !os.IsNotExist(err) {
-		return err
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // writeTempFile writes b to a temporary file, closes the file and returns its path.
 func (d DirCache) writeTempFile(prefix string, b []byte) (name string, returnError error) {
+	_ = "STUB: not implemented"
 	// TempFile uses 0600 permissions
-	f, err := os.CreateTemp(string(d), prefix)
-	if err != nil {
-		return "", err
-	}
-	defer func() {
-		if returnError != nil {
-			os.Remove(f.Name())
-		}
-	}()
-	if _, err := f.Write(b); err != nil {
-		f.Close()
-		return "", err
-	}
-	return f.Name(), f.Close()
+	return "", nil
 }

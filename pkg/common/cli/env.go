@@ -1,10 +1,8 @@
 package cli
 
 import (
-	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 )
 
 var (
@@ -25,29 +23,12 @@ type Env struct {
 	BaseDir string
 }
 
-func (e *Env) Printf(format string, args ...any) error {
-	_, err := fmt.Fprintf(e.Stdout, format, args...)
-	return err
-}
+func (e *Env) Printf(format string, args ...any) error { _ = "STUB: not implemented"; return nil }
 
-func (e *Env) Println(args ...any) error {
-	_, err := fmt.Fprintln(e.Stdout, args...)
-	return err
-}
+func (e *Env) Println(args ...any) error { _ = "STUB: not implemented"; return nil }
 
-func (e *Env) ErrPrintf(format string, args ...any) error {
-	_, err := fmt.Fprintf(e.Stderr, format, args...)
-	return err
-}
+func (e *Env) ErrPrintf(format string, args ...any) error { _ = "STUB: not implemented"; return nil }
 
-func (e *Env) ErrPrintln(args ...any) error {
-	_, err := fmt.Fprintln(e.Stderr, args...)
-	return err
-}
+func (e *Env) ErrPrintln(args ...any) error { _ = "STUB: not implemented"; return nil }
 
-func (e *Env) JoinPath(parts ...string) string {
-	if e.BaseDir == "" {
-		return filepath.Join(parts...)
-	}
-	return filepath.Join(append([]string{e.BaseDir}, parts...)...)
-}
+func (e *Env) JoinPath(parts ...string) string { _ = "STUB: not implemented"; return "" }

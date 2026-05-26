@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"crypto/x509"
 	"sync"
 	"time"
 
@@ -11,9 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 	bundlev1 "github.com/spiffe/spire-api-sdk/proto/spire/api/server/bundle/v1"
 	"github.com/spiffe/spire-api-sdk/proto/spire/api/types"
-	"github.com/spiffe/spire/pkg/common/util"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/proto"
 )
 
 const (
@@ -41,115 +38,35 @@ type ServerAPISource struct {
 }
 
 func NewServerAPISource(config ServerAPISourceConfig) (*ServerAPISource, error) {
-	if config.PollInterval <= 0 {
-		config.PollInterval = DefaultServerAPIPollInterval
-	}
-	if config.Clock == nil {
-		config.Clock = clock.New()
-	}
-
-	conn, err := util.NewGRPCClient(config.GRPCTarget)
-	if err != nil {
-		return nil, err
-	}
-
-	ctx, cancel := context.WithCancel(context.Background())
-	s := &ServerAPISource{
-		log:    config.Log,
-		clock:  config.Clock,
-		cancel: cancel,
-	}
-
-	s.wg.Go(func() {
-		s.pollEvery(ctx, conn, config.PollInterval)
-	})
-	return s, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (s *ServerAPISource) Close() error {
-	s.cancel()
-	s.wg.Wait()
-	return nil
-}
+func (s *ServerAPISource) Close() error { _ = "STUB: not implemented"; return nil }
 
 func (s *ServerAPISource) FetchKeySet() (*jose.JSONWebKeySet, time.Time, bool) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	if s.jwks == nil {
-		return nil, time.Time{}, false
-	}
-	return s.jwks, s.modTime, true
+	_ = "STUB: not implemented"
+	return nil, *new(time.Time), false
 }
 
 func (s *ServerAPISource) LastSuccessfulPoll() time.Time {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.pollTime
+	_ = "STUB: not implemented"
+	return *new(time.Time)
 }
 
 func (s *ServerAPISource) pollEvery(ctx context.Context, conn *grpc.ClientConn, interval time.Duration) {
-	defer conn.Close()
-	client := bundlev1.NewBundleClient(conn)
-
-	s.log.WithField("interval", interval).Debug("Polling started")
-	for {
-		s.pollOnce(ctx, client)
-		select {
-		case <-ctx.Done():
-			s.log.WithError(ctx.Err()).Debug("Polling done")
-			return
-		case <-s.clock.After(interval):
-		}
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 func (s *ServerAPISource) pollOnce(ctx context.Context, client bundlev1.BundleClient) {
+	_ = "STUB: not implemented"
 	// Ensure the stream gets cleaned up
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	bundle, err := client.GetBundle(ctx, &bundlev1.GetBundleRequest{
-		OutputMask: &types.BundleMask{
-			JwtAuthorities: true,
-		},
-	})
-	if err != nil {
-		s.log.WithError(err).Warn("Failed to fetch bundle")
-		return
-	}
-
-	s.parseBundle(bundle)
-	s.mu.Lock()
-	s.pollTime = s.clock.Now()
-	s.mu.Unlock()
+	return
 }
 
 func (s *ServerAPISource) parseBundle(bundle *types.Bundle) {
+	_ = "STUB: not implemented"
 	// If the bundle hasn't changed, don't bother continuing
-	s.mu.RLock()
-	if s.bundle != nil && proto.Equal(s.bundle, bundle) {
-		s.mu.RUnlock()
-		return
-	}
-	s.mu.RUnlock()
-
-	jwks := new(jose.JSONWebKeySet)
-	for _, key := range bundle.JwtAuthorities {
-		publicKey, err := x509.ParsePKIXPublicKey(key.PublicKey)
-		if err != nil {
-			s.log.WithError(err).WithField("kid", key.KeyId).Warn("Malformed public key in bundle")
-			continue
-		}
-
-		jwks.Keys = append(jwks.Keys, jose.JSONWebKey{
-			Key:   publicKey,
-			KeyID: key.KeyId,
-		})
-	}
-
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.bundle = bundle
-	s.jwks = jwks
-	s.modTime = s.clock.Now()
+	return
 }

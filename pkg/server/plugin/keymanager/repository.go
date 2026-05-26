@@ -5,13 +5,10 @@ type Repository struct {
 }
 
 func (repo *Repository) GetKeyManager() KeyManager {
-	return repo.KeyManager
+	_ = "STUB: not implemented"
+	return *new(KeyManager)
 }
 
-func (repo *Repository) SetKeyManager(keyManager KeyManager) {
-	repo.KeyManager = keyManager
-}
+func (repo *Repository) SetKeyManager(keyManager KeyManager) { _ = "STUB: not implemented"; return }
 
-func (repo *Repository) Clear() {
-	repo.KeyManager = nil
-}
+func (repo *Repository) Clear() { _ = "STUB: not implemented"; return }

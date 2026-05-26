@@ -2,15 +2,14 @@ package catalog
 
 import (
 	"context"
-	"errors"
 	"net"
 	"sync"
 )
 
 type pipeAddr struct{}
 
-func (pipeAddr) Network() string { return "pipe" }
-func (pipeAddr) String() string  { return "pipe" }
+func (pipeAddr) Network() string { _ = "STUB: not implemented"; return "" }
+func (pipeAddr) String() string  { _ = "STUB: not implemented"; return "" }
 
 type pipeNet struct {
 	accept    chan net.Conn
@@ -18,49 +17,15 @@ type pipeNet struct {
 	closeOnce sync.Once
 }
 
-func newPipeNet() *pipeNet {
-	return &pipeNet{
-		accept: make(chan net.Conn),
-		closed: make(chan struct{}),
-	}
-}
+func newPipeNet() *pipeNet { _ = "STUB: not implemented"; return nil }
 
-func (n *pipeNet) Addr() net.Addr {
-	return pipeAddr{}
-}
+func (n *pipeNet) Addr() net.Addr { _ = "STUB: not implemented"; return *new(net.Addr) }
 
-func (n *pipeNet) Accept() (net.Conn, error) {
-	select {
-	case s := <-n.accept:
-		return s, nil
-	case <-n.closed:
-		return nil, errors.New("closed")
-	}
-}
+func (n *pipeNet) Accept() (net.Conn, error) { _ = "STUB: not implemented"; return *new(net.Conn), nil }
 
 func (n *pipeNet) DialContext(ctx context.Context, _ string) (conn net.Conn, err error) {
-	c, s := net.Pipe()
-
-	defer func() {
-		if err != nil {
-			c.Close()
-			s.Close()
-		}
-	}()
-
-	select {
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	case n.accept <- s:
-		return c, nil
-	case <-n.closed:
-		return nil, errors.New("network closed")
-	}
+	_ = "STUB: not implemented"
+	return *new(net.Conn), nil
 }
 
-func (n *pipeNet) Close() error {
-	n.closeOnce.Do(func() {
-		close(n.closed)
-	})
-	return nil
-}
+func (n *pipeNet) Close() error { _ = "STUB: not implemented"; return nil }

@@ -3,8 +3,6 @@ package manager
 import (
 	"context"
 	"crypto/x509"
-	"errors"
-	"fmt"
 	"sync"
 	"time"
 
@@ -18,14 +16,6 @@ import (
 	"github.com/spiffe/spire/pkg/agent/storage"
 	"github.com/spiffe/spire/pkg/agent/svid"
 	"github.com/spiffe/spire/pkg/common/backoff"
-	"github.com/spiffe/spire/pkg/common/errorutil"
-	"github.com/spiffe/spire/pkg/common/nodeutil"
-	"github.com/spiffe/spire/pkg/common/rotationutil"
-	"github.com/spiffe/spire/pkg/common/telemetry"
-	"github.com/spiffe/spire/pkg/common/util"
-	"github.com/spiffe/spire/pkg/common/version"
-	"github.com/spiffe/spire/pkg/common/x509util"
-	"github.com/spiffe/spire/pkg/server/api/limits"
 	"github.com/spiffe/spire/proto/spire/common"
 )
 
@@ -184,296 +174,95 @@ type manager struct {
 	processedTaintedJWTAuthorities map[string]struct{}
 }
 
-func (m *manager) Initialize(ctx context.Context) error {
-	m.storeSVID(m.svid.State().SVID, m.svid.State().Reattestable)
-	m.storeBundle(m.cache.Bundle())
+func (m *manager) Initialize(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
-	// upper limit of backoff is 8 mins
-	synchronizeBackoffMaxInterval := min(synchronizeMaxInterval, synchronizeMaxIntervalMultiple*m.c.SyncInterval)
+// upper limit of backoff is 8 mins
 
-	m.synchronizeBackoff = backoff.NewBackoff(m.clk, m.c.SyncInterval, backoff.WithMaxInterval(synchronizeBackoffMaxInterval))
-	m.svidSyncBackoff = backoff.NewBackoff(m.clk, cache.SVIDSyncInterval, backoff.WithMaxInterval(maxSVIDSyncInterval))
-	m.csrSizeLimitedBackoff = backoff.NewSizeLimitedBackOff(limits.SignLimitPerIP)
-	m.syncedEntries = make(map[string]*common.RegistrationEntry)
-	m.syncedBundles = make(map[string]*common.Bundle)
+// Post agent status with version information to the server
 
-	// Post agent status with version information to the server
-	if err := m.client.PostStatus(ctx, version.Version()); err != nil {
-		// Log the error but don't fail initialization - the server may not support this yet
-		m.c.Log.WithField(telemetry.AgentVersion, version.Version()).WithError(err).Error("Failed to post agent status")
-	}
+// Log the error but don't fail initialization - the server may not support this yet
 
-	err := m.synchronize(ctx)
-	if nodeutil.ShouldAgentReattest(err) {
-		m.c.Log.WithError(err).Error("Agent needs to re-attest: removing SVID and shutting down")
-		m.deleteSVID()
-	}
-	if nodeutil.ShouldAgentShutdown(err) {
-		m.c.Log.WithError(err).Error("Agent is banned: removing SVID and shutting down")
-		m.deleteSVID()
-	}
-	return err
-}
-
-func (m *manager) Run(ctx context.Context) error {
-	defer m.client.Release()
-
-	for {
-		err := util.RunTasks(ctx,
-			m.runSynchronizer,
-			m.runSyncSVIDs,
-			m.runSVIDObserver,
-			m.runBundleObserver,
-			m.svid.Run)
-
-		switch {
-		case err == nil || errors.Is(err, context.Canceled) || errorutil.IsSIGINTOrSIGTERMError(err):
-			m.c.Log.Info("Cache manager stopped")
-			return nil
-		case nodeutil.ShouldAgentReattest(err):
-			m.c.Log.WithError(err).Warn("Agent needs to re-attest; will attempt to re-attest")
-			reattestError := m.svid.Reattest(ctx)
-			if reattestError != nil {
-				m.c.Log.WithError(reattestError).Error("Agent failed re-attestation; removing SVID and shutting down")
-				m.deleteSVID()
-				return err
-			}
-		case nodeutil.ShouldAgentShutdown(err):
-			m.c.Log.WithError(err).Warn("Agent is banned: removing SVID and shutting down")
-			m.deleteSVID()
-			return err
-		default:
-			m.c.Log.WithError(err).Error("Cache manager crashed")
-			return err
-		}
-	}
-}
+func (m *manager) Run(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
 func (m *manager) SubscribeToCacheChanges(ctx context.Context, selectors cache.Selectors) (cache.Subscriber, error) {
-	return m.cache.SubscribeToWorkloadUpdates(ctx, selectors)
+	_ = "STUB: not implemented"
+	return *new(cache.Subscriber), nil
 }
 
 func (m *manager) SubscribeToSVIDChanges() observer.Stream {
-	return m.svid.Subscribe()
+	_ = "STUB: not implemented"
+	return *new(observer.Stream)
 }
 
 func (m *manager) SubscribeToBundleChanges() *cache.BundleStream {
-	return m.cache.SubscribeToBundleChanges()
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (m *manager) GetRotationMtx() *sync.RWMutex {
-	return m.svid.GetRotationMtx()
-}
+func (m *manager) GetRotationMtx() *sync.RWMutex { _ = "STUB: not implemented"; return nil }
 
 func (m *manager) GetCurrentCredentials() svid.State {
-	return m.svid.State()
+	_ = "STUB: not implemented"
+	return *new(svid.State)
 }
 
-func (m *manager) SetRotationFinishedHook(f func()) {
-	m.svid.SetRotationFinishedHook(f)
-}
+func (m *manager) SetRotationFinishedHook(f func()) { _ = "STUB: not implemented"; return }
 
 func (m *manager) MatchingRegistrationEntries(selectors []*common.Selector) []*common.RegistrationEntry {
-	return m.cache.MatchingRegistrationEntries(selectors)
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (m *manager) CountX509SVIDs() int {
-	return m.cache.CountX509SVIDs()
-}
+func (m *manager) CountX509SVIDs() int { _ = "STUB: not implemented"; return 0 }
 
-func (m *manager) CountJWTSVIDs() int {
-	return m.cache.CountJWTSVIDs()
-}
+func (m *manager) CountJWTSVIDs() int { _ = "STUB: not implemented"; return 0 }
 
-func (m *manager) CountSVIDStoreX509SVIDs() int {
-	return m.svidStoreCache.CountX509SVIDs()
-}
+func (m *manager) CountSVIDStoreX509SVIDs() int { _ = "STUB: not implemented"; return 0 }
 
 // FetchWorkloadUpdates gets the latest workload update for the selectors
 func (m *manager) FetchWorkloadUpdate(selectors []*common.Selector) *cache.WorkloadUpdate {
-	return m.cache.FetchWorkloadUpdate(selectors)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (m *manager) FetchJWTSVID(ctx context.Context, entry *common.RegistrationEntry, audience []string) (*client.JWTSVID, error) {
-	spiffeID, err := spiffeid.FromString(entry.SpiffeId)
-	if err != nil {
-		return nil, fmt.Errorf("invalid SPIFFE ID: %w", err)
-	}
-
-	now := m.clk.Now()
-	cachedSVID, ok := m.cache.GetJWTSVID(spiffeID, audience)
-	if ok && !m.c.RotationStrategy.JWTSVIDExpiresSoon(cachedSVID, now) {
-		return cachedSVID, nil
-	}
-
-	// Determine if an unexpired JWT-SVID exists in the cache to pass
-	// to NewJWTSVID method. If this is true, we'll fall back to the
-	// cache hit more quickly rather than wait longer for the Server
-	isCacheHit := ok && !rotationutil.JWTSVIDExpired(cachedSVID, now)
-
-	newSVID, svidSPIFFEID, err := m.client.NewJWTSVID(ctx, entry.EntryId, audience, isCacheHit)
-	switch {
-	case err == nil:
-	case cachedSVID == nil:
-		return nil, err
-	case rotationutil.JWTSVIDExpired(cachedSVID, now):
-		return nil, fmt.Errorf("unable to renew JWT for %q (err=%w)", spiffeID, err)
-	default:
-		m.c.Log.WithError(err).WithField(telemetry.SPIFFEID, spiffeID).Warn("Unable to renew JWT; returning cached copy")
-		return cachedSVID, nil
-	}
-
-	m.cache.SetJWTSVID(svidSPIFFEID, audience, newSVID)
-	return newSVID, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (m *manager) runSynchronizer(ctx context.Context) error {
-	syncInterval := min(m.synchronizeBackoff.NextBackOff(), defaultSyncInterval)
-	for {
-		select {
-		case <-m.clk.After(syncInterval):
-		case <-ctx.Done():
-			return nil
-		}
+// Determine if an unexpired JWT-SVID exists in the cache to pass
+// to NewJWTSVID method. If this is true, we'll fall back to the
+// cache hit more quickly rather than wait longer for the Server
 
-		err := m.synchronize(ctx)
-		if err == nil {
-			err = m.c.TrustBundleSources.SetSuccessIfRunning()
-			if err != nil {
-				return err
-			}
-		}
-		switch {
-		case x509util.IsUnknownAuthorityError(err):
-			if m.c.RebootstrapMode == "never" {
-				m.c.Log.WithError(err).Info("Synchronize failed, non-recoverable error")
-				return fmt.Errorf("failed to sync with SPIRE Server: %w", err)
-			}
-			startTime, err := m.c.TrustBundleSources.GetStartTime()
-			if err != nil {
-				return err
-			}
-			seconds := time.Since(startTime)
-			if seconds < m.c.RebootstrapDelay {
-				fmt.Printf("Trust Bandle and Server dont agree.... Ignoring for now. Rebootstrap timeout left: %s\n", m.c.RebootstrapDelay-seconds)
-			} else {
-				fmt.Printf("Trust Bandle and Server dont agree.... rebootstrapping")
-				err = m.c.TrustBundleSources.SetForceRebootstrap()
-				if err != nil {
-					return err
-				}
-				return errors.New("shutting down for rebootstrapping")
-			}
-			m.synchronizeBackoff.Reset()
-			syncInterval = m.synchronizeBackoff.NextBackOff()
-			syncInterval = min(syncInterval, defaultSyncInterval)
-			continue
-		case err != nil && nodeutil.ShouldAgentReattest(err):
-			fallthrough
-		case nodeutil.ShouldAgentShutdown(err):
-			m.c.Log.WithError(err).Error("Synchronize failed")
-			return err
-		case err != nil:
-			m.c.Log.WithError(err).Error("Synchronize failed")
-			// Increase sync interval and wait for next synchronization
-			syncInterval = m.synchronizeBackoff.NextBackOff()
-		default:
-			m.synchronizeBackoff.Reset()
-			syncInterval = m.synchronizeBackoff.NextBackOff()
+func (m *manager) runSynchronizer(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
-			// Clamp the sync interval to the default value when the agent doesn't have any SVIDs cached
-			// AND the previous sync request succeeded
-			if m.cache.CountX509SVIDs() == 0 {
-				syncInterval = min(syncInterval, defaultSyncInterval)
-			}
-		}
-	}
-}
+// Increase sync interval and wait for next synchronization
 
-func (m *manager) runSyncSVIDs(ctx context.Context) error {
-	for {
-		select {
-		case <-m.clk.After(m.svidSyncBackoff.NextBackOff()):
-		case <-ctx.Done():
-			return nil
-		}
+// Clamp the sync interval to the default value when the agent doesn't have any SVIDs cached
+// AND the previous sync request succeeded
 
-		err := m.syncSVIDs(ctx)
-		switch {
-		case err != nil:
-			// Just log the error and wait for next synchronization
-			m.c.Log.WithError(err).Error("SVID sync failed")
-		default:
-			m.svidSyncBackoff.Reset()
-		}
-	}
-}
+func (m *manager) runSyncSVIDs(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
-func (m *manager) setLastSync() {
-	m.mtx.Lock()
-	defer m.mtx.Unlock()
+// Just log the error and wait for next synchronization
 
-	m.lastSync = m.clk.Now()
-}
+func (m *manager) setLastSync() { _ = "STUB: not implemented"; return }
 
-func (m *manager) GetLastSync() time.Time {
-	m.mtx.RLock()
-	defer m.mtx.RUnlock()
+func (m *manager) GetLastSync() time.Time { _ = "STUB: not implemented"; return *new(time.Time) }
 
-	return m.lastSync
-}
+func (m *manager) GetBundle() *cache.Bundle { _ = "STUB: not implemented"; return nil }
 
-func (m *manager) GetBundle() *cache.Bundle {
-	m.mtx.RLock()
-	defer m.mtx.RUnlock()
-
-	return m.cache.Bundle()
-}
-
-func (m *manager) runSVIDObserver(ctx context.Context) error {
-	svidStream := m.SubscribeToSVIDChanges()
-	for {
-		select {
-		case <-ctx.Done():
-			return nil
-		case <-svidStream.Changes():
-			s := svidStream.Next().(svid.State)
-			m.storeSVID(s.SVID, s.Reattestable)
-		}
-	}
-}
+func (m *manager) runSVIDObserver(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
 func (m *manager) runBundleObserver(ctx context.Context) error {
-	bundleStream := m.SubscribeToBundleChanges()
-	for {
-		select {
-		case <-ctx.Done():
-			return nil
-		case <-bundleStream.Changes():
-			b := bundleStream.Next()
-			m.storeBundle(b[m.c.TrustDomain])
-		}
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (m *manager) storeSVID(svidChain []*x509.Certificate, reattestable bool) {
-	if err := m.storage.StoreSVID(svidChain, reattestable); err != nil {
-		m.c.Log.WithError(err).Warn("Could not store SVID")
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
-func (m *manager) storeBundle(bundle *spiffebundle.Bundle) {
-	var rootCAs []*x509.Certificate
-	if bundle != nil {
-		rootCAs = bundle.X509Authorities()
-	}
-	if err := m.storage.StoreBundle(rootCAs); err != nil {
-		m.c.Log.WithError(err).Error("Could not store bundle")
-	}
-}
+func (m *manager) storeBundle(bundle *spiffebundle.Bundle) { _ = "STUB: not implemented"; return }
 
-func (m *manager) deleteSVID() {
-	if err := m.storage.DeleteSVID(); err != nil {
-		m.c.Log.WithError(err).Error("Failed to remove SVID")
-	}
-}
+func (m *manager) deleteSVID() { _ = "STUB: not implemented"; return }

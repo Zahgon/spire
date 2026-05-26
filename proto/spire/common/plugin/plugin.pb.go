@@ -7,11 +7,10 @@
 package plugin
 
 import (
+	sync "sync"
+
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
 )
 
 const (
@@ -32,47 +31,24 @@ type ConfigureRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ConfigureRequest) Reset() {
-	*x = ConfigureRequest{}
-	mi := &file_spire_common_plugin_plugin_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ConfigureRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ConfigureRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ConfigureRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ConfigureRequest) ProtoMessage() {}
+func (*ConfigureRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ConfigureRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_spire_common_plugin_plugin_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ConfigureRequest.ProtoReflect.Descriptor instead.
-func (*ConfigureRequest) Descriptor() ([]byte, []int) {
-	return file_spire_common_plugin_plugin_proto_rawDescGZIP(), []int{0}
-}
+func (*ConfigureRequest) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *ConfigureRequest) GetConfiguration() string {
-	if x != nil {
-		return x.Configuration
-	}
-	return ""
-}
+func (x *ConfigureRequest) GetConfiguration() string { _ = "STUB: not implemented"; return "" }
 
 func (x *ConfigureRequest) GetGlobalConfig() *ConfigureRequest_GlobalConfig {
-	if x != nil {
-		return x.GlobalConfig
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -86,42 +62,21 @@ type ConfigureResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ConfigureResponse) Reset() {
-	*x = ConfigureResponse{}
-	mi := &file_spire_common_plugin_plugin_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ConfigureResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ConfigureResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ConfigureResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ConfigureResponse) ProtoMessage() {}
+func (*ConfigureResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ConfigureResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_spire_common_plugin_plugin_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ConfigureResponse.ProtoReflect.Descriptor instead.
-func (*ConfigureResponse) Descriptor() ([]byte, []int) {
-	return file_spire_common_plugin_plugin_proto_rawDescGZIP(), []int{1}
-}
+func (*ConfigureResponse) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *ConfigureResponse) GetErrorList() []string {
-	if x != nil {
-		return x.ErrorList
-	}
-	return nil
-}
+func (x *ConfigureResponse) GetErrorList() []string { _ = "STUB: not implemented"; return nil }
 
 // * Represents an empty request.
 type GetPluginInfoRequest struct {
@@ -130,34 +85,21 @@ type GetPluginInfoRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetPluginInfoRequest) Reset() {
-	*x = GetPluginInfoRequest{}
-	mi := &file_spire_common_plugin_plugin_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *GetPluginInfoRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *GetPluginInfoRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *GetPluginInfoRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*GetPluginInfoRequest) ProtoMessage() {}
+func (*GetPluginInfoRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *GetPluginInfoRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_spire_common_plugin_plugin_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use GetPluginInfoRequest.ProtoReflect.Descriptor instead.
 func (*GetPluginInfoRequest) Descriptor() ([]byte, []int) {
-	return file_spire_common_plugin_plugin_proto_rawDescGZIP(), []int{2}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // * Represents the plugin metadata.
@@ -176,98 +118,40 @@ type GetPluginInfoResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetPluginInfoResponse) Reset() {
-	*x = GetPluginInfoResponse{}
-	mi := &file_spire_common_plugin_plugin_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *GetPluginInfoResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *GetPluginInfoResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *GetPluginInfoResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*GetPluginInfoResponse) ProtoMessage() {}
+func (*GetPluginInfoResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *GetPluginInfoResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_spire_common_plugin_plugin_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use GetPluginInfoResponse.ProtoReflect.Descriptor instead.
 func (*GetPluginInfoResponse) Descriptor() ([]byte, []int) {
-	return file_spire_common_plugin_plugin_proto_rawDescGZIP(), []int{3}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (x *GetPluginInfoResponse) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
+func (x *GetPluginInfoResponse) GetName() string { _ = "STUB: not implemented"; return "" }
 
-func (x *GetPluginInfoResponse) GetCategory() string {
-	if x != nil {
-		return x.Category
-	}
-	return ""
-}
+func (x *GetPluginInfoResponse) GetCategory() string { _ = "STUB: not implemented"; return "" }
 
-func (x *GetPluginInfoResponse) GetType() string {
-	if x != nil {
-		return x.Type
-	}
-	return ""
-}
+func (x *GetPluginInfoResponse) GetType() string { _ = "STUB: not implemented"; return "" }
 
-func (x *GetPluginInfoResponse) GetDescription() string {
-	if x != nil {
-		return x.Description
-	}
-	return ""
-}
+func (x *GetPluginInfoResponse) GetDescription() string { _ = "STUB: not implemented"; return "" }
 
-func (x *GetPluginInfoResponse) GetDateCreated() string {
-	if x != nil {
-		return x.DateCreated
-	}
-	return ""
-}
+func (x *GetPluginInfoResponse) GetDateCreated() string { _ = "STUB: not implemented"; return "" }
 
-func (x *GetPluginInfoResponse) GetLocation() string {
-	if x != nil {
-		return x.Location
-	}
-	return ""
-}
+func (x *GetPluginInfoResponse) GetLocation() string { _ = "STUB: not implemented"; return "" }
 
-func (x *GetPluginInfoResponse) GetVersion() string {
-	if x != nil {
-		return x.Version
-	}
-	return ""
-}
+func (x *GetPluginInfoResponse) GetVersion() string { _ = "STUB: not implemented"; return "" }
 
-func (x *GetPluginInfoResponse) GetAuthor() string {
-	if x != nil {
-		return x.Author
-	}
-	return ""
-}
+func (x *GetPluginInfoResponse) GetAuthor() string { _ = "STUB: not implemented"; return "" }
 
-func (x *GetPluginInfoResponse) GetCompany() string {
-	if x != nil {
-		return x.Company
-	}
-	return ""
-}
+func (x *GetPluginInfoResponse) GetCompany() string { _ = "STUB: not implemented"; return "" }
 
 type InitRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -276,42 +160,21 @@ type InitRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *InitRequest) Reset() {
-	*x = InitRequest{}
-	mi := &file_spire_common_plugin_plugin_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *InitRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *InitRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *InitRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*InitRequest) ProtoMessage() {}
+func (*InitRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *InitRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_spire_common_plugin_plugin_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use InitRequest.ProtoReflect.Descriptor instead.
-func (*InitRequest) Descriptor() ([]byte, []int) {
-	return file_spire_common_plugin_plugin_proto_rawDescGZIP(), []int{4}
-}
+func (*InitRequest) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *InitRequest) GetHostServices() []string {
-	if x != nil {
-		return x.HostServices
-	}
-	return nil
-}
+func (x *InitRequest) GetHostServices() []string { _ = "STUB: not implemented"; return nil }
 
 type InitResponse struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
@@ -320,42 +183,21 @@ type InitResponse struct {
 	sizeCache      protoimpl.SizeCache
 }
 
-func (x *InitResponse) Reset() {
-	*x = InitResponse{}
-	mi := &file_spire_common_plugin_plugin_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *InitResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *InitResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *InitResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*InitResponse) ProtoMessage() {}
+func (*InitResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *InitResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_spire_common_plugin_plugin_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use InitResponse.ProtoReflect.Descriptor instead.
-func (*InitResponse) Descriptor() ([]byte, []int) {
-	return file_spire_common_plugin_plugin_proto_rawDescGZIP(), []int{5}
-}
+func (*InitResponse) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *InitResponse) GetPluginServices() []string {
-	if x != nil {
-		return x.PluginServices
-	}
-	return nil
-}
+func (x *InitResponse) GetPluginServices() []string { _ = "STUB: not implemented"; return nil }
 
 // * Global configuration nested type.
 type ConfigureRequest_GlobalConfig struct {
@@ -365,40 +207,25 @@ type ConfigureRequest_GlobalConfig struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ConfigureRequest_GlobalConfig) Reset() {
-	*x = ConfigureRequest_GlobalConfig{}
-	mi := &file_spire_common_plugin_plugin_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ConfigureRequest_GlobalConfig) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ConfigureRequest_GlobalConfig) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ConfigureRequest_GlobalConfig) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ConfigureRequest_GlobalConfig) ProtoMessage() {}
+func (*ConfigureRequest_GlobalConfig) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ConfigureRequest_GlobalConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_spire_common_plugin_plugin_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ConfigureRequest_GlobalConfig.ProtoReflect.Descriptor instead.
 func (*ConfigureRequest_GlobalConfig) Descriptor() ([]byte, []int) {
-	return file_spire_common_plugin_plugin_proto_rawDescGZIP(), []int{0, 0}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *ConfigureRequest_GlobalConfig) GetTrustDomain() string {
-	if x != nil {
-		return x.TrustDomain
-	}
+	_ = "STUB: not implemented"
 	return ""
 }
 
@@ -439,10 +266,8 @@ var (
 )
 
 func file_spire_common_plugin_plugin_proto_rawDescGZIP() []byte {
-	file_spire_common_plugin_plugin_proto_rawDescOnce.Do(func() {
-		file_spire_common_plugin_plugin_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_spire_common_plugin_plugin_proto_rawDesc), len(file_spire_common_plugin_plugin_proto_rawDesc)))
-	})
-	return file_spire_common_plugin_plugin_proto_rawDescData
+	_ = "STUB: not implemented"
+	return nil
 }
 
 var file_spire_common_plugin_plugin_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
@@ -466,26 +291,5 @@ var file_spire_common_plugin_plugin_proto_depIdxs = []int32{
 	0, // [0:1] is the sub-list for field type_name
 }
 
-func init() { file_spire_common_plugin_plugin_proto_init() }
-func file_spire_common_plugin_plugin_proto_init() {
-	if File_spire_common_plugin_plugin_proto != nil {
-		return
-	}
-	type x struct{}
-	out := protoimpl.TypeBuilder{
-		File: protoimpl.DescBuilder{
-			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_spire_common_plugin_plugin_proto_rawDesc), len(file_spire_common_plugin_plugin_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   7,
-			NumExtensions: 0,
-			NumServices:   1,
-		},
-		GoTypes:           file_spire_common_plugin_plugin_proto_goTypes,
-		DependencyIndexes: file_spire_common_plugin_plugin_proto_depIdxs,
-		MessageInfos:      file_spire_common_plugin_plugin_proto_msgTypes,
-	}.Build()
-	File_spire_common_plugin_plugin_proto = out.File
-	file_spire_common_plugin_plugin_proto_goTypes = nil
-	file_spire_common_plugin_plugin_proto_depIdxs = nil
-}
+func init()                                       { file_spire_common_plugin_plugin_proto_init() }
+func file_spire_common_plugin_plugin_proto_init() { _ = "STUB: not implemented"; return }

@@ -1,10 +1,8 @@
 package log
 
 import (
-	"bytes"
 	"io"
 	"log"
-	"os"
 
 	"github.com/hashicorp/go-hclog"
 	"github.com/sirupsen/logrus"
@@ -19,86 +17,55 @@ type HCLogAdapter struct {
 }
 
 func NewHCLogAdapter(log logrus.FieldLogger, name string) *HCLogAdapter {
-	return &HCLogAdapter{
-		log:  log,
-		name: name,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // HCLog has one more level than we do. As such, we will never
 // set trace level.
-func (*HCLogAdapter) Trace(_ string, _ ...any) {
-}
+func (*HCLogAdapter) Trace(_ string, _ ...any) { _ = "STUB: not implemented"; return }
 
-func (a *HCLogAdapter) Debug(msg string, args ...any) {
-	a.CreateEntry(args).Debug(msg)
-}
+func (a *HCLogAdapter) Debug(msg string, args ...any) { _ = "STUB: not implemented"; return }
 
-func (a *HCLogAdapter) Info(msg string, args ...any) {
-	a.CreateEntry(args).Info(msg)
-}
+func (a *HCLogAdapter) Info(msg string, args ...any) { _ = "STUB: not implemented"; return }
 
-func (a *HCLogAdapter) Warn(msg string, args ...any) {
-	a.CreateEntry(args).Warn(msg)
-}
+func (a *HCLogAdapter) Warn(msg string, args ...any) { _ = "STUB: not implemented"; return }
 
-func (a *HCLogAdapter) Error(msg string, args ...any) {
-	a.CreateEntry(args).Error(msg)
-}
+func (a *HCLogAdapter) Error(msg string, args ...any) { _ = "STUB: not implemented"; return }
 
 func (a *HCLogAdapter) Log(level hclog.Level, msg string, args ...any) {
-	switch level {
-	case hclog.Trace:
-		a.Trace(msg, args...)
-	case hclog.Debug:
-		a.Debug(msg, args...)
-	case hclog.Info:
-		a.Info(msg, args...)
-	case hclog.Warn:
-		a.Warn(msg, args...)
-	case hclog.Error:
-		a.Error(msg, args...)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
-func (a *HCLogAdapter) IsTrace() bool {
-	return false
-}
+func (a *HCLogAdapter) IsTrace() bool { _ = "STUB: not implemented"; return false }
 
-func (a *HCLogAdapter) IsDebug() bool {
-	return a.shouldEmit(logrus.DebugLevel)
-}
+func (a *HCLogAdapter) IsDebug() bool { _ = "STUB: not implemented"; return false }
 
-func (a *HCLogAdapter) IsInfo() bool {
-	return a.shouldEmit(logrus.InfoLevel)
-}
+func (a *HCLogAdapter) IsInfo() bool { _ = "STUB: not implemented"; return false }
 
-func (a *HCLogAdapter) IsWarn() bool {
-	return a.shouldEmit(logrus.WarnLevel)
-}
+func (a *HCLogAdapter) IsWarn() bool { _ = "STUB: not implemented"; return false }
 
-func (a *HCLogAdapter) IsError() bool {
-	return a.shouldEmit(logrus.ErrorLevel)
-}
+func (a *HCLogAdapter) IsError() bool { _ = "STUB: not implemented"; return false }
 
 func (a *HCLogAdapter) SetLevel(hclog.Level) {
+	_ = "STUB: not implemented"
 	// interface definition says it is ok for this to be a noop if
 	// implementations don't need/want to support dynamic level changing, which
 	// we don't currently.
+	return
 }
 
 func (a *HCLogAdapter) GetLevel() hclog.Level {
+	_ = "STUB: not implemented"
 	// We don't support dynamically setting the level with SetLevel(),
 	// so just return a default value here.
-	return hclog.NoLevel
+	return *new(hclog.Level)
 }
 
 func (a *HCLogAdapter) With(args ...any) hclog.Logger {
-	e := a.CreateEntry(args)
-	return &HCLogAdapter{
-		log:  e,
-		args: concatFields(a.args, args),
-	}
+	_ = "STUB: not implemented"
+	return *new(hclog.Logger)
 }
 
 // concatFields combines two sets of key/value pairs.
@@ -106,37 +73,21 @@ func (a *HCLogAdapter) With(args ...any) hclog.Logger {
 // accidentally overriding the original slice a, e.g.
 // when logger.With() is called multiple times to create
 // sub-scoped loggers.
-func concatFields(a, b []any) []any {
-	c := make([]any, len(a)+len(b))
-	copy(c, a)
-	copy(c[len(a):], b)
-	return c
-}
+func concatFields(a, b []any) []any { _ = "STUB: not implemented"; return nil }
 
 // ImpliedArgs returns With key/value pairs
-func (a *HCLogAdapter) ImpliedArgs() []any {
-	return a.args
-}
+func (a *HCLogAdapter) ImpliedArgs() []any { _ = "STUB: not implemented"; return nil }
 
-func (a *HCLogAdapter) Name() string {
-	return a.name
-}
+func (a *HCLogAdapter) Name() string { _ = "STUB: not implemented"; return "" }
 
 func (a *HCLogAdapter) Named(name string) hclog.Logger {
-	var newName bytes.Buffer
-	if a.name != "" {
-		newName.WriteString(a.name)
-		newName.WriteString(".")
-	}
-	newName.WriteString(name)
-
-	return a.ResetNamed(newName.String())
+	_ = "STUB: not implemented"
+	return *new(hclog.Logger)
 }
 
 func (a *HCLogAdapter) ResetNamed(name string) hclog.Logger {
-	fields := []any{"subsystem_name", name}
-	e := a.CreateEntry(fields)
-	return &HCLogAdapter{log: e, name: name}
+	_ = "STUB: not implemented"
+	return *new(hclog.Logger)
 }
 
 // StandardLogger is meant to return a stdlib Logger type which wraps around
@@ -150,40 +101,15 @@ func (a *HCLogAdapter) ResetNamed(name string) hclog.Logger {
 //
 // Apologies to those who find themselves here.
 func (a *HCLogAdapter) StandardLogger(*hclog.StandardLoggerOptions) *log.Logger {
-	entry := a.log.WithFields(logrus.Fields{})
-	return log.New(entry.WriterLevel(logrus.InfoLevel), "", 0)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (a *HCLogAdapter) StandardWriter(*hclog.StandardLoggerOptions) io.Writer {
-	var w io.Writer
-	logger, ok := a.log.(*logrus.Logger)
-	if ok {
-		w = logger.Out
-	}
-	if w == nil {
-		w = os.Stderr
-	}
-	return w
+	_ = "STUB: not implemented"
+	return *new(io.Writer)
 }
 
-func (a *HCLogAdapter) shouldEmit(level logrus.Level) bool {
-	return a.log.WithFields(logrus.Fields{}).Level >= level
-}
+func (a *HCLogAdapter) shouldEmit(level logrus.Level) bool { _ = "STUB: not implemented"; return false }
 
-func (a *HCLogAdapter) CreateEntry(args []any) *logrus.Entry {
-	if len(args)%2 != 0 {
-		args = append(args, "<unknown>")
-	}
-
-	fields := make(logrus.Fields)
-	for i := 0; i < len(args); i += 2 {
-		k, ok := args[i].(string)
-		if !ok {
-			continue
-		}
-		v := args[i+1]
-		fields[k] = v
-	}
-
-	return a.log.WithFields(fields)
-}
+func (a *HCLogAdapter) CreateEntry(args []any) *logrus.Entry { _ = "STUB: not implemented"; return nil }

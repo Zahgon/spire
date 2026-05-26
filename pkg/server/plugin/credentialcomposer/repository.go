@@ -5,13 +5,13 @@ type Repository struct {
 }
 
 func (repo *Repository) GetCredentialComposers() []CredentialComposer {
-	return repo.CredentialComposers
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (repo *Repository) AddCredentialComposer(credentialComposer CredentialComposer) {
-	repo.CredentialComposers = append(repo.CredentialComposers, credentialComposer)
+	_ = "STUB: not implemented"
+	return
 }
 
-func (repo *Repository) Clear() {
-	repo.CredentialComposers = nil
-}
+func (repo *Repository) Clear() { _ = "STUB: not implemented"; return }

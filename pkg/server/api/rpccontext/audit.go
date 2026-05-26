@@ -11,40 +11,30 @@ import (
 type auditLogKey struct{}
 
 func WithAuditLog(ctx context.Context, auditLog audit.Logger) context.Context {
-	return context.WithValue(ctx, auditLogKey{}, auditLog)
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }
 
 func AddRPCAuditFields(ctx context.Context, fields logrus.Fields) {
-	if auditLog, ok := AuditLog(ctx); ok {
-		auditLog.AddFields(fields)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
-func AuditRPC(ctx context.Context) {
-	if auditLog, ok := AuditLog(ctx); ok {
-		auditLog.Audit()
-	}
-}
+func AuditRPC(ctx context.Context) { _ = "STUB: not implemented"; return }
 
 func AuditRPCWithFields(ctx context.Context, fields logrus.Fields) {
-	if auditLog, ok := AuditLog(ctx); ok {
-		auditLog.AuditWithFields(fields)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
-func AuditRPCWithError(ctx context.Context, err error) {
-	if auditLog, ok := AuditLog(ctx); ok {
-		auditLog.AuditWithError(err)
-	}
-}
+func AuditRPCWithError(ctx context.Context, err error) { _ = "STUB: not implemented"; return }
 
 func AuditRPCWithTypesStatus(ctx context.Context, s *types.Status, fieldsFunc func() logrus.Fields) {
-	if auditLog, ok := AuditLog(ctx); ok {
-		auditLog.AuditWithTypesStatus(fieldsFunc(), s)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 func AuditLog(ctx context.Context) (audit.Logger, bool) {
-	auditLog, ok := ctx.Value(auditLogKey{}).(audit.Logger)
-	return auditLog, ok
+	_ = "STUB: not implemented"
+	return *new(audit.Logger), false
 }

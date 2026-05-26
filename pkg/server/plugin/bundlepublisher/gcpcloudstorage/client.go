@@ -14,9 +14,11 @@ type gcsService interface {
 }
 
 func newGCSClient(ctx context.Context, opts ...option.ClientOption) (gcsService, error) {
-	return storage.NewClient(ctx, opts...)
+	_ = "STUB: not implemented"
+	return *new(gcsService), nil
 }
 
 func newStorageWriter(ctx context.Context, o *storage.ObjectHandle) io.WriteCloser {
-	return o.NewWriter(ctx)
+	_ = "STUB: not implemented"
+	return *new(io.WriteCloser)
 }

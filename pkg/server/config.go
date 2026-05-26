@@ -168,8 +168,4 @@ type FederationConfig struct {
 	FederatesWith map[spiffeid.TrustDomain]bundle_client.TrustDomainConfig
 }
 
-func New(config Config) *Server {
-	return &Server{
-		config: config,
-	}
-}
+func New(config Config) *Server { _ = "STUB: not implemented"; return nil }

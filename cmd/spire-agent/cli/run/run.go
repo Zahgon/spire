@@ -2,41 +2,19 @@ package run
 
 import (
 	"context"
-	"errors"
-	"flag"
-	"fmt"
 	"io"
-	"net"
-	"net/url"
-	"os"
-	"os/signal"
-	"path/filepath"
-	"sort"
-	"strconv"
-	"strings"
-	"syscall"
 	"time"
 
-	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
 	"github.com/hashicorp/hcl/hcl/token"
-	"github.com/imdario/mergo"
 	"github.com/mitchellh/cli"
 	"github.com/sirupsen/logrus"
 	"github.com/spiffe/spire/pkg/agent"
-	"github.com/spiffe/spire/pkg/agent/client"
-	"github.com/spiffe/spire/pkg/agent/trustbundlesources"
-	"github.com/spiffe/spire/pkg/agent/workloadkey"
-	"github.com/spiffe/spire/pkg/common/catalog"
 	common_cli "github.com/spiffe/spire/pkg/common/cli"
-	"github.com/spiffe/spire/pkg/common/config"
 	"github.com/spiffe/spire/pkg/common/fflag"
 	"github.com/spiffe/spire/pkg/common/health"
-	"github.com/spiffe/spire/pkg/common/idutil"
 	"github.com/spiffe/spire/pkg/common/log"
 	"github.com/spiffe/spire/pkg/common/telemetry"
-	"github.com/spiffe/spire/pkg/common/tlspolicy"
 )
 
 const (
@@ -133,572 +111,88 @@ type Command struct {
 }
 
 func NewRunCommand(ctx context.Context, logOptions []log.Option, allowUnknownConfig bool) cli.Command {
-	return newRunCommand(ctx, common_cli.DefaultEnv, logOptions, allowUnknownConfig)
+	_ = "STUB: not implemented"
+	return *new(cli.Command)
 }
 
 func newRunCommand(ctx context.Context, env *common_cli.Env, logOptions []log.Option, allowUnknownConfig bool) *Command {
-	return &Command{
-		ctx:                ctx,
-		env:                env,
-		logOptions:         logOptions,
-		allowUnknownConfig: allowUnknownConfig,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Help prints the agent cmd usage
-func (cmd *Command) Help() string {
-	return Help(commandName, cmd.env.Stderr)
-}
+func (cmd *Command) Help() string { _ = "STUB: not implemented"; return "" }
 
 // Help is a standalone function that prints a help message to writer.
 // It is used by both the run and validate commands, so they can share flag usage messages.
-func Help(name string, writer io.Writer) string {
-	_, err := parseFlags(name, []string{"-h"}, writer)
-	// Error is always present because -h is passed
-	return err.Error()
-}
+func Help(name string, writer io.Writer) string { _ = "STUB: not implemented"; return "" }
+
+// Error is always present because -h is passed
 
 func LoadConfig(name string, args []string, logOptions []log.Option, output io.Writer, allowUnknownConfig bool) (*agent.Config, error) {
+	_ = "STUB: not implemented"
 	// First parse the CLI flags so we can get the config
 	// file path, if set
-	cliInput, err := parseFlags(name, args, output)
-	if err != nil {
-		return nil, err
-	}
-
-	// Load and parse the config file using either the default
-	// path or CLI-specified value
-	fileInput, err := ParseFile(cliInput.ConfigPath, cliInput.ExpandEnv)
-	if err != nil {
-		return nil, err
-	}
-
-	input, err := mergeInput(fileInput, cliInput)
-	if err != nil {
-		return nil, err
-	}
-
-	err = fflag.Load(input.Agent.Experimental.Flags)
-	if err != nil {
-		return nil, fmt.Errorf("error loading feature flags: %w", err)
-	}
-
-	return NewAgentConfig(input, logOptions, allowUnknownConfig)
+	return nil, nil
 }
 
-func (cmd *Command) Run(args []string) int {
-	c, err := LoadConfig(commandName, args, cmd.logOptions, cmd.env.Stderr, cmd.allowUnknownConfig)
-	if err != nil {
-		_, _ = fmt.Fprintln(cmd.env.Stderr, err)
-		return 1
-	}
+// Load and parse the config file using either the default
+// path or CLI-specified value
 
-	if err := prepareEndpoints(c); err != nil {
-		fmt.Fprintln(cmd.env.Stderr, err)
-		return 1
-	}
+func (cmd *Command) Run(args []string) int { _ = "STUB: not implemented"; return 0 }
 
-	a := agent.New(c)
+func (*Command) Synopsis() string { _ = "STUB: not implemented"; return "" }
 
-	ctx := cmd.ctx
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	ctx, stop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
+func (c *agentConfig) validate() error { _ = "STUB: not implemented"; return nil }
 
-	err = a.Run(ctx)
-	if err != nil {
-		c.Log.WithError(err).Error("Agent crashed")
-		return 1
-	}
+// Validate join token configuration
 
-	c.Log.Info("Agent stopped gracefully")
-	return 0
-}
-
-func (*Command) Synopsis() string {
-	return "Runs the agent"
-}
-
-func (c *agentConfig) validate() error {
-	if c == nil {
-		return errors.New("agent section must be configured")
-	}
-
-	// Validate join token configuration
-	if c.JoinToken != "" && c.JoinTokenFile != "" {
-		return errors.New("only one of join_token or join_token_file can be specified, not both")
-	}
-
-	if c.ServerAddress == "" {
-		return errors.New("server_address must be configured")
-	}
-
-	if c.ServerPort == 0 {
-		return errors.New("server_port must be configured")
-	}
-
-	if c.TrustDomain == "" {
-		return errors.New("trust_domain must be configured")
-	}
-
-	// If insecure_bootstrap is set, trust_bundle_path or trust_bundle_url cannot be set
-	// If trust_bundle_url is set, download the trust bundle using HTTP and parse it from memory
-	// If trust_bundle_path is set, parse the trust bundle file on disk
-	// Both cannot be set
-	// The trust bundle URL must start with HTTPS
-	if c.InsecureBootstrap {
-		switch {
-		case c.TrustBundleURL != "" && c.TrustBundlePath != "":
-			return errors.New("only one of insecure_bootstrap, trust_bundle_url, or trust_bundle_path can be specified, not the three options")
-		case c.TrustBundleURL != "":
-			return errors.New("only one of insecure_bootstrap or trust_bundle_url can be specified, not both")
-		case c.TrustBundlePath != "":
-			return errors.New("only one of insecure_bootstrap or trust_bundle_path can be specified, not both")
-		}
-	} else if c.TrustBundlePath == "" && c.TrustBundleURL == "" {
-		return errors.New("trust_bundle_path or trust_bundle_url must be configured unless insecure_bootstrap is set")
-	}
-
-	if c.TrustBundleURL != "" && c.TrustBundlePath != "" {
-		return errors.New("only one of trust_bundle_url or trust_bundle_path can be specified, not both")
-	}
-
-	if c.TrustBundleFormat != trustbundlesources.BundleFormatPEM && c.TrustBundleFormat != trustbundlesources.BundleFormatSPIFFE {
-		return fmt.Errorf("invalid value for trust_bundle_format, expected %q or %q", trustbundlesources.BundleFormatPEM, trustbundlesources.BundleFormatSPIFFE)
-	}
-
-	if c.TrustBundleUnixSocket != "" && c.TrustBundleURL == "" {
-		return errors.New("if trust_bundle_unix_socket is specified, so must be trust_bundle_url")
-	}
-	if c.TrustBundleURL != "" {
-		u, err := url.Parse(c.TrustBundleURL)
-		if err != nil {
-			return fmt.Errorf("unable to parse trust bundle URL: %w", err)
-		}
-		if c.TrustBundleUnixSocket != "" {
-			if u.Scheme != "http" {
-				return errors.New("trust bundle URL must start with http:// when used with trust bundle unix socket")
-			}
-			params := u.Query()
-			for key := range params {
-				if strings.HasPrefix(key, "spiffe-") {
-					return errors.New("trust_bundle_url query params can not start with spiffe-")
-				}
-				if strings.HasPrefix(key, "spire-") {
-					return errors.New("trust_bundle_url query params can not start with spire-")
-				}
-			}
-		} else if u.Scheme != "https" {
-			return errors.New("trust bundle URL must start with https://")
-		}
-	}
-
-	return c.validateOS()
-}
+// If insecure_bootstrap is set, trust_bundle_path or trust_bundle_url cannot be set
+// If trust_bundle_url is set, download the trust bundle using HTTP and parse it from memory
+// If trust_bundle_path is set, parse the trust bundle file on disk
+// Both cannot be set
+// The trust bundle URL must start with HTTPS
 
 func ParseFile(path string, expandEnv bool) (*Config, error) {
-	c := &Config{}
-
-	if path == "" {
-		path = defaultConfigPath
-	}
-
-	// Return a friendly error if the file is missing
-	byteData, err := os.ReadFile(path)
-	if os.IsNotExist(err) {
-		absPath, err := filepath.Abs(path)
-		if err != nil {
-			msg := "could not determine CWD; config file not found at %s: use -config"
-			return nil, fmt.Errorf(msg, path)
-		}
-
-		msg := "could not find config file %s: please use the -config flag"
-		return nil, fmt.Errorf(msg, absPath)
-	}
-	if err != nil {
-		return nil, fmt.Errorf("unable to read configuration at %q: %w", path, err)
-	}
-	data := string(byteData)
-
-	// If envTemplate flag is passed, substitute $VARIABLES in configuration file
-	if expandEnv {
-		data = config.ExpandEnv(data)
-	}
-
-	if err := hcl.Decode(&c, data); err != nil {
-		return nil, fmt.Errorf("unable to decode configuration at %q: %w", path, err)
-	}
-
-	return c, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
+// Return a friendly error if the file is missing
+
+// If envTemplate flag is passed, substitute $VARIABLES in configuration file
+
 func parseFlags(name string, args []string, output io.Writer) (*agentConfig, error) {
-	flags := flag.NewFlagSet(name, flag.ContinueOnError)
-	flags.SetOutput(output)
-	c := &agentConfig{}
-
-	flags.StringVar(&c.ConfigPath, "config", defaultConfigPath, "Path to a SPIRE config file")
-	flags.StringVar(&c.DataDir, "dataDir", "", "A directory the agent can use for its runtime data")
-	flags.StringVar(&c.JoinToken, "joinToken", "", "An optional token which has been generated by the SPIRE server")
-	flags.StringVar(&c.JoinTokenFile, "joinTokenFile", "", "Path to a file containing an optional join token which has been generated by the SPIRE server")
-	flags.StringVar(&c.LogFile, "logFile", "", "File to write logs to")
-	flags.StringVar(&c.LogFormat, "logFormat", "", "'text' or 'json'")
-	flags.StringVar(&c.LogLevel, "logLevel", "", "'debug', 'info', 'warn', or 'error'")
-	flags.BoolVar(&c.LogSourceLocation, "logSourceLocation", false, "Include source file, line number and function name in log lines")
-	flags.StringVar(&c.ServerAddress, "serverAddress", "", "IP address or DNS name of the SPIRE server")
-	flags.IntVar(&c.ServerPort, "serverPort", 0, "Port number of the SPIRE server")
-	flags.StringVar(&c.TrustDomain, "trustDomain", "", "The trust domain that this agent belongs to")
-	flags.StringVar(&c.TrustBundlePath, "trustBundle", "", "Path to the SPIRE server CA bundle")
-	flags.StringVar(&c.TrustBundleURL, "trustBundleUrl", "", "URL to download the SPIRE server CA bundle")
-	flags.StringVar(&c.TrustBundleFormat, "trustBundleFormat", "", fmt.Sprintf("Format of the bootstrap trust bundle, %q or %q", trustbundlesources.BundleFormatPEM, trustbundlesources.BundleFormatSPIFFE))
-	flags.BoolVar(&c.AllowUnauthenticatedVerifiers, "allowUnauthenticatedVerifiers", false, "If true, the agent permits the retrieval of X509 certificate bundles by unregistered clients")
-	flags.BoolVar(&c.InsecureBootstrap, "insecureBootstrap", false, "If true, the agent bootstraps without verifying the server's identity")
-	flags.StringVar(&c.RebootstrapMode, "rebootstrapMode", "", "Can be one of 'never', 'auto', or 'always'")
-	flags.StringVar(&c.RebootstrapDelay, "rebootstrapDelay", "", "The time to delay after seeing a x509 cert mismatch from the server before rebootstrapping")
-	flags.BoolVar(&c.ExpandEnv, "expandEnv", false, "Expand environment variables in SPIRE config file")
-
-	c.addOSFlags(flags)
-
-	err := flags.Parse(args)
-	if err != nil {
-		return nil, err
-	}
-
-	return c, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func mergeInput(fileInput *Config, cliInput *agentConfig) (*Config, error) {
-	c := &Config{Agent: &agentConfig{}}
-
-	// Highest precedence first
-	err := mergo.Merge(c.Agent, cliInput)
-	if err != nil {
-		return nil, err
-	}
-
-	err = mergo.Merge(c, fileInput)
-	if err != nil {
-		return nil, err
-	}
-
-	err = mergo.Merge(c, defaultConfig())
-	if err != nil {
-		return nil, err
-	}
-
-	return c, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Highest precedence first
 
 func NewAgentConfig(c *Config, logOptions []log.Option, allowUnknownConfig bool) (*agent.Config, error) {
-	ac := &agent.Config{}
-
-	if err := validateConfig(c); err != nil {
-		return nil, err
-	}
-
-	ac.RebootstrapMode = c.Agent.RebootstrapMode
-	switch ac.RebootstrapMode {
-	case agent.RebootstrapNever:
-	case agent.RebootstrapAuto:
-	case agent.RebootstrapAlways:
-	case "":
-		ac.RebootstrapMode = agent.RebootstrapNever
-	default:
-		return nil, fmt.Errorf("unknown rebootstrap mode specified: %s", ac.RebootstrapMode)
-	}
-	if ac.RebootstrapMode != agent.RebootstrapNever && c.Agent.InsecureBootstrap {
-		return nil, errors.New("insecure_bootstrap option can not be used with rebootstrapping")
-	}
-
-	if c.Agent.RebootstrapDelay == "" {
-		c.Agent.RebootstrapDelay = "10m"
-	}
-	delay, err := time.ParseDuration(c.Agent.RebootstrapDelay)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing rebootstrap delay duration: %w", err)
-	}
-	ac.RebootstrapDelay = delay
-
-	if c.Agent.Experimental.SyncInterval != "" {
-		var err error
-		ac.SyncInterval, err = time.ParseDuration(c.Agent.Experimental.SyncInterval)
-		if err != nil {
-			return nil, fmt.Errorf("could not parse synchronization interval: %w", err)
-		}
-	}
-
-	serverHostPort := net.JoinHostPort(c.Agent.ServerAddress, strconv.Itoa(c.Agent.ServerPort))
-	ac.ServerAddress = fmt.Sprintf("dns:///%s", serverHostPort)
-
-	logOptions = append(logOptions,
-		log.WithLevel(c.Agent.LogLevel),
-		log.WithFormat(c.Agent.LogFormat),
-	)
-	if c.Agent.LogSourceLocation {
-		logOptions = append(logOptions, log.WithSourceLocation())
-	}
-	var reopenableFile *log.ReopenableFile
-	if c.Agent.LogFile != "" {
-		var err error
-		reopenableFile, err = log.NewReopenableFile(c.Agent.LogFile)
-		if err != nil {
-			return nil, err
-		}
-		logOptions = append(logOptions, log.WithReopenableOutputFile(reopenableFile))
-	}
-
-	logger, err := log.NewLogger(logOptions...)
-	if err != nil {
-		return nil, fmt.Errorf("could not start logger: %w", err)
-	}
-	ac.Log = logger
-	if reopenableFile != nil {
-		ac.LogReopener = log.ReopenOnSignal(logger, reopenableFile)
-	}
-
-	if c.Agent.Experimental.JWTSVIDCacheHitTimeout != "" {
-		var err error
-		timeout, err := time.ParseDuration(c.Agent.Experimental.JWTSVIDCacheHitTimeout)
-		if err != nil {
-			return nil, fmt.Errorf("could not parse jwt_svid_cache_hit_timeout: %w", err)
-		}
-		if timeout < 5*time.Second {
-			return nil, fmt.Errorf("jwt_svid_cache_hit_timeout (%s) must be greater than %s", timeout, 5*time.Second)
-		}
-		if timeout >= 30*time.Second {
-			return nil, fmt.Errorf("jwt_svid_cache_hit_timeout (%s) must be less than %s", timeout, 30*time.Second)
-		}
-		client.SetJWTSVIDCacheHitTimeout(timeout)
-		logger.Warn("The use of 'jwt_svid_cache_hit_timeout' is experimental")
-	}
-
-	ac.UseSyncAuthorizedEntries = true
-	if c.Agent.Experimental.UseSyncAuthorizedEntries != nil {
-		ac.Log.Warn("The 'use_sync_authorized_entries' configuration is deprecated. The option to disable it will be removed in SPIRE 1.13.")
-		ac.UseSyncAuthorizedEntries = *c.Agent.Experimental.UseSyncAuthorizedEntries
-	}
-
-	if c.Agent.X509SVIDCacheMaxSize < 0 {
-		return nil, errors.New("x509_svid_cache_max_size should not be negative")
-	}
-	ac.X509SVIDCacheMaxSize = c.Agent.X509SVIDCacheMaxSize
-
-	if c.Agent.JWTSVIDCacheMaxSize < 0 {
-		return nil, errors.New("jwt_svid_cache_max_size should not be negative")
-	}
-	ac.JWTSVIDCacheMaxSize = c.Agent.JWTSVIDCacheMaxSize
-
-	td, err := common_cli.ParseTrustDomain(c.Agent.TrustDomain, logger)
-	if err != nil {
-		return nil, err
-	}
-	ac.TrustDomain = td
-
-	addr, err := c.Agent.getAddr()
-	if err != nil {
-		return nil, err
-	}
-	ac.BindAddress = addr
-
-	if c.Agent.hasAdminAddr() {
-		adminAddr, err := c.Agent.getAdminAddr()
-		if err != nil {
-			return nil, err
-		}
-		ac.AdminBindAddress = adminAddr
-	}
-	// Handle join token - read from file if specified
-	if c.Agent.JoinTokenFile != "" {
-		tokenBytes, err := os.ReadFile(c.Agent.JoinTokenFile)
-		if err != nil {
-			return nil, fmt.Errorf("unable to read join token file %q: %w", c.Agent.JoinTokenFile, err)
-		}
-		joinToken := strings.TrimSpace(string(tokenBytes))
-		if joinToken == "" {
-			return nil, errors.New("join token file is empty")
-		}
-		ac.JoinToken = joinToken
-	} else {
-		ac.JoinToken = c.Agent.JoinToken
-	}
-	ac.DataDir = c.Agent.DataDir
-	ac.DefaultSVIDName = c.Agent.SDS.DefaultSVIDName
-	ac.DefaultBundleName = c.Agent.SDS.DefaultBundleName
-	ac.DefaultAllBundlesName = c.Agent.SDS.DefaultAllBundlesName
-	if ac.DefaultAllBundlesName == ac.DefaultBundleName {
-		logger.Warn(`The "default_bundle_name" and "default_all_bundles_name" configurables have the same value. "default_all_bundles_name" will be ignored. Please configure distinct values or use the defaults. This will be a configuration error in a future release.`)
-	}
-	ac.DisableSPIFFECertValidation = c.Agent.SDS.DisableSPIFFECertValidation
-
-	ts := &trustbundlesources.Config{
-		InsecureBootstrap:     c.Agent.InsecureBootstrap,
-		TrustBundleFormat:     c.Agent.TrustBundleFormat,
-		TrustBundlePath:       c.Agent.TrustBundlePath,
-		TrustBundleURL:        c.Agent.TrustBundleURL,
-		TrustBundleUnixSocket: c.Agent.TrustBundleUnixSocket,
-		TrustDomain:           c.Agent.TrustDomain,
-		ServerAddress:         c.Agent.ServerAddress,
-		ServerPort:            c.Agent.ServerPort,
-	}
-
-	ac.TrustBundleSources = trustbundlesources.New(ts, ac.Log.WithField("Logger", "TrustBundleSources"))
-
-	ac.WorkloadKeyType = workloadkey.ECP256
-	if c.Agent.WorkloadX509SVIDKeyType != "" {
-		ac.WorkloadKeyType, err = workloadkey.KeyTypeFromString(c.Agent.WorkloadX509SVIDKeyType)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	ac.ProfilingEnabled = c.Agent.ProfilingEnabled
-	ac.ProfilingPort = c.Agent.ProfilingPort
-	ac.ProfilingFreq = c.Agent.ProfilingFreq
-	ac.ProfilingNames = c.Agent.ProfilingNames
-
-	ac.AllowedForeignJWTClaims = c.Agent.AllowedForeignJWTClaims
-
-	ac.PluginConfigs, err = catalog.PluginConfigsFromHCLNode(c.Plugins)
-	if err != nil {
-		return nil, err
-	}
-
-	ac.Telemetry = c.Telemetry
-	ac.HealthChecks = c.HealthChecks
-
-	if !allowUnknownConfig {
-		if err := checkForUnknownConfig(c, logger); err != nil {
-			return nil, err
-		}
-	}
-
-	ac.AllowUnauthenticatedVerifiers = c.Agent.AllowUnauthenticatedVerifiers
-
-	for _, authorizedDelegate := range c.Agent.AuthorizedDelegates {
-		if _, err := idutil.MemberFromString(ac.TrustDomain, authorizedDelegate); err != nil {
-			return nil, fmt.Errorf("error validating authorized delegate: %w", err)
-		}
-	}
-
-	ac.AuthorizedDelegates = c.Agent.AuthorizedDelegates
-
-	if c.Agent.AvailabilityTarget != "" {
-		t, err := time.ParseDuration(c.Agent.AvailabilityTarget)
-		if err != nil {
-			return nil, fmt.Errorf("unable to parse availability_target: %w", err)
-		}
-		if t < minimumAvailabilityTarget {
-			return nil, fmt.Errorf("availability_target must be at least %s", minimumAvailabilityTarget.String())
-		}
-		ac.AvailabilityTarget = t
-	}
-
-	ac.TLSPolicy = tlspolicy.Policy{
-		RequirePQKEM: c.Agent.Experimental.RequirePQKEM,
-	}
-
-	tlspolicy.LogPolicy(ac.TLSPolicy, log.NewHCLogAdapter(logger, "tlspolicy"))
-
-	if cmp.Diff(experimentalConfig{}, c.Agent.Experimental) != "" {
-		logger.Warn("Experimental features have been enabled. Please see doc/upgrading.md for upgrade and compatibility considerations for experimental features.")
-	}
-
-	for _, f := range c.Agent.Experimental.Flags {
-		logger.Warnf("Developer feature flag %q has been enabled", f)
-	}
-
-	return ac, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func validateConfig(c *Config) error {
-	if c.Plugins == nil {
-		return errors.New("plugins section must be configured")
-	}
+// Handle join token - read from file if specified
 
-	return c.Agent.validate()
-}
+func validateConfig(c *Config) error { _ = "STUB: not implemented"; return nil }
 
 func checkForUnknownConfig(c *Config, l logrus.FieldLogger) (err error) {
-	detectedUnknown := func(section string, keyPositions map[string][]token.Pos) {
-		var keys []string
-		for k := range keyPositions {
-			keys = append(keys, k)
-		}
-
-		sort.Strings(keys)
-		l.WithFields(logrus.Fields{
-			"section": section,
-			"keys":    strings.Join(keys, ","),
-		}).Error("Unknown configuration detected")
-		err = errors.New("unknown configuration detected")
-	}
-
-	if len(c.UnusedKeyPositions) != 0 {
-		detectedUnknown("top-level", c.UnusedKeyPositions)
-	}
-
-	if a := c.Agent; a != nil && len(a.UnusedKeyPositions) != 0 {
-		detectedUnknown("agent", a.UnusedKeyPositions)
-	}
-
-	// TODO: Re-enable unused key detection for telemetry. See
-	// https://github.com/spiffe/spire/issues/1101 for more information
-	//
-	// if len(c.Telemetry.UnusedKeyPositions) != 0 {
-	//	detectedUnknown("telemetry", c.Telemetry.UnusedKeyPositions)
-	// }
-
-	if p := c.Telemetry.Prometheus; p != nil && len(p.UnusedKeyPositions) != 0 {
-		detectedUnknown("Prometheus", p.UnusedKeyPositions)
-	}
-
-	for _, v := range c.Telemetry.DogStatsd {
-		if len(v.UnusedKeyPositions) != 0 {
-			detectedUnknown("DogStatsd", v.UnusedKeyPositions)
-		}
-	}
-
-	for _, v := range c.Telemetry.Statsd {
-		if len(v.UnusedKeyPositions) != 0 {
-			detectedUnknown("Statsd", v.UnusedKeyPositions)
-		}
-	}
-
-	for _, v := range c.Telemetry.M3 {
-		if len(v.UnusedKeyPositions) != 0 {
-			detectedUnknown("M3", v.UnusedKeyPositions)
-		}
-	}
-
-	if p := c.Telemetry.InMem; p != nil && len(p.UnusedKeyPositions) != 0 {
-		detectedUnknown("InMem", p.UnusedKeyPositions)
-	}
-
-	if len(c.HealthChecks.UnusedKeyPositions) != 0 {
-		detectedUnknown("health check", c.HealthChecks.UnusedKeyPositions)
-	}
-
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func defaultConfig() *Config {
-	c := &Config{
-		Agent: &agentConfig{
-			DataDir:           defaultDataDir,
-			LogLevel:          defaultLogLevel,
-			LogFormat:         log.DefaultFormat,
-			TrustBundleFormat: trustbundlesources.BundleFormatPEM,
-			SDS: sdsConfig{
-				DefaultBundleName:           defaultDefaultBundleName,
-				DefaultSVIDName:             defaultDefaultSVIDName,
-				DefaultAllBundlesName:       defaultDefaultAllBundlesName,
-				DisableSPIFFECertValidation: defaultDisableSPIFFECertValidation,
-			},
-		},
-	}
-	c.Agent.setPlatformDefaults()
+// TODO: Re-enable unused key detection for telemetry. See
+// https://github.com/spiffe/spire/issues/1101 for more information
+//
+// if len(c.Telemetry.UnusedKeyPositions) != 0 {
+//	detectedUnknown("telemetry", c.Telemetry.UnusedKeyPositions)
+// }
 
-	return c
-}
+func defaultConfig() *Config { _ = "STUB: not implemented"; return nil }

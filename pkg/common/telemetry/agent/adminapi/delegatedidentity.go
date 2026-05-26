@@ -10,7 +10,8 @@ import (
 // StartFirstX509SVIDUpdateLatency returns Latency metric
 // for SubscribeToX509SVIDs API fetching the first update from cache.
 func StartFirstX509SVIDUpdateLatency(m telemetry.Metrics) *telemetry.Latency {
-	return telemetry.StartLatencyMetric(m, telemetry.DelegatedIdentityAPI, telemetry.SubscribeX509SVIDs, telemetry.FirstUpdate)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // End Call Counters
@@ -20,12 +21,14 @@ func StartFirstX509SVIDUpdateLatency(m telemetry.Metrics) *telemetry.Latency {
 // IncrDelegatedIdentityAPIConnectionCounter indicate Delegated Identity
 // API connection (some connection is made, running total count)
 func IncrDelegatedIdentityAPIConnectionCounter(m telemetry.Metrics) {
-	m.IncrCounter([]string{telemetry.DelegatedIdentityAPI, telemetry.Connection}, 1)
+	_ = "STUB: not implemented"
+	return
 }
 
 // SetDelegatedIdentityAPIConnectionGauge sets the number of active connections
 func SetDelegatedIdentityAPIConnectionGauge(m telemetry.Metrics, connections int32) {
-	m.SetGauge([]string{telemetry.DelegatedIdentityAPI, telemetry.Connections}, float32(connections))
+	_ = "STUB: not implemented"
+	return
 }
 
 // End Counters

@@ -2,9 +2,7 @@ package api
 
 import (
 	"context"
-	"errors"
 	"flag"
-	"fmt"
 
 	"github.com/mitchellh/cli"
 	"github.com/spiffe/go-spiffe/v2/proto/spiffe/workload"
@@ -12,12 +10,11 @@ import (
 	"github.com/spiffe/spire/pkg/common/cliprinter"
 )
 
-func NewFetchJWTCommand() cli.Command {
-	return newFetchJWTCommandWithEnv(commoncli.DefaultEnv, newWorkloadClient)
-}
+func NewFetchJWTCommand() cli.Command { _ = "STUB: not implemented"; return *new(cli.Command) }
 
 func newFetchJWTCommandWithEnv(env *commoncli.Env, clientMaker workloadClientMaker) cli.Command {
-	return adaptCommand(env, clientMaker, &fetchJWTCommand{env: env})
+	_ = "STUB: not implemented"
+	return *new(cli.Command)
 }
 
 type fetchJWTCommand struct {
@@ -27,80 +24,28 @@ type fetchJWTCommand struct {
 	env      *commoncli.Env
 }
 
-func (c *fetchJWTCommand) name() string {
-	return "fetch jwt"
-}
+func (c *fetchJWTCommand) name() string { _ = "STUB: not implemented"; return "" }
 
-func (c *fetchJWTCommand) synopsis() string {
-	return "Fetches a JWT SVID from the Workload API"
-}
+func (c *fetchJWTCommand) synopsis() string { _ = "STUB: not implemented"; return "" }
 
 func (c *fetchJWTCommand) run(ctx context.Context, _ *commoncli.Env, client *workloadClient) error {
-	if len(c.audience) == 0 {
-		return errors.New("audience must be specified")
-	}
-
-	bundlesResp, err := c.fetchJWTBundles(ctx, client)
-	if err != nil {
-		return err
-	}
-	svidResp, err := c.fetchJWTSVID(ctx, client)
-	if err != nil {
-		return err
-	}
-
-	return c.printer.PrintProto(svidResp, bundlesResp)
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (c *fetchJWTCommand) appendFlags(fs *flag.FlagSet) {
-	fs.Var(&c.audience, "audience", "comma separated list of audience values")
-	fs.StringVar(&c.spiffeID, "spiffeID", "", "SPIFFE ID subject (optional)")
-	outputValue := cliprinter.AppendFlagWithCustomPretty(&c.printer, fs, c.env, printPrettyResult)
-	fs.Var(outputValue, "format", "deprecated; use -output")
-}
+func (c *fetchJWTCommand) appendFlags(fs *flag.FlagSet) { _ = "STUB: not implemented"; return }
 
 func (c *fetchJWTCommand) fetchJWTSVID(ctx context.Context, client *workloadClient) (*workload.JWTSVIDResponse, error) {
-	ctx, cancel := client.prepareContext(ctx)
-	defer cancel()
-	return client.FetchJWTSVID(ctx, &workload.JWTSVIDRequest{
-		Audience: c.audience,
-		SpiffeId: c.spiffeID,
-	})
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *fetchJWTCommand) fetchJWTBundles(ctx context.Context, client *workloadClient) (*workload.JWTBundlesResponse, error) {
-	ctx, cancel := client.prepareContext(ctx)
-	defer cancel()
-	stream, err := client.FetchJWTBundles(ctx, &workload.JWTBundlesRequest{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to receive JWT bundles: %w", err)
-	}
-	return stream.Recv()
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func printPrettyResult(env *commoncli.Env, results ...any) error {
-	svidResp, ok := results[0].(*workload.JWTSVIDResponse)
-	if !ok {
-		env.Println(cliprinter.ErrInternalCustomPrettyFunc.Error())
-		return cliprinter.ErrInternalCustomPrettyFunc
-	}
-
-	bundlesResp, ok := results[1].(*workload.JWTBundlesResponse)
-	if !ok {
-		env.Println(cliprinter.ErrInternalCustomPrettyFunc.Error())
-		return cliprinter.ErrInternalCustomPrettyFunc
-	}
-
-	for _, svid := range svidResp.Svids {
-		env.Printf("token(%s):\n\t%s\n", svid.SpiffeId, svid.Svid)
-		if svid.Hint != "" {
-			env.Printf("hint(%s):\n\t%s\n", svid.SpiffeId, svid.Hint)
-		}
-	}
-
-	for trustDomainID, jwksJSON := range bundlesResp.Bundles {
-		env.Printf("bundle(%s):\n\t%s\n", trustDomainID, string(jwksJSON))
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }

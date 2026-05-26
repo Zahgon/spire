@@ -5,17 +5,10 @@ type Repository struct {
 }
 
 func (repo *Repository) GetSVIDStoreNamed(name string) (SVIDStore, bool) {
-	svidStore, ok := repo.SVIDStores[name]
-	return svidStore, ok
+	_ = "STUB: not implemented"
+	return *new(SVIDStore), false
 }
 
-func (repo *Repository) SetSVIDStore(svidStore SVIDStore) {
-	if repo.SVIDStores == nil {
-		repo.SVIDStores = make(map[string]SVIDStore)
-	}
-	repo.SVIDStores[svidStore.Name()] = svidStore
-}
+func (repo *Repository) SetSVIDStore(svidStore SVIDStore) { _ = "STUB: not implemented"; return }
 
-func (repo *Repository) Clear() {
-	repo.SVIDStores = nil
-}
+func (repo *Repository) Clear() { _ = "STUB: not implemented"; return }

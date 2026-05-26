@@ -8,43 +8,34 @@ import (
 )
 
 func PluginInitPluginServer(server PluginInitServer) pluginsdk.PluginServer {
-	return pluginInitPluginServer{PluginInitServer: server}
+	_ = "STUB: not implemented"
+	return *new(pluginsdk.PluginServer)
 }
 
 type pluginInitPluginServer struct {
 	PluginInitServer
 }
 
-func (s pluginInitPluginServer) Type() string {
-	return "PluginInit"
-}
+func (s pluginInitPluginServer) Type() string { _ = "STUB: not implemented"; return "" }
 
-func (s pluginInitPluginServer) GRPCServiceName() string {
-	return "spire.common.plugin.PluginInit"
-}
+func (s pluginInitPluginServer) GRPCServiceName() string { _ = "STUB: not implemented"; return "" }
 
 func (s pluginInitPluginServer) RegisterServer(server *grpc.Server) interface{} {
-	RegisterPluginInitServer(server, s.PluginInitServer)
-	return s.PluginInitServer
+	_ = "STUB: not implemented"
+	return nil
 }
 
 type PluginInitPluginClient struct {
 	PluginInitClient
 }
 
-func (s PluginInitPluginClient) Type() string {
-	return "PluginInit"
-}
+func (s PluginInitPluginClient) Type() string { _ = "STUB: not implemented"; return "" }
 
-func (c *PluginInitPluginClient) IsInitialized() bool {
-	return c.PluginInitClient != nil
-}
+func (c *PluginInitPluginClient) IsInitialized() bool { _ = "STUB: not implemented"; return false }
 
-func (c *PluginInitPluginClient) GRPCServiceName() string {
-	return "spire.common.plugin.PluginInit"
-}
+func (c *PluginInitPluginClient) GRPCServiceName() string { _ = "STUB: not implemented"; return "" }
 
 func (c *PluginInitPluginClient) InitClient(conn grpc.ClientConnInterface) interface{} {
-	c.PluginInitClient = NewPluginInitClient(conn)
-	return c.PluginInitClient
+	_ = "STUB: not implemented"
+	return nil
 }

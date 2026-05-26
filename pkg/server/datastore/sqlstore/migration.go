@@ -1,14 +1,9 @@
 package sqlstore
 
 import (
-	"errors"
-	"fmt"
-	"strconv"
-
 	"github.com/blang/semver/v4"
 	"github.com/jinzhu/gorm"
 	"github.com/sirupsen/logrus"
-	"github.com/spiffe/spire/pkg/common/telemetry"
 	"github.com/spiffe/spire/pkg/common/version"
 )
 
@@ -291,264 +286,103 @@ const (
 var codeVersion = semver.MustParse(version.Version())
 
 func migrateDB(db *gorm.DB, dbType string, disableMigration bool, log logrus.FieldLogger) (err error) {
+	_ = "STUB: not implemented"
 	// The version comparison logic in this package supports only 0.x and 1.x versioning semantics.
 	// It will need to be updated prior to releasing 2.x. Ensure that we're still building a pre-2.0
 	// version before continuing, and fail if we're not.
-	if codeVersion.Major > 1 {
-		log.Error("Migration code needs updating for current release version")
-		return newSQLError("current migration code not compatible with current release version")
-	}
-
-	isNew := !db.HasTable(&Migration{})
-	if err := db.Error; err != nil {
-		return newWrappedSQLError(err)
-	}
-
-	if isNew {
-		return initDB(db, dbType, log)
-	}
-
-	// ensure migrations table exists so we can check versioning in all cases
-	if err := db.AutoMigrate(&Migration{}).Error; err != nil {
-		return newWrappedSQLError(err)
-	}
-
-	migration := new(Migration)
-	if err := db.Assign(Migration{}).FirstOrCreate(migration).Error; err != nil {
-		return newWrappedSQLError(err)
-	}
-
-	schemaVersion := migration.Version
-
-	log = log.WithField(telemetry.Schema, strconv.Itoa(schemaVersion))
-
-	dbCodeVersion, err := getDBCodeVersion(*migration)
-	if err != nil {
-		log.WithError(err).Error("Error getting DB code version")
-		return newSQLError("error getting DB code version: %v", err)
-	}
-
-	log = log.WithField(telemetry.VersionInfo, dbCodeVersion.String())
-
-	if schemaVersion == latestSchemaVersion {
-		log.Debug("Code and DB schema versions are the same. No migration needed")
-
-		// same DB schema; if current code version greater than stored, store newer code version
-		if codeVersion.GT(dbCodeVersion) {
-			newMigration := Migration{
-				Version:     latestSchemaVersion,
-				CodeVersion: codeVersion.String(),
-			}
-
-			if err := db.Model(&Migration{}).Updates(newMigration).Error; err != nil {
-				return newWrappedSQLError(err)
-			}
-		}
-		return nil
-	}
-
-	if disableMigration {
-		if err = isDisabledMigrationAllowed(codeVersion, dbCodeVersion); err != nil {
-			log.WithError(err).Error("Auto-migrate must be enabled")
-			return newWrappedSQLError(err)
-		}
-		return nil
-	}
-
-	// The DB schema version can get ahead of us if the cluster is in the middle of
-	// an upgrade. So long as the version is compatible, log a warning and continue.
-	// Otherwise, we should bail out. Migration rollbacks are not supported.
-	if schemaVersion > latestSchemaVersion {
-		if !isCompatibleCodeVersion(codeVersion, dbCodeVersion) {
-			log.Error("Incompatible DB schema is too new for code version, upgrade SPIRE Server")
-			return newSQLError("incompatible DB schema and code version")
-		}
-		log.Warn("DB schema is ahead of code version, upgrading SPIRE Server is recommended")
-		return nil
-	}
-
-	// at this point:
-	// - auto-migration is enabled
-	// - schema version of DB is behind
-
-	log.Info("Running migrations...")
-	for schemaVersion < latestSchemaVersion {
-		tx := db.Begin()
-		if err := tx.Error; err != nil {
-			return newWrappedSQLError(err)
-		}
-		schemaVersion, err = migrateVersion(tx, schemaVersion, log)
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-		if err := tx.Commit().Error; err != nil {
-			return newWrappedSQLError(err)
-		}
-	}
-
-	log.Info("Done running migrations")
 	return nil
 }
 
+// ensure migrations table exists so we can check versioning in all cases
+
+// same DB schema; if current code version greater than stored, store newer code version
+
+// The DB schema version can get ahead of us if the cluster is in the middle of
+// an upgrade. So long as the version is compatible, log a warning and continue.
+// Otherwise, we should bail out. Migration rollbacks are not supported.
+
+// at this point:
+// - auto-migration is enabled
+// - schema version of DB is behind
+
 func isDisabledMigrationAllowed(thisCodeVersion, dbCodeVersion semver.Version) error {
+	_ = "STUB: not implemented"
 	// If auto-migrate is disabled, and we are running a compatible version (+/- 1
 	// minor from the stored code version) then we are done here
-	if !isCompatibleCodeVersion(thisCodeVersion, dbCodeVersion) {
-		return errors.New("auto-migration must be enabled for current DB")
-	}
 	return nil
 }
 
 func getDBCodeVersion(migration Migration) (dbCodeVersion semver.Version, err error) {
+	_ = "STUB: not implemented"
 	// default to 0.0.0
-	dbCodeVersion = semver.Version{}
-	// we will have a blank code version from pre-0.9, and fresh, datastores
-	if migration.CodeVersion != "" {
-		dbCodeVersion, err = semver.Parse(migration.CodeVersion)
-		if err != nil {
-			return dbCodeVersion, fmt.Errorf("unable to parse code version from DB: %w", err)
-		}
-	}
-	return dbCodeVersion, nil
+	return *new(semver.Version), nil
 }
 
+// we will have a blank code version from pre-0.9, and fresh, datastores
+
 func isCompatibleCodeVersion(thisCodeVersion, dbCodeVersion semver.Version) bool {
+	_ = "STUB: not implemented"
 	// If major version is the same and minor version is +/- 1, versions are compatible
-	minMinor, maxMinor := min(dbCodeVersion.Minor, thisCodeVersion.Minor), max(dbCodeVersion.Minor, thisCodeVersion.Minor)
-	return dbCodeVersion.Major == thisCodeVersion.Major && (minMinor == maxMinor || minMinor+1 == maxMinor)
+	return false
 }
 
 func initDB(db *gorm.DB, dbType string, log logrus.FieldLogger) (err error) {
-	log.Info("Initializing new database")
-	tx := db.Begin()
-	if err := tx.Error; err != nil {
-		return newWrappedSQLError(err)
-	}
-
-	tables := []any{
-		&Bundle{},
-		&AttestedNode{},
-		&AttestedNodeEvent{},
-		&NodeSelector{},
-		&RegisteredEntry{},
-		&RegisteredEntryEvent{},
-		&JoinToken{},
-		&Selector{},
-		&Migration{},
-		&DNSName{},
-		&FederatedTrustDomain{},
-		CAJournal{},
-	}
-
-	if err := tableOptionsForDialect(tx, dbType).AutoMigrate(tables...).Error; err != nil {
-		tx.Rollback()
-		return newWrappedSQLError(err)
-	}
-
-	if err := tx.Assign(Migration{
-		Version:     latestSchemaVersion,
-		CodeVersion: codeVersion.String(),
-	}).FirstOrCreate(&Migration{}).Error; err != nil {
-		tx.Rollback()
-		return newWrappedSQLError(err)
-	}
-
-	if err := addFederatedRegistrationEntriesRegisteredEntryIDIndex(tx); err != nil {
-		return err
-	}
-
-	if err := tx.Commit().Error; err != nil {
-		return newWrappedSQLError(err)
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func tableOptionsForDialect(tx *gorm.DB, dbType string) *gorm.DB {
+	_ = "STUB: not implemented"
 	// This allows for setting table options for a particular DB type.
 	// For MySQL, (for compatibility reasons) we want to make sure that
 	// we can support indexes on strings (varchar(255) in the DB).
-	if isMySQLDbType(dbType) {
-		return tx.Set("gorm:table_options", "ENGINE=InnoDB  ROW_FORMAT=DYNAMIC DEFAULT CHARSET=utf8")
-	}
-	return tx
+	return nil
 }
 
 func migrateVersion(tx *gorm.DB, currVersion int, log logrus.FieldLogger) (versionOut int, err error) {
-	log.WithField(telemetry.VersionInfo, currVersion).Info("Migrating version")
-
-	nextVersion := currVersion + 1
-	if err := tx.Model(&Migration{}).Updates(Migration{
-		Version:     nextVersion,
-		CodeVersion: version.Version(),
-	}).Error; err != nil {
-		return 0, newWrappedSQLError(err)
-	}
-
-	if currVersion < lastMinorReleaseSchemaVersion {
-		return 0, newSQLError("migrating from schema version %d requires a previous SPIRE release; please follow the upgrade strategy at doc/upgrading.md", currVersion)
-	}
-
-	// Place all migrations handled by the current minor release here. This
-	// list can be opportunistically pruned after every minor release but won't
-	// break things if it isn't.
-	//
-	// When adding a supported migration to version XX, add a case and the
-	// corresponding function. The case in the following switch statement will
-	// look like this:
-	//
-	// case XX:
-	//   err = migrateToVXX(tx)
-	//
-	// And the migrateToVXX function will be like this:
-	// func migrateToVXX(tx *gorm.DB) error {
-	//   if err := tx.AutoMigrate(&Foo{}, &Bar{}).Error; err != nil {
-	//     return sqlError.Wrap(err)
-	//   }
-	//   return nil
-	// }
-	//
-	switch currVersion {
-	case 23:
-		err = migrateToV24(tx)
-	case 24:
-		err = migrateToV25(tx)
-	default:
-		err = newSQLError("no migration support for unknown schema version %d", currVersion)
-	}
-	if err != nil {
-		return 0, err
-	}
-
-	return nextVersion, nil
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
+// Place all migrations handled by the current minor release here. This
+// list can be opportunistically pruned after every minor release but won't
+// break things if it isn't.
+//
+// When adding a supported migration to version XX, add a case and the
+// corresponding function. The case in the following switch statement will
+// look like this:
+//
+// case XX:
+//   err = migrateToVXX(tx)
+//
+// And the migrateToVXX function will be like this:
+// func migrateToVXX(tx *gorm.DB) error {
+//   if err := tx.AutoMigrate(&Foo{}, &Bar{}).Error; err != nil {
+//     return sqlError.Wrap(err)
+//   }
+//   return nil
+// }
+//
+
 func migrateToV24(tx *gorm.DB) error {
+	_ = "STUB: not implemented"
 	// Add agent_version column to attested_node_entries table
-	if err := tx.AutoMigrate(&AttestedNode{}).Error; err != nil {
-		return newWrappedSQLError(err)
-	}
 	return nil
 }
 
 func migrateToV25(tx *gorm.DB) error {
+	_ = "STUB: not implemented"
 	// Add additional_attributes column to registered_entries table
-	if err := tx.AutoMigrate(&RegisteredEntry{}).Error; err != nil {
-		return newWrappedSQLError(err)
-	}
 	return nil
 }
 
 func addFederatedRegistrationEntriesRegisteredEntryIDIndex(tx *gorm.DB) error {
+	_ = "STUB: not implemented"
 	// GORM creates the federated_registration_entries implicitly with a primary
 	// key tuple (bundle_id, registered_entry_id). Unfortunately, MySQL5 does
 	// not use the primary key index efficiently when joining by registered_entry_id
 	// during registration entry list operations. We can't use gorm AutoMigrate
 	// to introduce the index since there is no explicit struct to add tags to
 	// so we have to manually create it.
-	if err := tx.Table("federated_registration_entries").AddIndex("idx_federated_registration_entries_registered_entry_id", "registered_entry_id").Error; err != nil {
-		return newWrappedSQLError(err)
-	}
 	return nil
 }

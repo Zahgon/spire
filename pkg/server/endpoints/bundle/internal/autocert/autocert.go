@@ -41,33 +41,21 @@
 //   key match when the key a crypto.Signer and not a concrete RSA/ECDSA private
 //   key type.
 
-//nolint //forked code
+// nolint //forked code
 package autocert
 
 import (
-	"bytes"
 	"context"
 	"crypto"
-	"crypto/ecdsa"
-	"crypto/rand"
-	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
-	"encoding/pem"
-	"errors"
-	"fmt"
 	mathrand "math/rand"
-	"net"
 	"net/http"
-	"path"
-	"slices"
-	"strings"
 	"sync"
 	"time"
 
 	"golang.org/x/crypto/acme"
-	"golang.org/x/net/idna"
 )
 
 // DefaultACMEDirectory is the default ACME Directory URL used when the Manager's Client is nil.
@@ -90,12 +78,16 @@ func init() {
 // AcceptTOS is a Manager.Prompt function that always returns true to
 // indicate acceptance of the CA's Terms of Service during account
 // registration.
-func AcceptTOS(tosURL string) bool { return true }
+func AcceptTOS(tosURL string) bool {
+	_ = "STUB: not implemented"
 
-// HostPolicy specifies which host names the Manager is allowed to respond to.
-// It returns a non-nil error if the host should be rejected.
-// The returned error is accessible via tls.Conn.Handshake and its callers.
-// See Manager's HostPolicy field and GetCertificate method docs for more details.
+	// HostPolicy specifies which host names the Manager is allowed to respond to.
+	// It returns a non-nil error if the host should be rejected.
+	// The returned error is accessible via tls.Conn.Handshake and its callers.
+	// See Manager's HostPolicy field and GetCertificate method docs for more details.
+	return false
+}
+
 type HostPolicy func(ctx context.Context, host string) error
 
 // HostWhitelist returns a policy where only the specified host names are allowed.
@@ -105,35 +97,24 @@ type HostPolicy func(ctx context.Context, host string) error
 // Note that all hosts will be converted to Punycode via idna.Lookup.ToASCII so that
 // Manager.GetCertificate can handle the Unicode IDN and mixedcase hosts correctly.
 // Invalid hosts will be silently ignored.
-func HostWhitelist(hosts ...string) HostPolicy {
-	whitelist := make(map[string]bool, len(hosts))
-	for _, h := range hosts {
-		if h, err := idna.Lookup.ToASCII(h); err == nil {
-			whitelist[h] = true
-		}
-	}
-	return func(_ context.Context, host string) error {
-		if !whitelist[host] {
-			return fmt.Errorf("acme/autocert: host %q not configured in HostWhitelist", host)
-		}
-		return nil
-	}
-}
+func HostWhitelist(hosts ...string) HostPolicy { _ = "STUB: not implemented"; return *new(HostPolicy) }
 
 // defaultHostPolicy is used when Manager.HostPolicy is not set.
 func defaultHostPolicy(context.Context, string) error {
+	_ = "STUB: not implemented"
+
+	// Manager is a stateful certificate manager built on top of acme.Client.
+	// It obtains and refreshes certificates automatically using "tls-alpn-01"
+	// or "http-01" challenge types, as well as providing them to a TLS server
+	// via tls.Config.
+	//
+	// You must specify a cache implementation, such as DirCache,
+	// to reuse obtained certificates across program restarts.
+	// Otherwise, your server is very likely to exceed the certificate
+	// issuer's request rate limits.
 	return nil
 }
 
-// Manager is a stateful certificate manager built on top of acme.Client.
-// It obtains and refreshes certificates automatically using "tls-alpn-01"
-// or "http-01" challenge types, as well as providing them to a TLS server
-// via tls.Config.
-//
-// You must specify a cache implementation, such as DirCache,
-// to reuse obtained certificates across program restarts.
-// Otherwise, your server is very likely to exceed the certificate
-// issuer's request rate limits.
 type Manager struct {
 	// Prompt specifies a callback function to conditionally accept a CA's Terms of Service (TOS).
 	// The registration may require the caller to agree to the CA's TOS.
@@ -243,27 +224,14 @@ type certKey struct {
 	isToken bool   // tls-based challenge token cert; key type is undefined regardless of isRSA
 }
 
-func (c certKey) String() string {
-	if c.isToken {
-		return c.domain + "+token"
-	}
-	if c.isRSA {
-		return c.domain + "+rsa"
-	}
-	return c.domain
-}
+func (c certKey) String() string { _ = "STUB: not implemented"; return "" }
 
 // TLSConfig creates a new TLS config suitable for net/http.Server servers,
 // supporting HTTP/2 and the tls-alpn-01 ACME challenge type.
-func (m *Manager) TLSConfig() *tls.Config {
-	return &tls.Config{
-		GetCertificate: m.GetCertificate,
-		NextProtos: []string{
-			"h2", "http/1.1", // enable HTTP/2
-			acme.ALPNProto, // enable tls-alpn ACME challenges
-		},
-	}
-}
+func (m *Manager) TLSConfig() *tls.Config { _ = "STUB: not implemented"; return nil }
+
+// enable HTTP/2
+// enable tls-alpn ACME challenges
 
 // GetCertificate implements the tls.Config.GetCertificate hook.
 // It provides a TLS certificate for hello.ServerName host, including answering
@@ -278,124 +246,48 @@ func (m *Manager) TLSConfig() *tls.Config {
 // If GetCertificate is used directly, instead of via Manager.TLSConfig, package users will
 // also have to add acme.ALPNProto to NextProtos for tls-alpn-01, or use HTTPHandler for http-01.
 func (m *Manager) GetCertificate(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
-	if m.Prompt == nil {
-		return nil, errors.New("acme/autocert: Manager.Prompt not set")
-	}
-
-	name := hello.ServerName
-	if name == "" {
-		return nil, errors.New("acme/autocert: missing server name")
-	}
-	if !strings.Contains(strings.Trim(name, "."), ".") {
-		return nil, errors.New("acme/autocert: server name component count invalid")
-	}
-
-	// Note that this conversion is necessary because some server names in the handshakes
-	// started by some clients (such as cURL) are not converted to Punycode, which will
-	// prevent us from obtaining certificates for them. In addition, we should also treat
-	// example.com and EXAMPLE.COM as equivalent and return the same certificate for them.
-	// Fortunately, this conversion also helped us deal with this kind of mixedcase problems.
-	//
-	// Due to the "σςΣ" problem (see https://unicode.org/faq/idn.html#22), we can't use
-	// idna.Punycode.ToASCII (or just idna.ToASCII) here.
-	name, err := idna.Lookup.ToASCII(name)
-	if err != nil {
-		return nil, errors.New("acme/autocert: server name contains invalid character")
-	}
-
-	// In the worst-case scenario, the timeout needs to account for caching, host policy,
-	// domain ownership verification and certificate issuance.
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
-	defer cancel()
-
-	// Check whether this is a token cert requested for TLS-ALPN challenge.
-	if wantsTokenCert(hello) {
-		m.challengeMu.RLock()
-		defer m.challengeMu.RUnlock()
-		if cert := m.certTokens[name]; cert != nil {
-			return cert, nil
-		}
-		if cert, err := m.cacheGet(ctx, certKey{domain: name, isToken: true}); err == nil {
-			return cert, nil
-		}
-		// TODO: cache error results?
-		return nil, fmt.Errorf("acme/autocert: no token cert for %q", name)
-	}
-
-	// regular domain
-	ck := certKey{
-		domain: strings.TrimSuffix(name, "."), // golang.org/issue/18114
-		isRSA:  !supportsECDSA(hello),
-	}
-	cert, err := m.cert(ctx, ck)
-	if err == nil {
-		return cert, nil
-	}
-	if err != ErrCacheMiss {
-		return nil, err
-	}
-
-	// first-time
-	if err := m.hostPolicy()(ctx, name); err != nil {
-		return nil, err
-	}
-	cert, err = m.createCert(ctx, ck)
-	if err != nil {
-		return nil, err
-	}
-	m.cachePut(ctx, ck, cert)
-	return cert, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Note that this conversion is necessary because some server names in the handshakes
+// started by some clients (such as cURL) are not converted to Punycode, which will
+// prevent us from obtaining certificates for them. In addition, we should also treat
+// example.com and EXAMPLE.COM as equivalent and return the same certificate for them.
+// Fortunately, this conversion also helped us deal with this kind of mixedcase problems.
+//
+// Due to the "σςΣ" problem (see https://unicode.org/faq/idn.html#22), we can't use
+// idna.Punycode.ToASCII (or just idna.ToASCII) here.
+
+// In the worst-case scenario, the timeout needs to account for caching, host policy,
+// domain ownership verification and certificate issuance.
+
+// Check whether this is a token cert requested for TLS-ALPN challenge.
+
+// TODO: cache error results?
+
+// regular domain
+
+// golang.org/issue/18114
+
+// first-time
 
 // wantsTokenCert reports whether a TLS request with SNI is made by a CA server
 // for a challenge verification.
 func wantsTokenCert(hello *tls.ClientHelloInfo) bool {
+	_ = "STUB: not implemented"
 	// tls-alpn-01
-	if len(hello.SupportedProtos) == 1 && hello.SupportedProtos[0] == acme.ALPNProto {
-		return true
-	}
 	return false
 }
 
 func supportsECDSA(hello *tls.ClientHelloInfo) bool {
+	_ = "STUB: not implemented"
 	// The "signature_algorithms" extension, if present, limits the key exchange
 	// algorithms allowed by the cipher suites. See RFC 5246, section 7.4.1.4.1.
-	if hello.SignatureSchemes != nil {
-		ecdsaOK := false
-	schemeLoop:
-		for _, scheme := range hello.SignatureSchemes {
-			const tlsECDSAWithSHA1 tls.SignatureScheme = 0x0203 // constant added in Go 1.10
-			switch scheme {
-			case tlsECDSAWithSHA1, tls.ECDSAWithP256AndSHA256,
-				tls.ECDSAWithP384AndSHA384, tls.ECDSAWithP521AndSHA512:
-				ecdsaOK = true
-				break schemeLoop
-			}
-		}
-		if !ecdsaOK {
-			return false
-		}
-	}
-	if hello.SupportedCurves != nil {
-		ecdsaOK := slices.Contains(hello.SupportedCurves, tls.CurveP256)
-		if !ecdsaOK {
-			return false
-		}
-	}
-	for _, suite := range hello.CipherSuites {
-		switch suite {
-		case tls.TLS_ECDHE_ECDSA_WITH_RC4_128_SHA,
-			tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
-			tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
-			tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,
-			tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
-			tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
-			tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305:
-			return true
-		}
-	}
 	return false
 }
+
+// constant added in Go 1.10
 
 // HTTPHandler configures the Manager to provision ACME "http-01" challenge responses.
 // It returns an http.Handler that responds to the challenges and must be
@@ -413,155 +305,54 @@ func supportsECDSA(hello *tls.ClientHelloInfo) bool {
 // If HTTPHandler is never called, the Manager will only use the "tls-alpn-01"
 // challenge for domain verification.
 func (m *Manager) HTTPHandler(fallback http.Handler) http.Handler {
-	m.challengeMu.Lock()
-	defer m.challengeMu.Unlock()
-	m.tryHTTP01 = true
-
-	if fallback == nil {
-		fallback = http.HandlerFunc(handleHTTPRedirect)
-	}
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !strings.HasPrefix(r.URL.Path, "/.well-known/acme-challenge/") {
-			fallback.ServeHTTP(w, r)
-			return
-		}
-		// A reasonable context timeout for cache and host policy only,
-		// because we don't wait for a new certificate issuance here.
-		ctx, cancel := context.WithTimeout(r.Context(), time.Minute)
-		defer cancel()
-		if err := m.hostPolicy()(ctx, r.Host); err != nil {
-			http.Error(w, err.Error(), http.StatusForbidden)
-			return
-		}
-		data, err := m.httpToken(ctx, r.URL.Path)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusNotFound)
-			return
-		}
-		w.Write(data)
-	})
+	_ = "STUB: not implemented"
+	return *new(http.Handler)
 }
 
-func handleHTTPRedirect(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" && r.Method != "HEAD" {
-		http.Error(w, "Use HTTPS", http.StatusBadRequest)
-		return
-	}
-	target := "https://" + stripPort(r.Host) + r.URL.RequestURI()
-	http.Redirect(w, r, target, http.StatusFound)
-}
+// A reasonable context timeout for cache and host policy only,
+// because we don't wait for a new certificate issuance here.
 
-func stripPort(hostport string) string {
-	host, _, err := net.SplitHostPort(hostport)
-	if err != nil {
-		return hostport
-	}
-	return net.JoinHostPort(host, "443")
-}
+func handleHTTPRedirect(w http.ResponseWriter, r *http.Request) { _ = "STUB: not implemented"; return }
+
+func stripPort(hostport string) string { _ = "STUB: not implemented"; return "" }
 
 // cert returns an existing certificate either from m.state or cache.
 // If a certificate is found in cache but not in m.state, the latter will be filled
 // with the cached value.
 func (m *Manager) cert(ctx context.Context, ck certKey) (*tls.Certificate, error) {
-	m.stateMu.Lock()
-	if s, ok := m.state[ck]; ok {
-		m.stateMu.Unlock()
-		s.RLock()
-		defer s.RUnlock()
-		return s.tlscert()
-	}
-	defer m.stateMu.Unlock()
-	cert, err := m.cacheGet(ctx, ck)
-	if err != nil {
-		return nil, err
-	}
-	signer, ok := cert.PrivateKey.(crypto.Signer)
-	if !ok {
-		return nil, errors.New("acme/autocert: private key cannot sign")
-	}
-	if m.state == nil {
-		m.state = make(map[certKey]*certState)
-	}
-	s := &certState{
-		key:  signer,
-		cert: cert.Certificate,
-		leaf: cert.Leaf,
-	}
-	m.state[ck] = s
-	go m.renew(ck, s.key, s.leaf.NotAfter)
-	return cert, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // cacheGet always returns a valid certificate, or an error otherwise.
 // If a cached certificate exists but is not valid, ErrCacheMiss is returned.
 func (m *Manager) cacheGet(ctx context.Context, ck certKey) (*tls.Certificate, error) {
-	if m.Cache == nil {
-		return nil, ErrCacheMiss
-	}
-	pub, err := m.Cache.Get(ctx, ck.String())
-	if err != nil {
-		return nil, err
-	}
-
-	// public
-	var pubDER [][]byte
-	for len(pub) > 0 {
-		var b *pem.Block
-		b, pub = pem.Decode(pub)
-		if b == nil {
-			break
-		}
-		pubDER = append(pubDER, b.Bytes)
-	}
-	if len(pub) > 0 {
-		// Leftover content not consumed by pem.Decode. Corrupt. Ignore.
-		return nil, ErrCacheMiss
-	}
-
-	privateKey, err := m.KeyStore.GetPrivateKey(ctx, ck.String())
-	if err != nil {
-		// No such private key. Corrupt. Ignore.
-		return nil, ErrCacheMiss
-	}
-
-	// verify and create TLS cert
-	leaf, err := validCert(ck, pubDER, privateKey, m.now())
-	if err != nil {
-		return nil, ErrCacheMiss
-	}
-
-	tlscert := &tls.Certificate{
-		Certificate: pubDER,
-		PrivateKey:  privateKey,
-		Leaf:        leaf,
-		// Limit the supported signature algorithms to those that use SHA256
-		// to align with a minimum set supported by known key managers.
-		// See issue #2302.
-		// TODO: Query the key manager for supported algorithms to determine
-		// this set dynamically.
-		SupportedSignatureAlgorithms: supportedSignatureAlgorithms(privateKey),
-	}
-	return tlscert, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// public
+
+// Leftover content not consumed by pem.Decode. Corrupt. Ignore.
+
+// No such private key. Corrupt. Ignore.
+
+// verify and create TLS cert
+
+// Limit the supported signature algorithms to those that use SHA256
+// to align with a minimum set supported by known key managers.
+// See issue #2302.
+// TODO: Query the key manager for supported algorithms to determine
+// this set dynamically.
 
 func (m *Manager) cachePut(ctx context.Context, ck certKey, tlscert *tls.Certificate) error {
-	if m.Cache == nil {
-		return nil
-	}
-
-	// contains PEM-encoded data
-	var buf bytes.Buffer
-
-	// public
-	for _, b := range tlscert.Certificate {
-		pb := &pem.Block{Type: "CERTIFICATE", Bytes: b}
-		if err := pem.Encode(&buf, pb); err != nil {
-			return err
-		}
-	}
-
-	return m.Cache.Put(ctx, ck.String(), buf.Bytes())
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// contains PEM-encoded data
+
+// public
 
 // createCert starts the domain ownership verification and returns a certificate
 // for that domain upon success.
@@ -569,293 +360,112 @@ func (m *Manager) cachePut(ctx context.Context, ck certKey, tlscert *tls.Certifi
 // If the domain is already being verified, it waits for the existing verification to complete.
 // Either way, createCert blocks for the duration of the whole process.
 func (m *Manager) createCert(ctx context.Context, ck certKey) (*tls.Certificate, error) {
+	_ = "STUB: not implemented"
 	// TODO: maybe rewrite this whole piece using sync.Once
-	state, err := m.certState(ctx, ck)
-	if err != nil {
-		return nil, err
-	}
-	// state may exist if another goroutine is already working on it
-	// in which case just wait for it to finish
-	if !state.locked {
-		state.RLock()
-		defer state.RUnlock()
-		return state.tlscert()
-	}
-
-	// We are the first; state is locked.
-	// Unblock the readers when domain ownership is verified,
-	// and we got the cert or the process failed.
-	defer state.Unlock()
-	state.locked = false
-
-	der, leaf, err := m.authorizedCert(ctx, state.key, ck)
-	if err != nil {
-		// Remove the failed state after some time,
-		// making the manager call createCert again on the following TLS hello.
-		time.AfterFunc(createCertRetryAfter, func() {
-			defer testDidRemoveState(ck)
-			m.stateMu.Lock()
-			defer m.stateMu.Unlock()
-			// Verify the state hasn't changed and it's still invalid
-			// before deleting.
-			s, ok := m.state[ck]
-			if !ok {
-				return
-			}
-			if _, err := validCert(ck, s.cert, s.key, m.now()); err == nil {
-				return
-			}
-			delete(m.state, ck)
-		})
-		return nil, err
-	}
-	state.cert = der
-	state.leaf = leaf
-	go m.renew(ck, state.key, state.leaf.NotAfter)
-	return state.tlscert()
+	return nil, nil
 }
+
+// state may exist if another goroutine is already working on it
+// in which case just wait for it to finish
+
+// We are the first; state is locked.
+// Unblock the readers when domain ownership is verified,
+// and we got the cert or the process failed.
+
+// Remove the failed state after some time,
+// making the manager call createCert again on the following TLS hello.
+
+// Verify the state hasn't changed and it's still invalid
+// before deleting.
 
 // certState returns a new or existing certState.
 // If a new certState is returned, state.exist is false and the state is locked.
 // The returned error is non-nil only in the case where a new state could not be created.
 func (m *Manager) certState(ctx context.Context, ck certKey) (*certState, error) {
-	m.stateMu.Lock()
-	defer m.stateMu.Unlock()
-	if m.state == nil {
-		m.state = make(map[certKey]*certState)
-	}
-	// existing state
-	if state, ok := m.state[ck]; ok {
-		return state, nil
-	}
-
-	// new locked state
-	var (
-		err error
-		key crypto.Signer
-	)
-	if ck.isRSA {
-		key, err = m.KeyStore.NewPrivateKey(ctx, ck.String(), RSA2048)
-	} else {
-		key, err = m.KeyStore.NewPrivateKey(ctx, ck.String(), EC256)
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	state := &certState{
-		key:    key,
-		locked: true,
-	}
-	state.Lock() // will be unlocked by m.certState caller
-	m.state[ck] = state
-	return state, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// existing state
+
+// new locked state
+
+// will be unlocked by m.certState caller
 
 // authorizedCert starts the domain ownership verification process and requests a new cert upon success.
 // The key argument is the certificate private key.
 func (m *Manager) authorizedCert(ctx context.Context, key crypto.Signer, ck certKey) (der [][]byte, leaf *x509.Certificate, err error) {
-	csr, err := certRequest(key, ck.domain, m.ExtraExtensions)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	client, err := m.acmeClient(ctx)
-	if err != nil {
-		return nil, nil, err
-	}
-	dir, err := client.Discover(ctx)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	var chain [][]byte
-	switch {
-	// Pre-RFC legacy CA.
-	case dir.OrderURL == "":
-		if err := m.verify(ctx, client, ck.domain); err != nil {
-			return nil, nil, err
-		}
-		der, _, err := client.CreateCert(ctx, csr, 0, true)
-		if err != nil {
-			return nil, nil, err
-		}
-		chain = der
-	// RFC 8555 compliant CA.
-	default:
-		o, err := m.verifyRFC(ctx, client, ck.domain)
-		if err != nil {
-			return nil, nil, err
-		}
-		der, _, err := client.CreateOrderCert(ctx, o.FinalizeURL, csr, true)
-		if err != nil {
-			return nil, nil, err
-		}
-		chain = der
-	}
-	leaf, err = validCert(ck, chain, key, m.now())
-	if err != nil {
-		return nil, nil, err
-	}
-	return chain, leaf, nil
+	_ = "STUB: not implemented"
+	return nil, nil, nil
 }
+
+// Pre-RFC legacy CA.
+
+// RFC 8555 compliant CA.
 
 // verify runs the identifier (domain) pre-authorization flow for legacy CAs
 // using each applicable ACME challenge type.
 func (m *Manager) verify(ctx context.Context, client *acme.Client, domain string) error {
+	_ = "STUB: not implemented"
 	// Remove all hanging authorizations to reduce rate limit quotas
 	// after we're done.
-	var authzURLs []string
-	defer func() {
-		go m.deactivatePendingAuthz(authzURLs)
-	}()
-
-	// errs accumulates challenge failure errors, printed if all fail
-	errs := make(map[*acme.Challenge]error)
-	challengeTypes := m.supportedChallengeTypes()
-	var nextTyp int // challengeType index of the next challenge type to try
-	for {
-		// Start domain authorization and get the challenge.
-		authz, err := client.Authorize(ctx, domain)
-		if err != nil {
-			return err
-		}
-		authzURLs = append(authzURLs, authz.URI)
-		// No point in accepting challenges if the authorization status
-		// is in a final state.
-		switch authz.Status {
-		case acme.StatusValid:
-			return nil // already authorized
-		case acme.StatusInvalid:
-			return fmt.Errorf("acme/autocert: invalid authorization %q", authz.URI)
-		}
-
-		// Pick the next preferred challenge.
-		var chal *acme.Challenge
-		for chal == nil && nextTyp < len(challengeTypes) {
-			chal = pickChallenge(challengeTypes[nextTyp], authz.Challenges)
-			nextTyp++
-		}
-		if chal == nil {
-			errorMsg := fmt.Sprintf("acme/autocert: unable to authorize %q", domain)
-			for chal, err := range errs {
-				errorMsg += fmt.Sprintf("; challenge %q failed with error: %v", chal.Type, err)
-			}
-			return errors.New(errorMsg)
-		}
-		cleanup, err := m.fulfill(ctx, client, chal, domain)
-		if err != nil {
-			errs[chal] = err
-			continue
-		}
-		defer cleanup()
-		if _, err := client.Accept(ctx, chal); err != nil {
-			errs[chal] = err
-			continue
-		}
-
-		// A challenge is fulfilled and accepted: wait for the CA to validate.
-		if _, err := client.WaitAuthorization(ctx, authz.URI); err != nil {
-			errs[chal] = err
-			continue
-		}
-		return nil
-	}
+	return nil
 }
+
+// errs accumulates challenge failure errors, printed if all fail
+
+// challengeType index of the next challenge type to try
+
+// Start domain authorization and get the challenge.
+
+// No point in accepting challenges if the authorization status
+// is in a final state.
+
+// already authorized
+
+// Pick the next preferred challenge.
+
+// A challenge is fulfilled and accepted: wait for the CA to validate.
 
 // verifyRFC runs the identifier (domain) order-based authorization flow for RFC compliant CAs
 // using each applicable ACME challenge type.
 func (m *Manager) verifyRFC(ctx context.Context, client *acme.Client, domain string) (*acme.Order, error) {
+	_ = "STUB: not implemented"
 	// Try each supported challenge type starting with a new order each time.
 	// The nextTyp index of the next challenge type to try is shared across
 	// all order authorizations: if we've tried a challenge type once, and it didn't work,
 	// it will most likely not work on another order's authorization either.
-	challengeTypes := m.supportedChallengeTypes()
-	nextTyp := 0 // challengeTypes index
-AuthorizeOrderLoop:
-	for {
-		o, err := client.AuthorizeOrder(ctx, acme.DomainIDs(domain))
-		if err != nil {
-			return nil, err
-		}
-		// Remove all hanging authorizations to reduce rate limit quotas
-		// after we're done.
-		defer func() {
-			go m.deactivatePendingAuthz(o.AuthzURLs)
-		}()
-
-		// Check if there's actually anything we need to do.
-		switch o.Status {
-		case acme.StatusReady:
-			// Already authorized.
-			return o, nil
-		case acme.StatusPending:
-			// Continue normal Order-based flow.
-		default:
-			return nil, fmt.Errorf("acme/autocert: invalid new order status %q; order URL: %q", o.Status, o.URI)
-		}
-
-		// Satisfy all pending authorizations.
-		for _, zurl := range o.AuthzURLs {
-			z, err := client.GetAuthorization(ctx, zurl)
-			if err != nil {
-				return nil, err
-			}
-			if z.Status != acme.StatusPending {
-				// We are interested only in pending authorizations.
-				continue
-			}
-			// Pick the next preferred challenge.
-			var chal *acme.Challenge
-			for chal == nil && nextTyp < len(challengeTypes) {
-				chal = pickChallenge(challengeTypes[nextTyp], z.Challenges)
-				nextTyp++
-			}
-			if chal == nil {
-				return nil, fmt.Errorf("acme/autocert: unable to satisfy %q for domain %q: no viable challenge type found", z.URI, domain)
-			}
-			// Respond to the challenge and wait for validation result.
-			cleanup, err := m.fulfill(ctx, client, chal, domain)
-			if err != nil {
-				continue AuthorizeOrderLoop
-			}
-			defer cleanup()
-			if _, err := client.Accept(ctx, chal); err != nil {
-				continue AuthorizeOrderLoop
-			}
-			if _, err := client.WaitAuthorization(ctx, z.URI); err != nil {
-				continue AuthorizeOrderLoop
-			}
-		}
-
-		// All authorizations are satisfied.
-		// Wait for the CA to update the order status.
-		o, err = client.WaitOrder(ctx, o.URI)
-		if err != nil {
-			continue AuthorizeOrderLoop
-		}
-		return o, nil
-	}
+	return nil, nil
 }
 
+// challengeTypes index
+
+// Remove all hanging authorizations to reduce rate limit quotas
+// after we're done.
+
+// Check if there's actually anything we need to do.
+
+// Already authorized.
+
+// Continue normal Order-based flow.
+
+// Satisfy all pending authorizations.
+
+// We are interested only in pending authorizations.
+
+// Pick the next preferred challenge.
+
+// Respond to the challenge and wait for validation result.
+
+// All authorizations are satisfied.
+// Wait for the CA to update the order status.
+
 func pickChallenge(typ string, chal []*acme.Challenge) *acme.Challenge {
-	for _, c := range chal {
-		if c.Type == typ {
-			return c
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (m *Manager) supportedChallengeTypes() []string {
-	m.challengeMu.RLock()
-	defer m.challengeMu.RUnlock()
-	typ := []string{"tls-alpn-01"}
-	if m.tryHTTP01 {
-		typ = append(typ, "http-01")
-	}
-	return typ
-}
+func (m *Manager) supportedChallengeTypes() []string { _ = "STUB: not implemented"; return nil }
 
 // deactivatePendingAuthz relinquishes all authorizations identified by the elements
 // of the provided uri slice which are in "pending" state.
@@ -864,80 +474,31 @@ func (m *Manager) supportedChallengeTypes() []string {
 // deactivatePendingAuthz takes no context argument and instead runs with its own
 // "detached" context because deactivations are done in a goroutine separate from
 // that of the main issuance or renewal flow.
-func (m *Manager) deactivatePendingAuthz(uri []string) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
-	defer cancel()
-	client, err := m.acmeClient(ctx)
-	if err != nil {
-		return
-	}
-	for _, u := range uri {
-		z, err := client.GetAuthorization(ctx, u)
-		if err == nil && z.Status == acme.StatusPending {
-			client.RevokeAuthorization(ctx, u)
-		}
-	}
-}
+func (m *Manager) deactivatePendingAuthz(uri []string) { _ = "STUB: not implemented"; return }
 
 // fulfill provisions a response to the challenge chal.
 // The cleanup is non-nil only if provisioning succeeded.
 func (m *Manager) fulfill(ctx context.Context, client *acme.Client, chal *acme.Challenge, domain string) (cleanup func(), err error) {
-	switch chal.Type {
-	case "tls-alpn-01":
-		cert, err := client.TLSALPN01ChallengeCert(chal.Token, domain)
-		if err != nil {
-			return nil, err
-		}
-		m.putCertToken(ctx, domain, &cert)
-		return func() { go m.deleteCertToken(domain) }, nil
-	case "http-01":
-		resp, err := client.HTTP01ChallengeResponse(chal.Token)
-		if err != nil {
-			return nil, err
-		}
-		p := client.HTTP01ChallengePath(chal.Token)
-		m.putHTTPToken(ctx, p, resp)
-		return func() { go m.deleteHTTPToken(p) }, nil
-	}
-	return nil, fmt.Errorf("acme/autocert: unknown challenge type %q", chal.Type)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // putCertToken stores the token certificate with the specified name
 // in both m.certTokens map and m.Cache.
 func (m *Manager) putCertToken(ctx context.Context, name string, cert *tls.Certificate) {
-	m.challengeMu.Lock()
-	defer m.challengeMu.Unlock()
-	if m.certTokens == nil {
-		m.certTokens = make(map[string]*tls.Certificate)
-	}
-	m.certTokens[name] = cert
-	m.cachePut(ctx, certKey{domain: name, isToken: true}, cert)
+	_ = "STUB: not implemented"
+	return
 }
 
 // deleteCertToken removes the token certificate with the specified name
 // from both m.certTokens map and m.Cache.
-func (m *Manager) deleteCertToken(name string) {
-	m.challengeMu.Lock()
-	defer m.challengeMu.Unlock()
-	delete(m.certTokens, name)
-	if m.Cache != nil {
-		ck := certKey{domain: name, isToken: true}
-		m.Cache.Delete(context.Background(), ck.String())
-	}
-}
+func (m *Manager) deleteCertToken(name string) { _ = "STUB: not implemented"; return }
 
 // httpToken retrieves an existing http-01 token value from an in-memory map
 // or the optional cache.
 func (m *Manager) httpToken(ctx context.Context, tokenPath string) ([]byte, error) {
-	m.challengeMu.RLock()
-	defer m.challengeMu.RUnlock()
-	if v, ok := m.httpTokens[tokenPath]; ok {
-		return v, nil
-	}
-	if m.Cache == nil {
-		return nil, fmt.Errorf("acme/autocert: no token at %q", tokenPath)
-	}
-	return m.Cache.Get(ctx, httpTokenCacheKey(tokenPath))
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // putHTTPToken stores a http-01 token value using tokenPath as key
@@ -945,36 +506,19 @@ func (m *Manager) httpToken(ctx context.Context, tokenPath string) ([]byte, erro
 //
 // It ignores any error returned from Cache.Put.
 func (m *Manager) putHTTPToken(ctx context.Context, tokenPath, val string) {
-	m.challengeMu.Lock()
-	defer m.challengeMu.Unlock()
-	if m.httpTokens == nil {
-		m.httpTokens = make(map[string][]byte)
-	}
-	b := []byte(val)
-	m.httpTokens[tokenPath] = b
-	if m.Cache != nil {
-		m.Cache.Put(ctx, httpTokenCacheKey(tokenPath), b)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // deleteHTTPToken removes a http-01 token value from both in-memory map
 // and the optional Cache, ignoring any error returned from the latter.
 //
 // If m.Cache is non-nil, it blocks until Cache.Delete returns without a timeout.
-func (m *Manager) deleteHTTPToken(tokenPath string) {
-	m.challengeMu.Lock()
-	defer m.challengeMu.Unlock()
-	delete(m.httpTokens, tokenPath)
-	if m.Cache != nil {
-		m.Cache.Delete(context.Background(), httpTokenCacheKey(tokenPath))
-	}
-}
+func (m *Manager) deleteHTTPToken(tokenPath string) { _ = "STUB: not implemented"; return }
 
 // httpTokenCacheKey returns a key at which a http-01 token value may be stored
 // in the Manager's optional Cache.
-func httpTokenCacheKey(tokenPath string) string {
-	return path.Base(tokenPath) + "+http-01"
-}
+func httpTokenCacheKey(tokenPath string) string { _ = "STUB: not implemented"; return "" }
 
 // renew starts a cert renewal timer loop, one per domain.
 //
@@ -985,113 +529,40 @@ func httpTokenCacheKey(tokenPath string) string {
 // The key argument is a certificate private key.
 // The exp argument is the cert expiration time (NotAfter).
 func (m *Manager) renew(ck certKey, key crypto.Signer, exp time.Time) {
-	m.renewalMu.Lock()
-	defer m.renewalMu.Unlock()
-	if m.renewal[ck] != nil {
-		// another goroutine is already on it
-		return
-	}
-	if m.renewal == nil {
-		m.renewal = make(map[certKey]*domainRenewal)
-	}
-	dr := &domainRenewal{m: m, ck: ck, key: key}
-	m.renewal[ck] = dr
-	dr.start(exp)
+	_ = "STUB: not implemented"
+	return
 }
+
+// another goroutine is already on it
 
 // stopRenew stops all currently running cert renewal timers.
 // The timers are not restarted during the lifetime of the Manager.
-func (m *Manager) stopRenew() {
-	m.renewalMu.Lock()
-	defer m.renewalMu.Unlock()
-	for name, dr := range m.renewal {
-		delete(m.renewal, name)
-		dr.stop()
-	}
-}
+func (m *Manager) stopRenew() { _ = "STUB: not implemented"; return }
 
 func (m *Manager) accountKey(ctx context.Context) (crypto.Signer, error) {
-	const keyName = "acme_account+key"
-
-	privKey, err := m.KeyStore.GetPrivateKey(ctx, keyName)
-	switch {
-	case err == nil:
-		return privKey, nil
-	case err == ErrNoSuchKey:
-		privKey, err = m.KeyStore.NewPrivateKey(ctx, keyName, EC256)
-		if err != nil {
-			return nil, fmt.Errorf("acme/autocert: unable to generate account key: %v", err)
-		}
-		return privKey, nil
-	default:
-		return nil, fmt.Errorf("acme/autocert: unable to get account key: %v", err)
-	}
+	_ = "STUB: not implemented"
+	return *new(crypto.Signer), nil
 }
 
 func (m *Manager) acmeClient(ctx context.Context) (*acme.Client, error) {
-	m.clientMu.Lock()
-	defer m.clientMu.Unlock()
-	if m.client != nil {
-		return m.client, nil
-	}
-
-	client := m.Client
-	if client == nil {
-		client = &acme.Client{DirectoryURL: DefaultACMEDirectory}
-	}
-	if client.Key == nil {
-		var err error
-		client.Key, err = m.accountKey(ctx)
-		if err != nil {
-			return nil, err
-		}
-	}
-	if client.UserAgent == "" {
-		client.UserAgent = "autocert"
-	}
-	var contact []string
-	if m.Email != "" {
-		contact = []string{"mailto:" + m.Email}
-	}
-	a := &acme.Account{Contact: contact}
-	_, err := client.Register(ctx, a, m.Prompt)
-	if err == nil || isAccountAlreadyExist(err) {
-		m.client = client
-		err = nil
-	}
-	return m.client, err
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // isAccountAlreadyExist reports whether the err, as returned from acme.Client.Register,
 // indicates the account has already been registered.
-func isAccountAlreadyExist(err error) bool {
-	if err == acme.ErrAccountAlreadyExists {
-		return true
-	}
-	ae, ok := err.(*acme.Error)
-	return ok && ae.StatusCode == http.StatusConflict
-}
+func isAccountAlreadyExist(err error) bool { _ = "STUB: not implemented"; return false }
 
-func (m *Manager) hostPolicy() HostPolicy {
-	if m.HostPolicy != nil {
-		return m.HostPolicy
-	}
-	return defaultHostPolicy
-}
+func (m *Manager) hostPolicy() HostPolicy { _ = "STUB: not implemented"; return *new(HostPolicy) }
 
 func (m *Manager) renewBefore() time.Duration {
-	if m.RenewBefore > renewJitter {
-		return m.RenewBefore
-	}
-	return 720 * time.Hour // 30 days
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
-func (m *Manager) now() time.Time {
-	if m.nowFunc != nil {
-		return m.nowFunc()
-	}
-	return time.Now()
-}
+// 30 days
+
+func (m *Manager) now() time.Time { _ = "STUB: not implemented"; return *new(time.Time) }
 
 // certState is ready when its mutex is unlocked for reading.
 type certState struct {
@@ -1104,34 +575,18 @@ type certState struct {
 
 // tlscert creates a tls.Certificate from s.key and s.cert.
 // Callers should wrap it in s.RLock() and s.RUnlock().
-func (s *certState) tlscert() (*tls.Certificate, error) {
-	if s.key == nil {
-		return nil, errors.New("acme/autocert: missing signer")
-	}
-	if len(s.cert) == 0 {
-		return nil, errors.New("acme/autocert: missing certificate")
-	}
-	return &tls.Certificate{
-		PrivateKey:  s.key,
-		Certificate: s.cert,
-		Leaf:        s.leaf,
-		// Limit the supported signature algorithms to those that use SHA256
-		// to align with a minimum set supported by known key managers.
-		// See issue #2302.
-		// TODO: Query the key manager for supported algorithms to determine
-		// this set dynamically.
-		SupportedSignatureAlgorithms: supportedSignatureAlgorithms(s.key),
-	}, nil
-}
+func (s *certState) tlscert() (*tls.Certificate, error) { _ = "STUB: not implemented"; return nil, nil }
+
+// Limit the supported signature algorithms to those that use SHA256
+// to align with a minimum set supported by known key managers.
+// See issue #2302.
+// TODO: Query the key manager for supported algorithms to determine
+// this set dynamically.
 
 // certRequest generates a CSR for the given common name cn and optional SANs.
 func certRequest(key crypto.Signer, cn string, ext []pkix.Extension, san ...string) ([]byte, error) {
-	req := &x509.CertificateRequest{
-		Subject:         pkix.Name{CommonName: cn},
-		DNSNames:        san,
-		ExtraExtensions: ext,
-	}
-	return x509.CreateCertificateRequest(rand.Reader, req, key)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // validCert parses a cert chain provided as der argument and verifies the leaf and der[0]
@@ -1140,82 +595,25 @@ func certRequest(key crypto.Signer, cn string, ext []pkix.Extension, san ...stri
 //
 // The returned value is the verified leaf cert.
 func validCert(ck certKey, der [][]byte, key crypto.Signer, now time.Time) (leaf *x509.Certificate, err error) {
+	_ = "STUB: not implemented"
 	// parse public part(s)
-	var n int
-	for _, b := range der {
-		n += len(b)
-	}
-	pub := make([]byte, n)
-	n = 0
-	for _, b := range der {
-		n += copy(pub[n:], b)
-	}
-	x509Cert, err := x509.ParseCertificates(pub)
-	if err != nil || len(x509Cert) == 0 {
-		return nil, errors.New("acme/autocert: no public key found")
-	}
-	// verify the leaf is not expired and matches the domain name
-	leaf = x509Cert[0]
-	if now.Before(leaf.NotBefore) {
-		return nil, errors.New("acme/autocert: certificate is not valid yet")
-	}
-	if now.After(leaf.NotAfter) {
-		return nil, errors.New("acme/autocert: expired certificate")
-	}
-	if err := leaf.VerifyHostname(ck.domain); err != nil {
-		return nil, err
-	}
-	// ensure the leaf corresponds to the private key and matches the certKey type
-	switch pub := leaf.PublicKey.(type) {
-	case *rsa.PublicKey:
-		prvPub, ok := key.Public().(*rsa.PublicKey)
-		if !ok {
-			return nil, errors.New("acme/autocert: private key type does not match public key type")
-		}
-		if pub.N.Cmp(prvPub.N) != 0 {
-			return nil, errors.New("acme/autocert: private key does not match public key")
-		}
-		if !ck.isRSA && !ck.isToken {
-			return nil, errors.New("acme/autocert: key type does not match expected value")
-		}
-	case *ecdsa.PublicKey:
-		prvPub, ok := key.Public().(*ecdsa.PublicKey)
-		if !ok {
-			return nil, errors.New("acme/autocert: private key type does not match public key type")
-		}
-		if pub.X.Cmp(prvPub.X) != 0 || pub.Y.Cmp(prvPub.Y) != 0 {
-			return nil, errors.New("acme/autocert: private key does not match public key")
-		}
-		if ck.isRSA && !ck.isToken {
-			return nil, errors.New("acme/autocert: key type does not match expected value")
-		}
-	default:
-		return nil, errors.New("acme/autocert: unknown public key algorithm")
-	}
-	return leaf, nil
+	return nil, nil
 }
+
+// verify the leaf is not expired and matches the domain name
+
+// ensure the leaf corresponds to the private key and matches the certKey type
 
 type lockedMathRand struct {
 	sync.Mutex
 	rnd *mathrand.Rand
 }
 
-func (r *lockedMathRand) int63n(max int64) int64 {
-	r.Lock()
-	n := r.rnd.Int63n(max)
-	r.Unlock()
-	return n
-}
+func (r *lockedMathRand) int63n(max int64) int64 { _ = "STUB: not implemented"; return 0 }
 
 func supportedSignatureAlgorithms(privKey crypto.Signer) []tls.SignatureScheme {
-	var out []tls.SignatureScheme
-	switch privKey.Public().(type) {
-	case *ecdsa.PublicKey:
-		out = []tls.SignatureScheme{tls.ECDSAWithP256AndSHA256}
-	case *rsa.PublicKey:
-		out = []tls.SignatureScheme{tls.PKCS1WithSHA256, tls.PSSWithSHA256}
-	}
-	return out
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // For easier testing.

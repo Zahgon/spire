@@ -5,10 +5,11 @@ import "context"
 type pluginNameKey struct{}
 
 func PluginNameFromHostServiceContext(ctx context.Context) (string, bool) {
-	name, ok := ctx.Value(pluginNameKey{}).(string)
-	return name, ok
+	_ = "STUB: not implemented"
+	return "", false
 }
 
 func WithPluginName(ctx context.Context, name string) context.Context {
-	return context.WithValue(ctx, pluginNameKey{}, name)
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }

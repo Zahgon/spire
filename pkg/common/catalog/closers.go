@@ -1,10 +1,7 @@
 package catalog
 
 import (
-	"errors"
 	"io"
-	"slices"
-	"time"
 
 	"google.golang.org/grpc"
 )
@@ -12,46 +9,15 @@ import (
 type closerGroup []io.Closer
 
 func (cs closerGroup) Close() error {
+	_ = "STUB: not implemented"
 	// Close in reverse order.
-	var errs error
-	for _, c := range slices.Backward(cs) {
-		errs = errors.Join(errs, c.Close())
-	}
-
-	return errs
+	return nil
 }
 
 type closerFunc func()
 
-func closerFuncs(fns ...func()) closerGroup {
-	var closers closerGroup
-	for _, fn := range fns {
-		closers = append(closers, closerFunc(fn))
-	}
-	return closers
-}
+func closerFuncs(fns ...func()) closerGroup { _ = "STUB: not implemented"; return *new(closerGroup) }
 
-func (fn closerFunc) Close() error {
-	fn()
-	return nil
-}
+func (fn closerFunc) Close() error { _ = "STUB: not implemented"; return nil }
 
-func gracefulStopWithTimeout(s *grpc.Server) bool {
-	done := make(chan struct{})
-
-	go func() {
-		s.GracefulStop()
-		close(done)
-	}()
-
-	t := time.NewTimer(time.Minute)
-	defer t.Stop()
-
-	select {
-	case <-done:
-		return true
-	case <-t.C:
-		s.Stop()
-		return false
-	}
-}
+func gracefulStopWithTimeout(s *grpc.Server) bool { _ = "STUB: not implemented"; return false }

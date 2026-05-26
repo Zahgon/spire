@@ -5,17 +5,18 @@ type Repository struct {
 }
 
 func (repo *Repository) GetWorkloadAttestors() []WorkloadAttestor {
-	return repo.WorkloadAttestors
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (repo *Repository) AddWorkloadAttestor(workloadattestor WorkloadAttestor) {
-	repo.WorkloadAttestors = append(repo.WorkloadAttestors, workloadattestor)
+	_ = "STUB: not implemented"
+	return
 }
 
 func (repo *Repository) SetWorkloadAttestors(workloadAttestors ...WorkloadAttestor) {
-	repo.WorkloadAttestors = workloadAttestors
+	_ = "STUB: not implemented"
+	return
 }
 
-func (repo *Repository) Clear() {
-	repo.WorkloadAttestors = nil
-}
+func (repo *Repository) Clear() { _ = "STUB: not implemented"; return }

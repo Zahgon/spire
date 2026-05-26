@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"slices"
 )
 
 type PreprocessFunc = func(ctx context.Context, fullMethod string, req any) (context.Context, error)
@@ -27,33 +26,21 @@ type Middleware interface {
 }
 
 // Preprocess creates a middleware from a function that does pre-processing only.
-func Preprocess(fn PreprocessFunc) Middleware {
-	return funcs{
-		preprocess: fn,
-	}
-}
+func Preprocess(fn PreprocessFunc) Middleware { _ = "STUB: not implemented"; return *new(Middleware) }
 
 // Postprocess creates a middleware from a function that does postprocessing only.
-func Postprocess(fn PostprocessFunc) Middleware {
-	return funcs{
-		postprocess: fn,
-	}
-}
+func Postprocess(fn PostprocessFunc) Middleware { _ = "STUB: not implemented"; return *new(Middleware) }
 
 // Funcs constructs a Middleware from a pair of functions, one for preprocessing, one for postprocessing.
 func Funcs(preprocess PreprocessFunc, postprocess PostprocessFunc) Middleware {
-	return funcs{
-		preprocess:  preprocess,
-		postprocess: postprocess,
-	}
+	_ = "STUB: not implemented"
+	return *new(Middleware)
 }
 
 // Chain chains together a series of middleware. The middleware is called in
 // order during preprocessing and in reverse order for postprocessing. The
 // context returned by each Middleware during preprocessing is passed into subsequent middlewares
-func Chain(middleware ...Middleware) Middleware {
-	return middlewares(middleware)
-}
+func Chain(middleware ...Middleware) Middleware { _ = "STUB: not implemented"; return *new(Middleware) }
 
 type funcs struct {
 	preprocess  PreprocessFunc
@@ -62,48 +49,28 @@ type funcs struct {
 
 // Preprocess implements the Middleware interface
 func (h funcs) Preprocess(ctx context.Context, fullMethod string, req any) (context.Context, error) {
-	if h.preprocess != nil {
-		return h.preprocess(ctx, fullMethod, req)
-	}
-	return ctx, nil
+	_ = "STUB: not implemented"
+	return *new(context.Context), nil
 }
 
 // Preprocess implements the Middleware interface
 func (h funcs) Postprocess(ctx context.Context, fullMethod string, handlerInvoked bool, rpcErr error) {
-	if h.postprocess != nil {
-		h.postprocess(ctx, fullMethod, handlerInvoked, rpcErr)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 type middlewares []Middleware
 
 func (ms middlewares) Preprocess(ctx context.Context, fullMethod string, req any) (context.Context, error) {
-	if len(ms) == 0 {
-		return ctx, nil
-	}
-
-	m := ms[0]
-	ms = ms[1:]
-
-	ctx, err := m.Preprocess(ctx, fullMethod, req)
-	if err != nil {
-		return nil, err
-	}
-
-	downstreamCtx, err := ms.Preprocess(ctx, fullMethod, req)
-	if err != nil {
-		// The downstream middleware failed to preprocess. Invoke the
-		// postprocess step of this middleware layer, passing in the context
-		// originally set up by this layer.
-		m.Postprocess(ctx, fullMethod, false, err)
-		return nil, err
-	}
-
-	return downstreamCtx, nil
+	_ = "STUB: not implemented"
+	return *new(context.Context), nil
 }
 
+// The downstream middleware failed to preprocess. Invoke the
+// postprocess step of this middleware layer, passing in the context
+// originally set up by this layer.
+
 func (ms middlewares) Postprocess(ctx context.Context, fullMethod string, handlerInvoked bool, rpcErr error) {
-	for _, m := range slices.Backward(ms) {
-		m.Postprocess(ctx, fullMethod, handlerInvoked, rpcErr)
-	}
+	_ = "STUB: not implemented"
+	return
 }

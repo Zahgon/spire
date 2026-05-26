@@ -2,12 +2,6 @@
 package sshpop
 
 import (
-	"errors"
-	"fmt"
-	"os"
-	"strings"
-
-	"github.com/hashicorp/hcl"
 	"github.com/spiffe/go-spiffe/v2/spiffeid"
 	configv1 "github.com/spiffe/spire-plugin-sdk/proto/spire/service/common/config/v1"
 	"github.com/spiffe/spire/pkg/common/agentpathtemplate"
@@ -67,12 +61,11 @@ type ClientConfigRequest struct {
 }
 
 func (ccr *ClientConfigRequest) GetCoreConfiguration() *configv1.CoreConfiguration {
-	return ccr.coreConfig
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (ccr *ClientConfigRequest) GetHclConfiguration() string {
-	return ccr.hclText
-}
+func (ccr *ClientConfigRequest) GetHclConfiguration() string { _ = "STUB: not implemented"; return "" }
 
 type ServerConfigRequest struct {
 	coreConfig *configv1.CoreConfiguration
@@ -80,14 +73,17 @@ type ServerConfigRequest struct {
 }
 
 func (scr *ServerConfigRequest) GetCoreConfiguration() *configv1.CoreConfiguration {
-	return scr.coreConfig
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (scr *ServerConfigRequest) GetHclConfiguration() string {
-	return scr.hclText
+	_ = "STUB: not implemented"
+
+	// ServerConfig configures the server.
+	return ""
 }
 
-// ServerConfig configures the server.
 type ServerConfig struct {
 	CertAuthorities     []string `hcl:"cert_authorities"`
 	CertAuthoritiesPath string   `hcl:"cert_authorities_path"`
@@ -102,195 +98,46 @@ type ServerConfig struct {
 }
 
 func BuildServerConfig(coreConfig catalog.CoreConfig, hclText string, status *pluginconf.Status) *ServerConfig {
-	newConfig := new(ServerConfig)
-	if err := hcl.Decode(newConfig, hclText); err != nil {
-		status.ReportErrorf("failed to decode configuration: %v", err)
-		return nil
-	}
-
-	newConfig.trustDomain = coreConfig.TrustDomain
-
-	if newConfig.CertAuthorities == nil && newConfig.CertAuthoritiesPath == "" {
-		status.ReportErrorf("missing required config value for \"cert_authorities\" or \"cert_authorities_path\"")
-	}
-	var certAuthorities []string
-	if newConfig.CertAuthorities != nil {
-		certAuthorities = append(certAuthorities, newConfig.CertAuthorities...)
-	}
-	if newConfig.CertAuthoritiesPath != "" {
-		fileCertAuthorities, err := pubkeysFromPath(newConfig.CertAuthoritiesPath)
-		if err != nil {
-			status.ReportErrorf("failed to get cert authorities from file: %v", err)
-		}
-		certAuthorities = append(certAuthorities, fileCertAuthorities...)
-	}
-
-	certChecker, err := certCheckerFromPubkeys(certAuthorities)
-	if err != nil {
-		status.ReportErrorf("failed to create cert checker: %v", err)
-	}
-	newConfig.certChecker = certChecker
-
-	newConfig.agentPathTemplate = DefaultAgentPathTemplate
-	if len(newConfig.AgentPathTemplate) != 0 {
-		tmpl, err := agentpathtemplate.Parse(newConfig.AgentPathTemplate)
-		if err != nil {
-			status.ReportErrorf("failed to parse agent svid template: %q", newConfig.AgentPathTemplate)
-		} else {
-			newConfig.agentPathTemplate = tmpl
-		}
-	}
-
-	return newConfig
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (sc *ServerConfig) NewServer() *Server {
-	return &Server{
-		certChecker:       sc.certChecker,
-		agentPathTemplate: sc.agentPathTemplate,
-		trustDomain:       sc.trustDomain,
-		canonicalDomain:   sc.CanonicalDomain,
-	}
-}
+func (sc *ServerConfig) NewServer() *Server { _ = "STUB: not implemented"; return nil }
 
 func BuildClientConfig(coreConfig catalog.CoreConfig, hclText string, status *pluginconf.Status) *ClientConfig {
-	newConfig := new(ClientConfig)
-	if err := hcl.Decode(newConfig, hclText); err != nil {
-		status.ReportErrorf("failed to decode configuration: %v", err)
-		return nil
-	}
-
-	newConfig.HostKeyPath = stringOrDefault(newConfig.HostKeyPath, defaultHostKeyPath)
-	newConfig.HostCertPath = stringOrDefault(newConfig.HostCertPath, defaultHostCertPath)
-
-	keyBytes, err := os.ReadFile(newConfig.HostKeyPath)
-	if err != nil {
-		status.ReportErrorf("failed to read host key file: %v", err)
-	}
-	certBytes, err := os.ReadFile(newConfig.HostCertPath)
-	if err != nil {
-		status.ReportErrorf("failed to read host cert file: %v", err)
-	}
-	if keyBytes != nil && certBytes != nil {
-		cert, signer, err := getCertAndSignerFromBytes(certBytes, keyBytes)
-		if err != nil {
-			status.ReportErrorf("failed to get cert and signer from pem: %v", err)
-		}
-		newConfig.cert = cert
-		newConfig.signer = signer
-	}
-
-	return newConfig
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (cc *ClientConfig) NewClient() *Client {
-	return &Client{
-		cert:   cc.cert,
-		signer: cc.signer,
-	}
-}
+func (cc *ClientConfig) NewClient() *Client { _ = "STUB: not implemented"; return nil }
 
 func NewClient(trustDomain string, configString string) (*Client, error) {
-	request := &ClientConfigRequest{
-		coreConfig: &configv1.CoreConfiguration{
-			TrustDomain: fmt.Sprintf("spiffe://%s", trustDomain),
-		},
-		hclText: configString,
-	}
-
-	newClientConfig, _, err := pluginconf.Build(request, BuildClientConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	return newClientConfig.NewClient(), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func stringOrDefault(configValue, defaultValue string) string {
-	if configValue == "" {
-		return defaultValue
-	}
-	return configValue
-}
+func stringOrDefault(configValue, defaultValue string) string { _ = "STUB: not implemented"; return "" }
 
 func getCertAndSignerFromBytes(certBytes, keyBytes []byte) (*ssh.Certificate, ssh.Signer, error) {
-	signer, err := ssh.ParsePrivateKey(keyBytes)
-	if err != nil {
-		return nil, nil, err
-	}
-	pubkey, _, _, _, err := ssh.ParseAuthorizedKey(certBytes)
-	if err != nil {
-		return nil, nil, err
-	}
-	cert, ok := pubkey.(*ssh.Certificate)
-	if !ok {
-		return nil, nil, errors.New("pubkey isn't a certificate")
-	}
-	return cert, signer, nil
+	_ = "STUB: not implemented"
+	return nil, *new(ssh.Signer), nil
 }
 
 func NewServer(trustDomain, configString string) (*Server, error) {
-	request := &ServerConfigRequest{
-		coreConfig: &configv1.CoreConfiguration{
-			TrustDomain: trustDomain,
-		},
-		hclText: configString,
-	}
-
-	newServerConfig, _, err := pluginconf.Build(request, BuildServerConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	return newServerConfig.NewServer(), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func pubkeysFromPath(pubkeysPath string) ([]string, error) {
-	pubkeysBytes, err := os.ReadFile(pubkeysPath)
-	if err != nil {
-		return nil, err
-	}
-	splitPubkeys := strings.Split(string(pubkeysBytes), "\n")
-	var pubkeys []string
-	for _, pubkey := range splitPubkeys {
-		if pubkey == "" {
-			continue
-		}
-		pubkeys = append(pubkeys, pubkey)
-	}
-	if pubkeys == nil {
-		return nil, fmt.Errorf("no data found in file: %q", pubkeysPath)
-	}
-	return pubkeys, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func certCheckerFromPubkeys(certAuthorities []string) (*ssh.CertChecker, error) {
-	if len(certAuthorities) == 0 {
-		return nil, errors.New("must provide at least one cert authority")
-	}
-	authorities := make(map[string]bool)
-	for _, certAuthority := range certAuthorities {
-		authority, _, _, _, err := ssh.ParseAuthorizedKey([]byte(certAuthority))
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse public key %q: %w", certAuthority, err)
-		}
-		authorities[ssh.FingerprintSHA256(authority)] = true
-	}
-	return &ssh.CertChecker{
-		IsHostAuthority: func(auth ssh.PublicKey, _ string) bool {
-			return authorities[ssh.FingerprintSHA256(auth)]
-		},
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (c *Client) NewHandshake() *ClientHandshake {
-	return &ClientHandshake{
-		c: c,
-	}
-}
+func (c *Client) NewHandshake() *ClientHandshake { _ = "STUB: not implemented"; return nil }
 
-func (s *Server) NewHandshake() *ServerHandshake {
-	return &ServerHandshake{
-		s: s,
-	}
-}
+func (s *Server) NewHandshake() *ServerHandshake { _ = "STUB: not implemented"; return nil }

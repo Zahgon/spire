@@ -1,10 +1,5 @@
 package fixture
 
-import (
-	"path/filepath"
-	"runtime"
-)
-
 var (
 	packageDir string
 )
@@ -13,18 +8,8 @@ func init() {
 	packageDir = initPackageDir()
 }
 
-func initPackageDir() string {
-	_, file, _, ok := runtime.Caller(0)
-	if !ok {
-		panic("unable to obtain caller information")
-	}
-	return filepath.Dir(file)
-}
+func initPackageDir() string { _ = "STUB: not implemented"; return "" }
 
-func Path(path string) string {
-	return filepath.Join(packageDir, path)
-}
+func Path(path string) string { _ = "STUB: not implemented"; return "" }
 
-func Join(parts ...string) string {
-	return Path(filepath.Join(parts...))
-}
+func Join(parts ...string) string { _ = "STUB: not implemented"; return "" }

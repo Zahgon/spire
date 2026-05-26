@@ -7,11 +7,10 @@
 package journal
 
 import (
+	sync "sync"
+
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
 )
 
 const (
@@ -51,32 +50,27 @@ var (
 	}
 )
 
-func (x Status) Enum() *Status {
-	p := new(Status)
-	*p = x
-	return p
-}
+func (x Status) Enum() *Status { _ = "STUB: not implemented"; return nil }
 
-func (x Status) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
+func (x Status) String() string { _ = "STUB: not implemented"; return "" }
 
 func (Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_private_server_journal_journal_proto_enumTypes[0].Descriptor()
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumDescriptor)
 }
 
 func (Status) Type() protoreflect.EnumType {
-	return &file_private_server_journal_journal_proto_enumTypes[0]
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumType)
 }
 
 func (x Status) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumNumber)
 }
 
 // Deprecated: Use Status.Descriptor instead.
-func (Status) EnumDescriptor() ([]byte, []int) {
-	return file_private_server_journal_journal_proto_rawDescGZIP(), []int{0}
-}
+func (Status) EnumDescriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 type X509CAEntry struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -100,91 +94,35 @@ type X509CAEntry struct {
 	sizeCache           protoimpl.SizeCache
 }
 
-func (x *X509CAEntry) Reset() {
-	*x = X509CAEntry{}
-	mi := &file_private_server_journal_journal_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *X509CAEntry) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *X509CAEntry) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *X509CAEntry) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*X509CAEntry) ProtoMessage() {}
+func (*X509CAEntry) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *X509CAEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_private_server_journal_journal_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use X509CAEntry.ProtoReflect.Descriptor instead.
-func (*X509CAEntry) Descriptor() ([]byte, []int) {
-	return file_private_server_journal_journal_proto_rawDescGZIP(), []int{0}
-}
+func (*X509CAEntry) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *X509CAEntry) GetSlotId() string {
-	if x != nil {
-		return x.SlotId
-	}
-	return ""
-}
+func (x *X509CAEntry) GetSlotId() string { _ = "STUB: not implemented"; return "" }
 
-func (x *X509CAEntry) GetIssuedAt() int64 {
-	if x != nil {
-		return x.IssuedAt
-	}
-	return 0
-}
+func (x *X509CAEntry) GetIssuedAt() int64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *X509CAEntry) GetCertificate() []byte {
-	if x != nil {
-		return x.Certificate
-	}
-	return nil
-}
+func (x *X509CAEntry) GetCertificate() []byte { _ = "STUB: not implemented"; return nil }
 
-func (x *X509CAEntry) GetUpstreamChain() [][]byte {
-	if x != nil {
-		return x.UpstreamChain
-	}
-	return nil
-}
+func (x *X509CAEntry) GetUpstreamChain() [][]byte { _ = "STUB: not implemented"; return nil }
 
-func (x *X509CAEntry) GetStatus() Status {
-	if x != nil {
-		return x.Status
-	}
-	return Status_UNKNOWN
-}
+func (x *X509CAEntry) GetStatus() Status { _ = "STUB: not implemented"; return *new(Status) }
 
-func (x *X509CAEntry) GetAuthorityId() string {
-	if x != nil {
-		return x.AuthorityId
-	}
-	return ""
-}
+func (x *X509CAEntry) GetAuthorityId() string { _ = "STUB: not implemented"; return "" }
 
-func (x *X509CAEntry) GetNotAfter() int64 {
-	if x != nil {
-		return x.NotAfter
-	}
-	return 0
-}
+func (x *X509CAEntry) GetNotAfter() int64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *X509CAEntry) GetUpstreamAuthorityId() string {
-	if x != nil {
-		return x.UpstreamAuthorityId
-	}
-	return ""
-}
+func (x *X509CAEntry) GetUpstreamAuthorityId() string { _ = "STUB: not implemented"; return "" }
 
 type JWTKeyEntry struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -206,84 +144,33 @@ type JWTKeyEntry struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *JWTKeyEntry) Reset() {
-	*x = JWTKeyEntry{}
-	mi := &file_private_server_journal_journal_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *JWTKeyEntry) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *JWTKeyEntry) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *JWTKeyEntry) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*JWTKeyEntry) ProtoMessage() {}
+func (*JWTKeyEntry) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *JWTKeyEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_private_server_journal_journal_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use JWTKeyEntry.ProtoReflect.Descriptor instead.
-func (*JWTKeyEntry) Descriptor() ([]byte, []int) {
-	return file_private_server_journal_journal_proto_rawDescGZIP(), []int{1}
-}
+func (*JWTKeyEntry) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *JWTKeyEntry) GetSlotId() string {
-	if x != nil {
-		return x.SlotId
-	}
-	return ""
-}
+func (x *JWTKeyEntry) GetSlotId() string { _ = "STUB: not implemented"; return "" }
 
-func (x *JWTKeyEntry) GetIssuedAt() int64 {
-	if x != nil {
-		return x.IssuedAt
-	}
-	return 0
-}
+func (x *JWTKeyEntry) GetIssuedAt() int64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *JWTKeyEntry) GetNotAfter() int64 {
-	if x != nil {
-		return x.NotAfter
-	}
-	return 0
-}
+func (x *JWTKeyEntry) GetNotAfter() int64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *JWTKeyEntry) GetKid() string {
-	if x != nil {
-		return x.Kid
-	}
-	return ""
-}
+func (x *JWTKeyEntry) GetKid() string { _ = "STUB: not implemented"; return "" }
 
-func (x *JWTKeyEntry) GetPublicKey() []byte {
-	if x != nil {
-		return x.PublicKey
-	}
-	return nil
-}
+func (x *JWTKeyEntry) GetPublicKey() []byte { _ = "STUB: not implemented"; return nil }
 
-func (x *JWTKeyEntry) GetStatus() Status {
-	if x != nil {
-		return x.Status
-	}
-	return Status_UNKNOWN
-}
+func (x *JWTKeyEntry) GetStatus() Status { _ = "STUB: not implemented"; return *new(Status) }
 
-func (x *JWTKeyEntry) GetAuthorityId() string {
-	if x != nil {
-		return x.AuthorityId
-	}
-	return ""
-}
+func (x *JWTKeyEntry) GetAuthorityId() string { _ = "STUB: not implemented"; return "" }
 
 type WITKeyEntry struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -305,84 +192,33 @@ type WITKeyEntry struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *WITKeyEntry) Reset() {
-	*x = WITKeyEntry{}
-	mi := &file_private_server_journal_journal_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *WITKeyEntry) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *WITKeyEntry) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *WITKeyEntry) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*WITKeyEntry) ProtoMessage() {}
+func (*WITKeyEntry) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *WITKeyEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_private_server_journal_journal_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use WITKeyEntry.ProtoReflect.Descriptor instead.
-func (*WITKeyEntry) Descriptor() ([]byte, []int) {
-	return file_private_server_journal_journal_proto_rawDescGZIP(), []int{2}
-}
+func (*WITKeyEntry) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *WITKeyEntry) GetSlotId() string {
-	if x != nil {
-		return x.SlotId
-	}
-	return ""
-}
+func (x *WITKeyEntry) GetSlotId() string { _ = "STUB: not implemented"; return "" }
 
-func (x *WITKeyEntry) GetIssuedAt() int64 {
-	if x != nil {
-		return x.IssuedAt
-	}
-	return 0
-}
+func (x *WITKeyEntry) GetIssuedAt() int64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *WITKeyEntry) GetNotAfter() int64 {
-	if x != nil {
-		return x.NotAfter
-	}
-	return 0
-}
+func (x *WITKeyEntry) GetNotAfter() int64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *WITKeyEntry) GetKid() string {
-	if x != nil {
-		return x.Kid
-	}
-	return ""
-}
+func (x *WITKeyEntry) GetKid() string { _ = "STUB: not implemented"; return "" }
 
-func (x *WITKeyEntry) GetPublicKey() []byte {
-	if x != nil {
-		return x.PublicKey
-	}
-	return nil
-}
+func (x *WITKeyEntry) GetPublicKey() []byte { _ = "STUB: not implemented"; return nil }
 
-func (x *WITKeyEntry) GetStatus() Status {
-	if x != nil {
-		return x.Status
-	}
-	return Status_UNKNOWN
-}
+func (x *WITKeyEntry) GetStatus() Status { _ = "STUB: not implemented"; return *new(Status) }
 
-func (x *WITKeyEntry) GetAuthorityId() string {
-	if x != nil {
-		return x.AuthorityId
-	}
-	return ""
-}
+func (x *WITKeyEntry) GetAuthorityId() string { _ = "STUB: not implemented"; return "" }
 
 type Entries struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -393,56 +229,25 @@ type Entries struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Entries) Reset() {
-	*x = Entries{}
-	mi := &file_private_server_journal_journal_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *Entries) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *Entries) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *Entries) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*Entries) ProtoMessage() {}
+func (*Entries) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *Entries) ProtoReflect() protoreflect.Message {
-	mi := &file_private_server_journal_journal_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use Entries.ProtoReflect.Descriptor instead.
-func (*Entries) Descriptor() ([]byte, []int) {
-	return file_private_server_journal_journal_proto_rawDescGZIP(), []int{3}
-}
+func (*Entries) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *Entries) GetX509CAs() []*X509CAEntry {
-	if x != nil {
-		return x.X509CAs
-	}
-	return nil
-}
+func (x *Entries) GetX509CAs() []*X509CAEntry { _ = "STUB: not implemented"; return nil }
 
-func (x *Entries) GetJwtKeys() []*JWTKeyEntry {
-	if x != nil {
-		return x.JwtKeys
-	}
-	return nil
-}
+func (x *Entries) GetJwtKeys() []*JWTKeyEntry { _ = "STUB: not implemented"; return nil }
 
-func (x *Entries) GetWitKeys() []*WITKeyEntry {
-	if x != nil {
-		return x.WitKeys
-	}
-	return nil
-}
+func (x *Entries) GetWitKeys() []*WITKeyEntry { _ = "STUB: not implemented"; return nil }
 
 var File_private_server_journal_journal_proto protoreflect.FileDescriptor
 
@@ -493,10 +298,8 @@ var (
 )
 
 func file_private_server_journal_journal_proto_rawDescGZIP() []byte {
-	file_private_server_journal_journal_proto_rawDescOnce.Do(func() {
-		file_private_server_journal_journal_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_private_server_journal_journal_proto_rawDesc), len(file_private_server_journal_journal_proto_rawDesc)))
-	})
-	return file_private_server_journal_journal_proto_rawDescData
+	_ = "STUB: not implemented"
+	return nil
 }
 
 var file_private_server_journal_journal_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
@@ -522,27 +325,5 @@ var file_private_server_journal_journal_proto_depIdxs = []int32{
 	0, // [0:6] is the sub-list for field type_name
 }
 
-func init() { file_private_server_journal_journal_proto_init() }
-func file_private_server_journal_journal_proto_init() {
-	if File_private_server_journal_journal_proto != nil {
-		return
-	}
-	type x struct{}
-	out := protoimpl.TypeBuilder{
-		File: protoimpl.DescBuilder{
-			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_private_server_journal_journal_proto_rawDesc), len(file_private_server_journal_journal_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   4,
-			NumExtensions: 0,
-			NumServices:   0,
-		},
-		GoTypes:           file_private_server_journal_journal_proto_goTypes,
-		DependencyIndexes: file_private_server_journal_journal_proto_depIdxs,
-		EnumInfos:         file_private_server_journal_journal_proto_enumTypes,
-		MessageInfos:      file_private_server_journal_journal_proto_msgTypes,
-	}.Build()
-	File_private_server_journal_journal_proto = out.File
-	file_private_server_journal_journal_proto_goTypes = nil
-	file_private_server_journal_journal_proto_depIdxs = nil
-}
+func init()                                           { file_private_server_journal_journal_proto_init() }
+func file_private_server_journal_journal_proto_init() { _ = "STUB: not implemented"; return }

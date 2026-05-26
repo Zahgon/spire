@@ -5,13 +5,13 @@ type Repository struct {
 }
 
 func (repo *Repository) GetNodeAttestor() NodeAttestor {
-	return repo.NodeAttestor
+	_ = "STUB: not implemented"
+	return *new(NodeAttestor)
 }
 
 func (repo *Repository) SetNodeAttestor(nodeAttestor NodeAttestor) {
-	repo.NodeAttestor = nodeAttestor
+	_ = "STUB: not implemented"
+	return
 }
 
-func (repo *Repository) Clear() {
-	repo.NodeAttestor = nil
-}
+func (repo *Repository) Clear() { _ = "STUB: not implemented"; return }

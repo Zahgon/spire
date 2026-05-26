@@ -4,11 +4,9 @@ import "context"
 
 type healthCheckKey struct{}
 
-func IsCheck(ctx context.Context) bool {
-	_, ok := ctx.Value(healthCheckKey{}).(struct{})
-	return ok
-}
+func IsCheck(ctx context.Context) bool { _ = "STUB: not implemented"; return false }
 
 func CheckContext(ctx context.Context) context.Context {
-	return context.WithValue(ctx, healthCheckKey{}, struct{}{})
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }

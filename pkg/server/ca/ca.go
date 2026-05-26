@@ -5,22 +5,15 @@ import (
 	"crypto"
 	"crypto/x509"
 	"crypto/x509/pkix"
-	"errors"
-	"fmt"
 	"sync"
 	"time"
 
 	"github.com/andres-erbsen/clock"
 	"github.com/go-jose/go-jose/v4"
-	"github.com/go-jose/go-jose/v4/cryptosigner"
-	"github.com/go-jose/go-jose/v4/jwt"
 	"github.com/sirupsen/logrus"
 	"github.com/spiffe/go-spiffe/v2/spiffeid"
-	"github.com/spiffe/spire/pkg/common/cryptoutil"
 	"github.com/spiffe/spire/pkg/common/health"
 	"github.com/spiffe/spire/pkg/common/telemetry"
-	telemetry_server "github.com/spiffe/spire/pkg/common/telemetry/server"
-	"github.com/spiffe/spire/pkg/common/x509util"
 	"github.com/spiffe/spire/pkg/server/credtemplate"
 	"github.com/spiffe/spire/pkg/server/credvalidator"
 )
@@ -171,337 +164,89 @@ type CA struct {
 	taintedAuthoritiesCh chan []*x509.Certificate
 }
 
-func NewCA(config Config) *CA {
-	if config.Clock == nil {
-		config.Clock = clock.New()
-	}
+func NewCA(config Config) *CA { _ = "STUB: not implemented"; return nil }
 
-	ca := &CA{
-		c: config,
+// Notify caller about any tainted authority
 
-		// Notify caller about any tainted authority
-		taintedAuthoritiesCh: make(chan []*x509.Certificate, 1),
-	}
+func (ca *CA) X509CA() *X509CA { _ = "STUB: not implemented"; return nil }
 
-	_ = config.HealthChecker.AddCheck("server.ca", &caHealth{
-		ca: ca,
-		td: config.TrustDomain,
-	})
+func (ca *CA) SetX509CA(x509CA *X509CA) { _ = "STUB: not implemented"; return }
 
-	return ca
-}
+func (ca *CA) JWTKey() *JWTKey { _ = "STUB: not implemented"; return nil }
 
-func (ca *CA) X509CA() *X509CA {
-	ca.mu.RLock()
-	defer ca.mu.RUnlock()
-	return ca.x509CA
-}
+func (ca *CA) SetJWTKey(jwtKey *JWTKey) { _ = "STUB: not implemented"; return }
 
-func (ca *CA) SetX509CA(x509CA *X509CA) {
-	ca.mu.Lock()
-	defer ca.mu.Unlock()
-	ca.x509CA = x509CA
-	switch {
-	case x509CA == nil:
-		ca.x509CAChain = nil
-	case len(x509CA.UpstreamChain) > 0:
-		ca.x509CAChain = x509CA.UpstreamChain
-	default:
-		ca.x509CAChain = []*x509.Certificate{x509CA.Certificate}
-	}
-}
+func (ca *CA) WITKey() *WITKey { _ = "STUB: not implemented"; return nil }
 
-func (ca *CA) JWTKey() *JWTKey {
-	ca.mu.RLock()
-	defer ca.mu.RUnlock()
-	return ca.jwtKey
-}
-
-func (ca *CA) SetJWTKey(jwtKey *JWTKey) {
-	ca.mu.Lock()
-	defer ca.mu.Unlock()
-	ca.jwtKey = jwtKey
-}
-
-func (ca *CA) WITKey() *WITKey {
-	ca.mu.RLock()
-	defer ca.mu.RUnlock()
-	return ca.witKey
-}
-
-func (ca *CA) SetWITKey(witKey *WITKey) {
-	ca.mu.Lock()
-	defer ca.mu.Unlock()
-	ca.witKey = witKey
-}
+func (ca *CA) SetWITKey(witKey *WITKey) { _ = "STUB: not implemented"; return }
 
 func (ca *CA) NotifyTaintedX509Authorities(taintedAuthorities []*x509.Certificate) {
-	select {
-	case ca.taintedAuthoritiesCh <- taintedAuthorities:
-	default:
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 func (ca *CA) TaintedAuthorities() <-chan []*x509.Certificate {
-	return ca.taintedAuthoritiesCh
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (ca *CA) SignDownstreamX509CA(ctx context.Context, params DownstreamX509CAParams) ([]*x509.Certificate, error) {
-	x509CA, caChain, err := ca.getX509CA()
-	if err != nil {
-		return nil, err
-	}
-
-	template, err := ca.c.CredBuilder.BuildDownstreamX509CATemplate(ctx, credtemplate.DownstreamX509CAParams{
-		ParentChain: caChain,
-		PublicKey:   params.PublicKey,
-		TTL:         params.TTL,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	downstreamCA, err := x509util.CreateCertificate(template, x509CA.Certificate, template.PublicKey, x509CA.Signer)
-	if err != nil {
-		return nil, fmt.Errorf("unable to create downstream X509 CA: %w", err)
-	}
-
-	if err := ca.c.CredValidator.ValidateX509CA(downstreamCA); err != nil {
-		return nil, fmt.Errorf("invalid downstream X509 CA: %w", err)
-	}
-
-	telemetry_server.IncrServerCASignX509CACounter(ca.c.Metrics)
-
-	return makeCertChain(x509CA, downstreamCA), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (ca *CA) SignServerX509SVID(ctx context.Context, params ServerX509SVIDParams) ([]*x509.Certificate, error) {
-	x509CA, caChain, err := ca.getX509CA()
-	if err != nil {
-		return nil, err
-	}
-
-	template, err := ca.c.CredBuilder.BuildServerX509SVIDTemplate(ctx, credtemplate.ServerX509SVIDParams{
-		ParentChain: caChain,
-		PublicKey:   params.PublicKey,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	svidChain, err := ca.signX509SVID(x509CA, template)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := ca.c.CredValidator.ValidateServerX509SVID(svidChain[0]); err != nil {
-		return nil, fmt.Errorf("invalid server X509-SVID: %w", err)
-	}
-
-	return svidChain, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (ca *CA) SignAgentX509SVID(ctx context.Context, params AgentX509SVIDParams) ([]*x509.Certificate, error) {
-	x509CA, caChain, err := ca.getX509CA()
-	if err != nil {
-		return nil, err
-	}
-
-	template, err := ca.c.CredBuilder.BuildAgentX509SVIDTemplate(ctx, credtemplate.AgentX509SVIDParams{
-		ParentChain: caChain,
-		PublicKey:   params.PublicKey,
-		SPIFFEID:    params.SPIFFEID,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	svidChain, err := ca.signX509SVID(x509CA, template)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := ca.c.CredValidator.ValidateX509SVID(svidChain[0], params.SPIFFEID); err != nil {
-		return nil, fmt.Errorf("invalid agent X509-SVID: %w", err)
-	}
-
-	return svidChain, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (ca *CA) SignWorkloadX509SVID(ctx context.Context, params WorkloadX509SVIDParams) ([]*x509.Certificate, error) {
-	x509CA, caChain, err := ca.getX509CA()
-	if err != nil {
-		return nil, err
-	}
-
-	template, err := ca.c.CredBuilder.BuildWorkloadX509SVIDTemplate(ctx, credtemplate.WorkloadX509SVIDParams{
-		ParentChain: caChain,
-		PublicKey:   params.PublicKey,
-		SPIFFEID:    params.SPIFFEID,
-		DNSNames:    params.DNSNames,
-		TTL:         params.TTL,
-		Subject:     params.Subject,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	svidChain, err := ca.signX509SVID(x509CA, template)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := ca.c.CredValidator.ValidateX509SVID(svidChain[0], params.SPIFFEID); err != nil {
-		return nil, fmt.Errorf("invalid workload X509-SVID: %w", err)
-	}
-
-	return svidChain, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (ca *CA) SignWorkloadJWTSVID(ctx context.Context, params WorkloadJWTSVIDParams) (string, error) {
-	jwtKey := ca.JWTKey()
-	if jwtKey == nil {
-		return "", errors.New("JWT key is not available for signing")
-	}
-
-	claims, err := ca.c.CredBuilder.BuildWorkloadJWTSVIDClaims(ctx, credtemplate.WorkloadJWTSVIDParams{
-		SPIFFEID:      params.SPIFFEID,
-		Audience:      params.Audience,
-		TTL:           params.TTL,
-		ExpirationCap: jwtKey.NotAfter,
-	})
-	if err != nil {
-		return "", err
-	}
-
-	token, err := ca.signJWTSVID(jwtKey, claims)
-	if err != nil {
-		return "", fmt.Errorf("unable to sign JWT SVID: %w", err)
-	}
-
-	if err := ca.c.CredValidator.ValidateWorkloadJWTSVID(token, params.SPIFFEID); err != nil {
-		return "", err
-	}
-
-	telemetry_server.IncrServerCASignJWTSVIDCounter(ca.c.Metrics)
-	return token, nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
 
 func (ca *CA) SignWorkloadWITSVID(ctx context.Context, params WorkloadWITSVIDParams) (string, error) {
-	witKey := ca.WITKey()
-	if witKey == nil {
-		return "", errors.New("WIT key is not available for signing")
-	}
-
-	// We already validate in other places that a valid algorithm is given
-	if params.PublicKey.Algorithm == "" {
-		return "", errors.New("public key must have algorithm set")
-	}
-
-	claims, err := ca.c.CredBuilder.BuildWorkloadWITSVIDClaims(ctx, credtemplate.WorkloadWITSVIDParams{
-		SPIFFEID:      params.SPIFFEID,
-		PublicKey:     params.PublicKey,
-		TTL:           params.TTL,
-		ExpirationCap: witKey.NotAfter,
-	})
-	if err != nil {
-		return "", err
-	}
-
-	token, err := ca.signWITSVID(witKey, claims)
-	if err != nil {
-		return "", fmt.Errorf("unable to sign JWT SVID: %w", err)
-	}
-
-	if err := ca.c.CredValidator.ValidateWorkloadWITSVID(token, params.SPIFFEID); err != nil {
-		return "", err
-	}
-
-	return token, nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
 
+// We already validate in other places that a valid algorithm is given
+
 func (ca *CA) getX509CA() (*X509CA, []*x509.Certificate, error) {
-	ca.mu.RLock()
-	defer ca.mu.RUnlock()
-	if ca.x509CA == nil {
-		return nil, nil, errors.New("X509 CA is not available for signing")
-	}
-	return ca.x509CA, ca.x509CAChain, nil
+	_ = "STUB: not implemented"
+	return nil, nil, nil
 }
 
 func (ca *CA) signX509SVID(x509CA *X509CA, template *x509.Certificate) ([]*x509.Certificate, error) {
-	x509SVID, err := x509util.CreateCertificate(template, x509CA.Certificate, template.PublicKey, x509CA.Signer)
-	if err != nil {
-		return nil, fmt.Errorf("failed to sign X509 SVID: %w", err)
-	}
-	telemetry_server.IncrServerCASignX509Counter(ca.c.Metrics)
-	return makeCertChain(x509CA, x509SVID), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (ca *CA) signJWTSVID(jwtKey *JWTKey, claims map[string]any) (string, error) {
-	alg, err := cryptoutil.JoseAlgFromPublicKey(jwtKey.Signer.Public())
-	if err != nil {
-		return "", fmt.Errorf("failed to determine JWT key algorithm: %w", err)
-	}
-
-	jwtSigner, err := jose.NewSigner(
-		jose.SigningKey{
-			Algorithm: alg,
-			Key: jose.JSONWebKey{
-				Key:   cryptosigner.Opaque(jwtKey.Signer),
-				KeyID: jwtKey.Kid,
-			},
-		},
-		new(jose.SignerOptions).WithType("JWT"),
-	)
-	if err != nil {
-		return "", fmt.Errorf("failed to configure JWT signer: %w", err)
-	}
-
-	signedToken, err := jwt.Signed(jwtSigner).Claims(claims).Serialize()
-	if err != nil {
-		return "", fmt.Errorf("failed to sign JWT SVID: %w", err)
-	}
-
-	return signedToken, nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
 
-func (ca *CA) IsJWTSVIDsDisabled() bool {
-	return ca.c.DisableJWTSVIDs
-}
+func (ca *CA) IsJWTSVIDsDisabled() bool { _ = "STUB: not implemented"; return false }
 
-func (ca *CA) IsWITSVIDsDisabled() bool {
-	return ca.c.DisableWITSVIDs
-}
+func (ca *CA) IsWITSVIDsDisabled() bool { _ = "STUB: not implemented"; return false }
 
 func (ca *CA) signWITSVID(witKey *WITKey, claims map[string]any) (string, error) {
-	alg, err := cryptoutil.JoseAlgFromPublicKey(witKey.Signer.Public())
-	if err != nil {
-		return "", fmt.Errorf("failed to determine WIT key algorithm: %w", err)
-	}
-
-	jwtSigner, err := jose.NewSigner(
-		jose.SigningKey{
-			Algorithm: alg,
-			Key: jose.JSONWebKey{
-				Key:   cryptosigner.Opaque(witKey.Signer),
-				KeyID: witKey.Kid,
-			},
-		},
-		new(jose.SignerOptions).WithType("wit+jwt"),
-	)
-	if err != nil {
-		return "", fmt.Errorf("failed to configure WIT signer: %w", err)
-	}
-
-	signedToken, err := jwt.Signed(jwtSigner).Claims(claims).Serialize()
-	if err != nil {
-		return "", fmt.Errorf("failed to sign WIT SVID: %w", err)
-	}
-
-	return signedToken, nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
 
 func makeCertChain(x509CA *X509CA, leaf *x509.Certificate) []*x509.Certificate {
-	return append([]*x509.Certificate{leaf}, x509CA.UpstreamChain...)
+	_ = "STUB: not implemented"
+	return nil
 }

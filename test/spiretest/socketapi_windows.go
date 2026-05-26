@@ -3,79 +3,57 @@
 package spiretest
 
 import (
-	"crypto/rand"
-	"encoding/binary"
-	"fmt"
 	"net"
-	"path/filepath"
 	"testing"
 
-	"github.com/Microsoft/go-winio"
 	"github.com/spiffe/go-spiffe/v2/proto/spiffe/workload"
-	"github.com/spiffe/spire/pkg/common/namedpipe"
-	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 )
 
 func StartWorkloadAPI(t *testing.T, server workload.SpiffeWorkloadAPIServer) net.Addr {
-	return StartWorkloadAPIOnNamedPipe(t, namedpipe.GetPipeName(GetRandNamedPipeAddr().String()), server)
+	_ = "STUB: not implemented"
+	return *new(net.Addr)
 }
 
 func StartWorkloadAPIOnNamedPipe(t *testing.T, pipeName string, server workload.SpiffeWorkloadAPIServer) net.Addr {
-	return StartGRPCOnNamedPipeServer(t, pipeName, func(s *grpc.Server) {
-		workload.RegisterSpiffeWorkloadAPIServer(s, server)
-	})
+	_ = "STUB: not implemented"
+	return *new(net.Addr)
 }
 
 func StartGRPCServer(t *testing.T, registerFn func(s *grpc.Server)) net.Addr {
-	return StartGRPCOnNamedPipeServer(t, GetRandNamedPipeAddr().String(), registerFn)
+	_ = "STUB: not implemented"
+	return *new(net.Addr)
 }
 
 func StartGRPCOnNamedPipeServer(t *testing.T, pipeName string, registerFn func(s *grpc.Server)) net.Addr {
-	server := grpc.NewServer()
-	registerFn(server)
-
-	return ServeGRPCServerOnNamedPipe(t, server, pipeName)
+	_ = "STUB: not implemented"
+	return *new(net.Addr)
 }
 
 func ServeGRPCServerOnNamedPipe(t *testing.T, server *grpc.Server, pipeName string) net.Addr {
-	listener, err := winio.ListenPipe(`\\.\`+filepath.Join("pipe", pipeName), nil)
-	require.NoError(t, err)
-	ServeGRPCServerOnListener(t, server, listener)
-	return namedpipe.AddrFromName(namedpipe.GetPipeName(listener.Addr().String()))
+	_ = "STUB: not implemented"
+	return *new(net.Addr)
 }
 
 func ServeGRPCServerOnRandPipeName(t *testing.T, server *grpc.Server) net.Addr {
-	return ServeGRPCServerOnNamedPipe(t, server, GetRandNamedPipeAddr().String())
+	_ = "STUB: not implemented"
+	return *new(net.Addr)
 }
 
-func GetRandNamedPipeAddr() net.Addr {
-	return namedpipe.AddrFromName(fmt.Sprintf("spire-test-%x", randUint64()))
-}
+func GetRandNamedPipeAddr() net.Addr { _ = "STUB: not implemented"; return *new(net.Addr) }
 
-func randUint64() uint64 {
-	var value uint64
-	if err := binary.Read(rand.Reader, binary.LittleEndian, &value); err != nil {
-		panic(fmt.Sprintf("failed to generate random value for pipe name: %v", err))
-	}
-	return value
-}
+func randUint64() uint64 { _ = "STUB: not implemented"; return 0 }
 
 func ServeGRPCServerOnListener(t *testing.T, server *grpc.Server, listener net.Listener) {
+	_ = "STUB: not implemented"
 	// The Windows-specific implementation handles the race condition during cleanup
 	// with named pipes. Named pipes on Windows require special handling during
 	// shutdown to avoid deadlocks.
-	errCh := make(chan error, 1)
-	go func() {
-		errCh <- server.Serve(listener)
-	}()
-	t.Cleanup(func() {
-		// Close the listener first to unblock server.Serve()
-		// This is necessary on Windows to prevent deadlock during named pipe cleanup
-		listener.Close()
-		server.GracefulStop()
-		// Wait for Serve to return. We expect an error since we closed the listener,
-		// so we don't need to check it.
-		<-errCh
-	})
+	return
 }
+
+// Close the listener first to unblock server.Serve()
+// This is necessary on Windows to prevent deadlock during named pipe cleanup
+
+// Wait for Serve to return. We expect an error since we closed the listener,
+// so we don't need to check it.

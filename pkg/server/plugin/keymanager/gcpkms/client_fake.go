@@ -1,38 +1,19 @@
 package gcpkms
 
 import (
-	"bytes"
 	"context"
 	"crypto"
-	"crypto/ecdsa"
-	"crypto/rand"
-	"crypto/rsa"
-	"crypto/x509"
-	"encoding/pem"
-	"errors"
 	"fmt"
-	"maps"
-	"path"
-	"reflect"
 	"regexp"
-	"strconv"
-	"strings"
 	"sync"
 	"testing"
-	"time"
 
 	"cloud.google.com/go/iam"
-	"cloud.google.com/go/iam/apiv1/iampb"
 	"cloud.google.com/go/kms/apiv1/kmspb"
 	"github.com/googleapis/gax-go/v2"
 	"github.com/spiffe/spire/test/clock"
-	"github.com/spiffe/spire/test/testkey"
-	"google.golang.org/api/iterator"
 	"google.golang.org/api/oauth2/v2"
 	"google.golang.org/api/option"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
@@ -48,20 +29,8 @@ type fakeCryptoKeyIterator struct {
 }
 
 func (i *fakeCryptoKeyIterator) Next() (cryptoKey *kmspb.CryptoKey, err error) {
-	i.mu.Lock()
-	defer i.mu.Unlock()
-
-	if i.nextErr != nil {
-		return nil, i.nextErr
-	}
-
-	if i.index >= len(i.cryptoKeys) {
-		return nil, iterator.Done
-	}
-
-	cryptoKey = i.cryptoKeys[i.index]
-	i.index++
-	return cryptoKey, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 type fakeCryptoKeyVersionIterator struct {
@@ -73,20 +42,8 @@ type fakeCryptoKeyVersionIterator struct {
 }
 
 func (i *fakeCryptoKeyVersionIterator) Next() (cryptoKeyVersion *kmspb.CryptoKeyVersion, err error) {
-	i.mu.Lock()
-	defer i.mu.Unlock()
-
-	if i.nextErr != nil {
-		return nil, i.nextErr
-	}
-
-	if i.index >= len(i.cryptoKeyVersions) {
-		return nil, iterator.Done
-	}
-
-	cryptoKeyVersion = i.cryptoKeyVersions[i.index]
-	i.index++
-	return cryptoKeyVersion, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 type fakeCryptoKey struct {
@@ -96,37 +53,17 @@ type fakeCryptoKey struct {
 }
 
 func (fck *fakeCryptoKey) fetchFakeCryptoKeyVersions() map[string]*fakeCryptoKeyVersion {
-	fck.mu.RLock()
-	defer fck.mu.RUnlock()
-
-	if fck.fakeCryptoKeyVersions == nil {
-		return nil
-	}
-
-	fakeCryptoKeyVersions := make(map[string]*fakeCryptoKeyVersion, len(fck.fakeCryptoKeyVersions))
-	maps.Copy(fakeCryptoKeyVersions, fck.fakeCryptoKeyVersions)
-	return fakeCryptoKeyVersions
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (fck *fakeCryptoKey) getLabelValue(key string) string {
-	fck.mu.RLock()
-	defer fck.mu.RUnlock()
+func (fck *fakeCryptoKey) getLabelValue(key string) string { _ = "STUB: not implemented"; return "" }
 
-	return fck.Labels[key]
-}
-
-func (fck *fakeCryptoKey) getName() string {
-	fck.mu.RLock()
-	defer fck.mu.RUnlock()
-
-	return fck.Name
-}
+func (fck *fakeCryptoKey) getName() string { _ = "STUB: not implemented"; return "" }
 
 func (fck *fakeCryptoKey) putFakeCryptoKeyVersion(fckv *fakeCryptoKeyVersion) {
-	fck.mu.Lock()
-	defer fck.mu.Unlock()
-
-	fck.fakeCryptoKeyVersions[path.Base(fckv.Name)] = fckv
+	_ = "STUB: not implemented"
+	return
 }
 
 type fakeCryptoKeyVersion struct {
@@ -144,53 +81,21 @@ type fakeStore struct {
 }
 
 func (fs *fakeStore) fetchFakeCryptoKey(name string) (*fakeCryptoKey, bool) {
-	fs.mu.RLock()
-	defer fs.mu.RUnlock()
-
-	fakeCryptoKey, ok := fs.fakeCryptoKeys[name]
-	return fakeCryptoKey, ok
+	_ = "STUB: not implemented"
+	return nil, false
 }
 
 func (fs *fakeStore) fetchFakeCryptoKeys() map[string]*fakeCryptoKey {
-	fs.mu.RLock()
-	defer fs.mu.RUnlock()
-
-	if fs.fakeCryptoKeys == nil {
-		return nil
-	}
-
-	fakeCryptoKeys := make(map[string]*fakeCryptoKey, len(fs.fakeCryptoKeys))
-	maps.Copy(fakeCryptoKeys, fs.fakeCryptoKeys)
-	return fakeCryptoKeys
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (fs *fakeStore) fetchFakeCryptoKeyVersion(name string) (fakeCryptoKeyVersion, error) {
-	fs.mu.RLock()
-	defer fs.mu.RUnlock()
-
-	parent := path.Dir(path.Dir(name))
-	fakeCryptoKey, ok := fs.fakeCryptoKeys[parent]
-	if !ok {
-		return fakeCryptoKeyVersion{}, fmt.Errorf("could not get parent CryptoKey for %q CryptoKeyVersion", name)
-	}
-
-	version := path.Base(name)
-	fakeCryptoKey.mu.RLock()
-	defer fakeCryptoKey.mu.RUnlock()
-	fakeCryptokeyVersion, ok := fakeCryptoKey.fakeCryptoKeyVersions[version]
-	if ok {
-		return *fakeCryptokeyVersion, nil
-	}
-
-	return fakeCryptoKeyVersion{}, fmt.Errorf("could not find CryptoKeyVersion %q", version)
+	_ = "STUB: not implemented"
+	return *new(fakeCryptoKeyVersion), nil
 }
 
-func (fs *fakeStore) putFakeCryptoKey(fck *fakeCryptoKey) {
-	fs.mu.Lock()
-	defer fs.mu.Unlock()
-
-	fs.fakeCryptoKeys[fck.Name] = fck
-}
+func (fs *fakeStore) putFakeCryptoKey(fck *fakeCryptoKey) { _ = "STUB: not implemented"; return }
 
 type fakeIAMHandle struct {
 	mu             sync.RWMutex
@@ -199,37 +104,16 @@ type fakeIAMHandle struct {
 	setPolicyErr   error
 }
 
-func (h *fakeIAMHandle) V3() iamHandler3 {
-	h.mu.RLock()
-	defer h.mu.RUnlock()
-
-	return &fakeIAMHandle3{
-		expectedPolicy: h.expectedPolicy,
-		policyErr:      h.policyErr,
-		setPolicyErr:   h.setPolicyErr,
-	}
-}
+func (h *fakeIAMHandle) V3() iamHandler3 { _ = "STUB: not implemented"; return *new(iamHandler3) }
 
 func (h *fakeIAMHandle) setExpectedPolicy(expectedPolicy *iam.Policy3) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-
-	h.expectedPolicy = expectedPolicy
+	_ = "STUB: not implemented"
+	return
 }
 
-func (h *fakeIAMHandle) setPolicyError(fakeError error) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+func (h *fakeIAMHandle) setPolicyError(fakeError error) { _ = "STUB: not implemented"; return }
 
-	h.policyErr = fakeError
-}
-
-func (h *fakeIAMHandle) setSetPolicyErr(fakeError error) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-
-	h.setPolicyErr = fakeError
-}
+func (h *fakeIAMHandle) setSetPolicyErr(fakeError error) { _ = "STUB: not implemented"; return }
 
 type fakeIAMHandle3 struct {
 	mu             sync.RWMutex
@@ -239,26 +123,13 @@ type fakeIAMHandle3 struct {
 }
 
 func (h3 *fakeIAMHandle3) Policy(context.Context) (*iam.Policy3, error) {
-	h3.mu.RLock()
-	defer h3.mu.RUnlock()
-
-	if h3.policyErr != nil {
-		return nil, h3.policyErr
-	}
-	return &iam.Policy3{}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (h3 *fakeIAMHandle3) SetPolicy(_ context.Context, policy *iam.Policy3) error {
-	h3.mu.Lock()
-	defer h3.mu.Unlock()
-
-	if h3.expectedPolicy != nil {
-		if !reflect.DeepEqual(h3.expectedPolicy, policy) {
-			return fmt.Errorf("unexpected policy: %v", policy)
-		}
-	}
-
-	return h3.setPolicyErr
+	_ = "STUB: not implemented"
+	return nil
 }
 
 type fakeKMSClient struct {
@@ -286,520 +157,153 @@ type fakeKMSClient struct {
 	keyIsDisabled                bool
 }
 
-func (k *fakeKMSClient) setAsymmetricSignErr(fakeError error) {
-	k.mu.Lock()
-	defer k.mu.Unlock()
+func (k *fakeKMSClient) setAsymmetricSignErr(fakeError error) { _ = "STUB: not implemented"; return }
 
-	k.asymmetricSignErr = fakeError
-}
-
-func (k *fakeKMSClient) setCreateCryptoKeyErr(fakeError error) {
-	k.mu.Lock()
-	defer k.mu.Unlock()
-
-	k.createCryptoKeyErr = fakeError
-}
+func (k *fakeKMSClient) setCreateCryptoKeyErr(fakeError error) { _ = "STUB: not implemented"; return }
 
 func (k *fakeKMSClient) setInitialCryptoKeyVersionState(state kmspb.CryptoKeyVersion_CryptoKeyVersionState) {
-	k.initialCryptoKeyVersionState = state
+	_ = "STUB: not implemented"
+	return
 }
 
 func (k *fakeKMSClient) setDestroyCryptoKeyVersionErr(fakeError error) {
-	k.mu.Lock()
-	defer k.mu.Unlock()
-
-	k.destroyCryptoKeyVersionErr = fakeError
+	_ = "STUB: not implemented"
+	return
 }
 
 func (k *fakeKMSClient) setDestroyTime(fakeDestroyTime *timestamppb.Timestamp) {
-	k.mu.Lock()
-	defer k.mu.Unlock()
-
-	k.destroyTime = fakeDestroyTime
+	_ = "STUB: not implemented"
+	return
 }
 
 func (k *fakeKMSClient) setGetCryptoKeyVersionErr(fakeError error) {
-	k.mu.Lock()
-	defer k.mu.Unlock()
-
-	k.getCryptoKeyVersionErr = fakeError
+	_ = "STUB: not implemented"
+	return
 }
 
-func (k *fakeKMSClient) setIsKeyDisabled(ok bool) {
-	k.mu.Lock()
-	defer k.mu.Unlock()
-
-	k.keyIsDisabled = ok
-}
+func (k *fakeKMSClient) setIsKeyDisabled(ok bool) { _ = "STUB: not implemented"; return }
 
 func (k *fakeKMSClient) setGetPublicKeySequentialErrs(fakeError error, count int) {
-	k.mu.Lock()
-	defer k.mu.Unlock()
-	fakeErrors := make([]error, count)
-	for i := range count {
-		fakeErrors[i] = fakeError
-	}
-	k.getPublicKeyErrs = fakeErrors
+	_ = "STUB: not implemented"
+	return
 }
 
 func (k *fakeKMSClient) nextGetPublicKeySequentialErr() error {
-	k.mu.Lock()
-	defer k.mu.Unlock()
-	if len(k.getPublicKeyErrs) == 0 {
-		return nil
-	}
-	err := k.getPublicKeyErrs[0]
-	k.getPublicKeyErrs = k.getPublicKeyErrs[1:]
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (k *fakeKMSClient) setGetTokeninfoErr(fakeError error) {
-	k.mu.Lock()
-	defer k.mu.Unlock()
+func (k *fakeKMSClient) setGetTokeninfoErr(fakeError error) { _ = "STUB: not implemented"; return }
 
-	k.getTokeninfoErr = fakeError
-}
-
-func (k *fakeKMSClient) setListCryptoKeysErr(fakeError error) {
-	k.mu.Lock()
-	defer k.mu.Unlock()
-
-	k.listCryptoKeysErr = fakeError
-}
+func (k *fakeKMSClient) setListCryptoKeysErr(fakeError error) { _ = "STUB: not implemented"; return }
 
 func (k *fakeKMSClient) setPEMCrc32C(pemCrc32C *wrapperspb.Int64Value) {
-	k.mu.Lock()
-	defer k.mu.Unlock()
-
-	k.pemCrc32C = pemCrc32C
+	_ = "STUB: not implemented"
+	return
 }
 
 func (k *fakeKMSClient) setSignatureCrc32C(signatureCrc32C *wrapperspb.Int64Value) {
-	k.mu.Lock()
-	defer k.mu.Unlock()
-
-	k.signatureCrc32C = signatureCrc32C
+	_ = "STUB: not implemented"
+	return
 }
 
-func (k *fakeKMSClient) setUpdateCryptoKeyErr(fakeError error) {
-	k.mu.Lock()
-	defer k.mu.Unlock()
-
-	k.updateCryptoKeyErr = fakeError
-}
+func (k *fakeKMSClient) setUpdateCryptoKeyErr(fakeError error) { _ = "STUB: not implemented"; return }
 
 func (k *fakeKMSClient) AsymmetricSign(_ context.Context, signReq *kmspb.AsymmetricSignRequest, _ ...gax.CallOption) (*kmspb.AsymmetricSignResponse, error) {
-	k.mu.RLock()
-	defer k.mu.RUnlock()
-
-	if k.asymmetricSignErr != nil {
-		return nil, k.asymmetricSignErr
-	}
-
-	if signReq.Digest == nil {
-		return nil, status.Error(codes.InvalidArgument, "plugin should be signing over a digest")
-	}
-
-	fakeCryptoKeyVersion, err := k.store.fetchFakeCryptoKeyVersion(signReq.Name)
-	if err != nil {
-		return nil, err
-	}
-
-	signRSA := func(digest []byte, opts crypto.SignerOpts) ([]byte, error) {
-		if _, ok := fakeCryptoKeyVersion.privateKey.(*rsa.PrivateKey); !ok {
-			return nil, status.Errorf(codes.InvalidArgument, "invalid signing algorithm for RSA key")
-		}
-		return fakeCryptoKeyVersion.privateKey.Sign(rand.Reader, digest, opts)
-	}
-	signECDSA := func(digest []byte, opts crypto.SignerOpts) ([]byte, error) {
-		if _, ok := fakeCryptoKeyVersion.privateKey.(*ecdsa.PrivateKey); !ok {
-			return nil, status.Errorf(codes.InvalidArgument, "invalid signing algorithm for ECDSA key")
-		}
-		return fakeCryptoKeyVersion.privateKey.Sign(rand.Reader, digest, opts)
-	}
-
-	cryptoKeyName := path.Dir(path.Dir(signReq.Name))
-	fck, ok := k.store.fetchFakeCryptoKey(cryptoKeyName)
-	if !ok {
-		return nil, status.Errorf(codes.Internal, "could not find CryptoKey %q", cryptoKeyName)
-	}
-	var signature []byte
-	switch fck.VersionTemplate.Algorithm {
-	case kmspb.CryptoKeyVersion_EC_SIGN_P256_SHA256:
-		signature, err = signECDSA(signReq.Digest.GetSha256(), crypto.SHA256)
-	case kmspb.CryptoKeyVersion_EC_SIGN_P384_SHA384:
-		signature, err = signECDSA(signReq.Digest.GetSha384(), crypto.SHA384)
-	case kmspb.CryptoKeyVersion_RSA_SIGN_PKCS1_2048_SHA256:
-		signature, err = signRSA(signReq.Digest.GetSha256(), crypto.SHA256)
-	case kmspb.CryptoKeyVersion_RSA_SIGN_PKCS1_4096_SHA256:
-		signature, err = signRSA(signReq.Digest.GetSha256(), crypto.SHA256)
-	default:
-		return nil, status.Errorf(codes.InvalidArgument, "unsupported signing algorithm: %s", fck.VersionTemplate.Algorithm)
-	}
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "unable to sign digest: %v", err)
-	}
-
-	signatureCrc32C := &wrapperspb.Int64Value{Value: int64(crc32Checksum(signature))}
-	if k.signatureCrc32C != nil {
-		// Override the SignatureCrc32C value
-		signatureCrc32C = k.signatureCrc32C
-	}
-
-	return &kmspb.AsymmetricSignResponse{
-		Signature:       signature,
-		SignatureCrc32C: signatureCrc32C,
-		Name:            signReq.Name,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (k *fakeKMSClient) Close() error {
-	k.mu.RLock()
-	defer k.mu.RUnlock()
+// Override the SignatureCrc32C value
 
-	return k.closeErr
-}
+func (k *fakeKMSClient) Close() error { _ = "STUB: not implemented"; return nil }
 
 func (k *fakeKMSClient) CreateCryptoKey(_ context.Context, req *kmspb.CreateCryptoKeyRequest, _ ...gax.CallOption) (*kmspb.CryptoKey, error) {
-	k.mu.RLock()
-	defer k.mu.RUnlock()
-
-	if k.createCryptoKeyErr != nil {
-		return nil, k.createCryptoKeyErr
-	}
-
-	cryptoKey := &kmspb.CryptoKey{
-		Name:            path.Join(req.Parent, req.CryptoKeyId),
-		Labels:          req.CryptoKey.Labels,
-		VersionTemplate: req.CryptoKey.VersionTemplate,
-	}
-	version := "1"
-	fckv, err := k.createFakeCryptoKeyVersion(cryptoKey, version)
-	if err != nil {
-		return nil, err
-	}
-
-	fck := &fakeCryptoKey{
-		CryptoKey: cryptoKey,
-		fakeCryptoKeyVersions: map[string]*fakeCryptoKeyVersion{
-			version: fckv,
-		},
-	}
-	k.store.putFakeCryptoKey(fck)
-
-	// Return a clone to decouple the caller's copy from the fake
-	// store's copy, mimicking the behavior of a real KMS service
-	// where no memory is shared between client and server.
-	return proto.Clone(cryptoKey).(*kmspb.CryptoKey), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
+// Return a clone to decouple the caller's copy from the fake
+// store's copy, mimicking the behavior of a real KMS service
+// where no memory is shared between client and server.
+
 func (k *fakeKMSClient) CreateCryptoKeyVersion(_ context.Context, req *kmspb.CreateCryptoKeyVersionRequest, _ ...gax.CallOption) (*kmspb.CryptoKeyVersion, error) {
-	k.mu.Lock()
-	defer k.mu.Unlock()
-
-	if k.createCryptoKeyErr != nil {
-		return nil, k.createCryptoKeyErr
-	}
-
-	fck, ok := k.store.fakeCryptoKeys[req.Parent]
-	if !ok {
-		return nil, fmt.Errorf("could not find parent CryptoKey %q", req.Parent)
-	}
-	fckv, err := k.createFakeCryptoKeyVersion(fck.CryptoKey, fmt.Sprint(len(fck.fakeCryptoKeyVersions)+1))
-	if err != nil {
-		return nil, err
-	}
-
-	fck.putFakeCryptoKeyVersion(fckv)
-
-	return &kmspb.CryptoKeyVersion{
-		Algorithm: req.CryptoKeyVersion.Algorithm,
-		Name:      fckv.Name,
-		State:     kmspb.CryptoKeyVersion_ENABLED,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (k *fakeKMSClient) DestroyCryptoKeyVersion(_ context.Context, req *kmspb.DestroyCryptoKeyVersionRequest, _ ...gax.CallOption) (*kmspb.CryptoKeyVersion, error) {
-	if k.destroyCryptoKeyVersionErr != nil {
-		return nil, k.destroyCryptoKeyVersionErr
-	}
-
-	parent := path.Dir(path.Dir(req.Name))
-	fck, ok := k.store.fetchFakeCryptoKey(parent)
-	if !ok {
-		return nil, fmt.Errorf("could not get parent CryptoKey for %q CryptoKeyVersion", parent)
-	}
-
-	fckv, err := k.store.fetchFakeCryptoKeyVersion(req.Name)
-	if err != nil {
-		return nil, err
-	}
-
-	var destroyTime *timestamppb.Timestamp
-	if k.destroyTime != nil {
-		destroyTime = k.destroyTime
-	} else {
-		destroyTime = timestamppb.Now()
-	}
-
-	cryptoKeyVersion := &kmspb.CryptoKeyVersion{
-		DestroyTime: destroyTime,
-		Name:        fckv.Name,
-		State:       kmspb.CryptoKeyVersion_DESTROY_SCHEDULED,
-	}
-
-	fckv.CryptoKeyVersion = cryptoKeyVersion
-	fck.putFakeCryptoKeyVersion(&fckv)
-
-	return cryptoKeyVersion, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (k *fakeKMSClient) GetCryptoKeyVersion(_ context.Context, req *kmspb.GetCryptoKeyVersionRequest, _ ...gax.CallOption) (*kmspb.CryptoKeyVersion, error) {
-	k.mu.RLock()
-	defer k.mu.RUnlock()
-
-	if k.getCryptoKeyVersionErr != nil {
-		return nil, k.getCryptoKeyVersionErr
-	}
-
-	fakeCryptoKeyVersion, err := k.store.fetchFakeCryptoKeyVersion(req.Name)
-	if err != nil {
-		return nil, err
-	}
-
-	if k.keyIsDisabled {
-		fakeCryptoKeyVersion.CryptoKeyVersion.State = kmspb.CryptoKeyVersion_DISABLED
-	}
-	return fakeCryptoKeyVersion.CryptoKeyVersion, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (k *fakeKMSClient) GetPublicKey(_ context.Context, req *kmspb.GetPublicKeyRequest, _ ...gax.CallOption) (*kmspb.PublicKey, error) {
-	getPublicKeyErr := k.nextGetPublicKeySequentialErr()
-
-	if getPublicKeyErr != nil {
-		return nil, getPublicKeyErr
-	}
-
-	fakeCryptoKeyVersion, err := k.store.fetchFakeCryptoKeyVersion(req.Name)
-	if err != nil {
-		return nil, err
-	}
-
-	if k.pemCrc32C != nil {
-		// Override pemCrc32C
-		fakeCryptoKeyVersion.publicKey.PemCrc32C = k.pemCrc32C
-	}
-
-	return fakeCryptoKeyVersion.publicKey, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (k *fakeKMSClient) GetTokeninfo() (*oauth2.Tokeninfo, error) {
-	k.mu.RLock()
-	defer k.mu.RUnlock()
+// Override pemCrc32C
 
-	return k.tokeninfo, k.getTokeninfoErr
+func (k *fakeKMSClient) GetTokeninfo() (*oauth2.Tokeninfo, error) {
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (k *fakeKMSClient) ListCryptoKeys(_ context.Context, req *kmspb.ListCryptoKeysRequest, _ ...gax.CallOption) cryptoKeyIterator {
-	k.mu.RLock()
-	defer k.mu.RUnlock()
-
-	if k.listCryptoKeysErr != nil {
-		return &fakeCryptoKeyIterator{nextErr: k.listCryptoKeysErr}
-	}
-	var cryptoKeys []*kmspb.CryptoKey
-	fakeCryptoKeys := k.store.fetchFakeCryptoKeys()
-
-	for _, fck := range fakeCryptoKeys {
-		// Make sure that it's within the same Key Ring.
-		// The Key Ring name es specified in req.Parent.
-		// The Key Ring name is three levels up from the CryptoKey name.
-		if req.Parent != path.Dir(path.Dir(path.Dir(fck.Name))) {
-			// Key Ring doesn't match.
-			continue
-		}
-
-		// We Have a simplified filtering logic in this fake implementation,
-		// where we only care about the spire-active and spire-last-update labels.
-		if req.Filter != "" {
-			if !strings.Contains(req.Filter, "labels.spire-active = true") {
-				k.t.Fatal("Unsupported filter in ListCryptoKeys request")
-			}
-
-			lastUpdateRegexpResults := lastUpdateFilterRegexp.FindStringSubmatch(req.Filter)
-			var lastUpdateTimeFilter time.Time
-			var keyLastUpdateTime time.Time
-			if len(lastUpdateRegexpResults) == 2 {
-				lastUpdate := lastUpdateRegexpResults[1]
-				lastUpdateUnix, err := strconv.ParseInt(lastUpdate, 10, 64)
-				if err != nil {
-					k.t.Fatalf("Failed to parse last update time in request filter: %s", err)
-				}
-
-				lastUpdateTimeFilter = time.Unix(lastUpdateUnix, 0)
-
-				if keyLastUpdate, ok := fck.Labels[labelNameLastUpdate]; ok {
-					keyLastUpdateUnix, err := strconv.ParseInt(keyLastUpdate, 10, 64)
-					if err != nil {
-						k.t.Fatalf("Failed to parse last update time in crypto key: %s", err)
-					}
-
-					keyLastUpdateTime = time.Unix(keyLastUpdateUnix, 0)
-				}
-			}
-
-			if fck.Labels[labelNameActive] != "true" ||
-				(!lastUpdateTimeFilter.IsZero() && !keyLastUpdateTime.IsZero() && !keyLastUpdateTime.Before(lastUpdateTimeFilter)) {
-				continue
-			}
-		}
-
-		cryptoKeys = append(cryptoKeys, fck.CryptoKey)
-	}
-
-	return &fakeCryptoKeyIterator{cryptoKeys: cryptoKeys}
+	_ = "STUB: not implemented"
+	return *new(cryptoKeyIterator)
 }
+
+// Make sure that it's within the same Key Ring.
+// The Key Ring name es specified in req.Parent.
+// The Key Ring name is three levels up from the CryptoKey name.
+
+// Key Ring doesn't match.
+
+// We Have a simplified filtering logic in this fake implementation,
+// where we only care about the spire-active and spire-last-update labels.
 
 func (k *fakeKMSClient) ListCryptoKeyVersions(_ context.Context, req *kmspb.ListCryptoKeyVersionsRequest, _ ...gax.CallOption) cryptoKeyVersionIterator {
-	k.mu.RLock()
-	defer k.mu.RUnlock()
-
-	if k.listCryptoKeyVersionsErr != nil {
-		return &fakeCryptoKeyVersionIterator{nextErr: k.listCryptoKeyVersionsErr}
-	}
-
-	var cryptoKeyVersions []*kmspb.CryptoKeyVersion
-	fck, ok := k.store.fakeCryptoKeys[req.Parent]
-	if !ok {
-		return &fakeCryptoKeyVersionIterator{nextErr: errors.New("parent CryptoKey not found")}
-	}
-
-	for _, fckv := range fck.fakeCryptoKeyVersions {
-		// We Have a simplified filtering logic in this fake implementation,
-		// where we only support filtering by enabled status.
-		if req.Filter != "" {
-			if req.Filter != "state = "+kmspb.CryptoKeyVersion_ENABLED.String() {
-				k.t.Fatal("Unsupported filter in ListCryptoKeyVersions request")
-			}
-			if fckv.State != kmspb.CryptoKeyVersion_ENABLED {
-				continue
-			}
-		}
-		cryptoKeyVersions = append(cryptoKeyVersions, fckv.CryptoKeyVersion)
-	}
-
-	return &fakeCryptoKeyVersionIterator{cryptoKeyVersions: cryptoKeyVersions}
+	_ = "STUB: not implemented"
+	return *new(cryptoKeyVersionIterator)
 }
 
-func (k *fakeKMSClient) ResourceIAM(string) iamHandler {
-	k.mu.RLock()
-	defer k.mu.RUnlock()
+// We Have a simplified filtering logic in this fake implementation,
+// where we only support filtering by enabled status.
 
-	return k.fakeIAMHandle
+func (k *fakeKMSClient) ResourceIAM(string) iamHandler {
+	_ = "STUB: not implemented"
+	return *new(iamHandler)
 }
 
 func (k *fakeKMSClient) UpdateCryptoKey(_ context.Context, req *kmspb.UpdateCryptoKeyRequest, _ ...gax.CallOption) (*kmspb.CryptoKey, error) {
-	if k.updateCryptoKeyErr != nil {
-		return nil, k.updateCryptoKeyErr
-	}
-
-	fck, ok := k.store.fetchFakeCryptoKey(req.CryptoKey.Name)
-	if !ok {
-		return nil, fmt.Errorf("could not find CryptoKey %q", req.CryptoKey.Name)
-	}
-
-	k.mu.Lock()
-	defer k.mu.Unlock()
-
-	fck.mu.Lock()
-	defer fck.mu.Unlock()
-
-	// Clone to decouple the fake store's copy from the caller's
-	// copy, preventing shared-memory data races.
-	fck.CryptoKey = proto.Clone(req.CryptoKey).(*kmspb.CryptoKey)
-	return proto.Clone(fck.CryptoKey).(*kmspb.CryptoKey), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Clone to decouple the fake store's copy from the caller's
+// copy, preventing shared-memory data races.
 
 func (k *fakeKMSClient) createFakeCryptoKeyVersion(cryptoKey *kmspb.CryptoKey, version string) (*fakeCryptoKeyVersion, error) {
-	var privateKey crypto.Signer
-	var testKeys testkey.Keys
-
-	switch cryptoKey.VersionTemplate.Algorithm {
-	case kmspb.CryptoKeyVersion_EC_SIGN_P256_SHA256:
-		privateKey = testKeys.NewEC256(k.t)
-	case kmspb.CryptoKeyVersion_EC_SIGN_P384_SHA384:
-		privateKey = testKeys.NewEC384(k.t)
-	case kmspb.CryptoKeyVersion_RSA_SIGN_PKCS1_2048_SHA256:
-		privateKey = testKeys.NewRSA2048(k.t)
-	case kmspb.CryptoKeyVersion_RSA_SIGN_PKCS1_4096_SHA256:
-		privateKey = testKeys.NewRSA4096(k.t)
-	default:
-		return nil, fmt.Errorf("unknown algorithm %q", cryptoKey.VersionTemplate.Algorithm)
-	}
-
-	pkixData, err := x509.MarshalPKIXPublicKey(privateKey.Public())
-	if err != nil {
-		return nil, err
-	}
-	pemCert := new(bytes.Buffer)
-	if err = pem.Encode(pemCert, &pem.Block{
-		Type:  "CERTIFICATE",
-		Bytes: pkixData,
-	}); err != nil {
-		return nil, err
-	}
-
-	return &fakeCryptoKeyVersion{
-		privateKey: privateKey,
-		publicKey: &kmspb.PublicKey{
-			Pem:       pemCert.String(),
-			PemCrc32C: &wrapperspb.Int64Value{Value: int64(crc32Checksum(pemCert.Bytes()))},
-		},
-		CryptoKeyVersion: &kmspb.CryptoKeyVersion{
-			Name:      path.Join(cryptoKey.Name, "cryptoKeyVersions", version),
-			State:     k.initialCryptoKeyVersionState,
-			Algorithm: cryptoKey.VersionTemplate.Algorithm,
-		},
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (k *fakeKMSClient) getDefaultPolicy() *iam.Policy3 {
-	k.mu.RLock()
-	defer k.mu.RUnlock()
-
-	policy := new(iam.Policy3)
-	policy.Bindings = []*iampb.Binding{
-		{
-			Role:    "roles/cloudkms.signerVerifier",
-			Members: []string{fmt.Sprintf("serviceAccount:%s", k.tokeninfo.Email)},
-		},
-	}
-	return policy
-}
+func (k *fakeKMSClient) getDefaultPolicy() *iam.Policy3 { _ = "STUB: not implemented"; return nil }
 
 func (k *fakeKMSClient) putFakeCryptoKeys(fakeCryptoKeys []*fakeCryptoKey) {
-	for _, fck := range fakeCryptoKeys {
-		k.store.putFakeCryptoKey(&fakeCryptoKey{
-			CryptoKey:             fck.CryptoKey,
-			fakeCryptoKeyVersions: fck.fakeCryptoKeyVersions,
-		})
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 func newKMSClientFake(t *testing.T, c *clock.Mock) *fakeKMSClient {
-	return &fakeKMSClient{
-		fakeIAMHandle: &fakeIAMHandle{},
-		store:         newFakeStore(c),
-		t:             t,
-		tokeninfo: &oauth2.Tokeninfo{
-			Email: "email@example.org",
-		},
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func newFakeStore(c *clock.Mock) fakeStore {
-	return fakeStore{
-		fakeCryptoKeys: make(map[string]*fakeCryptoKey),
-		clk:            c,
-	}
-}
+func newFakeStore(c *clock.Mock) fakeStore { _ = "STUB: not implemented"; return *new(fakeStore) }

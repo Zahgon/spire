@@ -2,27 +2,22 @@ package x509
 
 import (
 	"context"
-	"errors"
 	"flag"
-	"fmt"
 
 	"github.com/mitchellh/cli"
-	localauthorityv1 "github.com/spiffe/spire-api-sdk/proto/spire/api/server/localauthority/v1"
-	"github.com/spiffe/spire/cmd/spire-server/cli/authoritycommon"
 	"github.com/spiffe/spire/cmd/spire-server/util"
 	commoncli "github.com/spiffe/spire/pkg/common/cli"
 	"github.com/spiffe/spire/pkg/common/cliprinter"
 )
 
 // NewShowCommand creates a new "x509 show" subcommand for "localauthority" command.
-func NewX509ShowCommand() cli.Command {
-	return NewX509ShowCommandWithEnv(commoncli.DefaultEnv)
-}
+func NewX509ShowCommand() cli.Command { _ = "STUB: not implemented"; return *new(cli.Command) }
 
 // NewX509ShowCommandWithEnv creates a new "x509 show" subcommand for "localauthority" command
 // using the environment specified
 func NewX509ShowCommandWithEnv(env *commoncli.Env) cli.Command {
-	return util.AdaptCommand(env, &x509ShowCommand{env: env})
+	_ = "STUB: not implemented"
+	return *new(cli.Command)
 }
 
 type x509ShowCommand struct {
@@ -31,55 +26,20 @@ type x509ShowCommand struct {
 	env *commoncli.Env
 }
 
-func (c *x509ShowCommand) Name() string {
-	return "localauthority x509 show"
-}
+func (c *x509ShowCommand) Name() string { _ = "STUB: not implemented"; return "" }
 
-func (*x509ShowCommand) Synopsis() string {
-	return "Shows the local X.509 authorities"
-}
+func (*x509ShowCommand) Synopsis() string { _ = "STUB: not implemented"; return "" }
 
-func (c *x509ShowCommand) AppendFlags(f *flag.FlagSet) {
-	cliprinter.AppendFlagWithCustomPretty(&c.printer, f, c.env, prettyPrintX509Show)
-}
+func (c *x509ShowCommand) AppendFlags(f *flag.FlagSet) { _ = "STUB: not implemented"; return }
 
 // Run executes all logic associated with a single invocation of the
 // `spire-server localauthority x509 show` CLI command
 func (c *x509ShowCommand) Run(ctx context.Context, _ *commoncli.Env, serverClient util.ServerClient) error {
-	client := serverClient.NewLocalAuthorityClient()
-	resp, err := client.GetX509AuthorityState(ctx, &localauthorityv1.GetX509AuthorityStateRequest{})
-	if err != nil {
-		return fmt.Errorf("could not get X.509 authorities: %w", err)
-	}
-
-	return c.printer.PrintProto(resp)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func prettyPrintX509Show(env *commoncli.Env, results ...any) error {
-	r, ok := results[0].(*localauthorityv1.GetX509AuthorityStateResponse)
-	if !ok {
-		return errors.New("internal error: cli printer; please report this bug")
-	}
-
-	env.Println("Active X.509 authority:")
-	if r.Active != nil {
-		authoritycommon.PrettyPrintX509AuthorityState(env, r.Active)
-	} else {
-		env.Println("  No active X.509 authority found")
-	}
-	env.Println()
-	env.Println("Prepared X.509 authority:")
-	if r.Prepared != nil {
-		authoritycommon.PrettyPrintX509AuthorityState(env, r.Prepared)
-	} else {
-		env.Println("  No prepared X.509 authority found")
-	}
-	env.Println()
-	env.Println("Old X.509 authority:")
-	if r.Old != nil {
-		authoritycommon.PrettyPrintX509AuthorityState(env, r.Old)
-	} else {
-		env.Println("  No old X.509 authority found")
-	}
+	_ = "STUB: not implemented"
 	return nil
 }

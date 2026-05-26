@@ -32,24 +32,13 @@ type Latency struct {
 // StartLatencyMetric starts a "call", which when finished via Done() will emit timing
 // and error related metrics.
 func StartLatencyMetric(metrics Metrics, key string, keyn ...string) *Latency {
-	return &Latency{
-		metrics: metrics,
-		key:     append([]string{key}, keyn...),
-		start:   time.Now(),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // AddLabel adds a label to be emitted with the call counter. It is safe to call
 // from multiple goroutines.
-func (l *Latency) AddLabel(name, value string) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
-	l.labels = append(l.labels, Label{Name: name, Value: value})
-}
+func (l *Latency) AddLabel(name, value string) { _ = "STUB: not implemented"; return }
 
 // Measure emits a latency metric based on l.start along with labels configured.
-func (l *Latency) Measure() {
-	l.mu.Lock()
-	defer l.mu.Unlock()
-	l.metrics.MeasureSinceWithLabels(append(l.key, ElapsedTime), l.start, l.labels)
-}
+func (l *Latency) Measure() { _ = "STUB: not implemented"; return }

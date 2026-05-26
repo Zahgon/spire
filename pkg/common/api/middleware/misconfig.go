@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/andres-erbsen/clock"
-	"github.com/spiffe/spire/pkg/common/api/rpccontext"
 )
 
 var (
@@ -25,24 +24,9 @@ const misconfigLogEvery = time.Minute
 // messages intersected with the number of RPCs should not produce any amount
 // of real memory use. Contention on the global mutex should also be
 // reasonable.
-func LogMisconfiguration(ctx context.Context, msg string) {
-	if shouldLogMisconfiguration(ctx, msg) {
-		rpccontext.Logger(ctx).Error(msg)
-	}
-}
+func LogMisconfiguration(ctx context.Context, msg string) { _ = "STUB: not implemented"; return }
 
 func shouldLogMisconfiguration(ctx context.Context, msg string) bool {
-	names, _ := rpccontext.Names(ctx)
-	key := names.Service + "|" + names.Method + "|" + msg
-
-	now := misconfigClk.Now()
-
-	misconfigLogMtx.Lock()
-	defer misconfigLogMtx.Unlock()
-	last, ok := misconfigLogTimes[key]
-	if !ok || now.Sub(last) >= misconfigLogEvery {
-		misconfigLogTimes[key] = now
-		return true
-	}
+	_ = "STUB: not implemented"
 	return false
 }

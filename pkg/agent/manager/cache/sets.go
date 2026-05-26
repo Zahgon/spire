@@ -35,25 +35,11 @@ var (
 // unique set of strings, allocated from a pool
 type stringSet map[string]struct{}
 
-func allocStringSet() (stringSet, func()) {
-	set := stringSetPool.Get().(stringSet)
-	return set, func() {
-		clearStringSet(set)
-		stringSetPool.Put(set)
-	}
-}
+func allocStringSet() (stringSet, func()) { _ = "STUB: not implemented"; return *new(stringSet), nil }
 
-func clearStringSet(set stringSet) {
-	for k := range set {
-		delete(set, k)
-	}
-}
+func clearStringSet(set stringSet) { _ = "STUB: not implemented"; return }
 
-func (set stringSet) Merge(ss ...string) {
-	for _, s := range ss {
-		set[s] = struct{}{}
-	}
-}
+func (set stringSet) Merge(ss ...string) { _ = "STUB: not implemented"; return }
 
 // unique set of selectors, allocated from a pool
 type selector struct {
@@ -61,90 +47,41 @@ type selector struct {
 	Value string
 }
 
-func makeSelector(s *common.Selector) selector {
-	return selector{
-		Type:  s.Type,
-		Value: s.Value,
-	}
-}
+func makeSelector(s *common.Selector) selector { _ = "STUB: not implemented"; return *new(selector) }
 
 type selectorSet map[selector]struct{}
 
 func allocSelectorSet(ss ...*common.Selector) (selectorSet, func()) {
-	set := selectorSetPool.Get().(selectorSet)
-	set.Merge(ss...)
-	return set, func() {
-		clearSelectorSet(set)
-		selectorSetPool.Put(set)
-	}
+	_ = "STUB: not implemented"
+	return *new(selectorSet), nil
 }
 
-func clearSelectorSet(set selectorSet) {
-	for k := range set {
-		delete(set, k)
-	}
-}
+func clearSelectorSet(set selectorSet) { _ = "STUB: not implemented"; return }
 
-func (set selectorSet) Merge(ss ...*common.Selector) {
-	for _, s := range ss {
-		set[makeSelector(s)] = struct{}{}
-	}
-}
+func (set selectorSet) Merge(ss ...*common.Selector) { _ = "STUB: not implemented"; return }
 
-func (set selectorSet) MergeSet(other selectorSet) {
-	for s := range other {
-		set[s] = struct{}{}
-	}
-}
+func (set selectorSet) MergeSet(other selectorSet) { _ = "STUB: not implemented"; return }
 
-func (set selectorSet) In(ss ...*common.Selector) bool {
-	for _, s := range ss {
-		if _, ok := set[makeSelector(s)]; !ok {
-			return false
-		}
-	}
-	return true
-}
+func (set selectorSet) In(ss ...*common.Selector) bool { _ = "STUB: not implemented"; return false }
 
-func (set selectorSet) SuperSetOf(other selectorSet) bool {
-	for k := range other {
-		if _, ok := set[k]; !ok {
-			return false
-		}
-	}
-	return true
-}
+func (set selectorSet) SuperSetOf(other selectorSet) bool { _ = "STUB: not implemented"; return false }
 
 // unique set of LRU cache records, allocated from a pool
 type lruCacheRecordSet map[*lruCacheRecord]struct{}
 
 func allocLRUCacheRecordSet() (lruCacheRecordSet, func()) {
-	set := lruCacheRecordSetPool.Get().(lruCacheRecordSet)
-	return set, func() {
-		clearLRUCacheRecordSet(set)
-		lruCacheRecordSetPool.Put(set)
-	}
+	_ = "STUB: not implemented"
+	return *new(lruCacheRecordSet), nil
 }
 
-func clearLRUCacheRecordSet(set lruCacheRecordSet) {
-	for k := range set {
-		delete(set, k)
-	}
-}
+func clearLRUCacheRecordSet(set lruCacheRecordSet) { _ = "STUB: not implemented"; return }
 
 // unique set of LRU cache subscribers, allocated from a pool
 type lruCacheSubscriberSet map[*lruCacheSubscriber]struct{}
 
 func allocLRUCacheSubscriberSet() (lruCacheSubscriberSet, func()) {
-	set := lruCacheSubscriberSetPool.Get().(lruCacheSubscriberSet)
-	return set, func() {
-		clearLRUCacheSubscriberSet(set)
-		lruCacheSubscriberSetPool.Put(set)
-	}
+	_ = "STUB: not implemented"
+	return *new(lruCacheSubscriberSet), nil
 }
 
-func clearLRUCacheSubscriberSet(set lruCacheSubscriberSet) {
-	for k := range set {
-		delete(set, k)
-	}
-}
+func clearLRUCacheSubscriberSet(set lruCacheSubscriberSet) { _ = "STUB: not implemented"; return }

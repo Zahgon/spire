@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/andres-erbsen/clock"
-	"github.com/imkira/go-observer"
 	"github.com/sirupsen/logrus"
 	"github.com/spiffe/spire/pkg/common/telemetry"
 	"github.com/spiffe/spire/pkg/server/ca"
@@ -26,16 +25,4 @@ type RotatorConfig struct {
 	Interval time.Duration
 }
 
-func NewRotator(c *RotatorConfig) *Rotator {
-	if c.Interval == 0 {
-		c.Interval = DefaultRotatorInterval
-	}
-	if c.Clock == nil {
-		c.Clock = clock.New()
-	}
-
-	return &Rotator{
-		c:     c,
-		state: observer.NewProperty(State{}),
-	}
-}
+func NewRotator(c *RotatorConfig) *Rotator { _ = "STUB: not implemented"; return nil }

@@ -114,18 +114,7 @@ const (
 	Dissociate
 )
 
-func (mode DeleteMode) String() string {
-	switch mode {
-	case Restrict:
-		return "RESTRICT"
-	case Delete:
-		return "DELETE"
-	case Dissociate:
-		return "DISSOCIATE"
-	default:
-		return "UNKNOWN"
-	}
-}
+func (mode DeleteMode) String() string { _ = "STUB: not implemented"; return "" }
 
 type MatchBehavior int32
 

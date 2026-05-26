@@ -1,13 +1,7 @@
 package plugin
 
 import (
-	"io"
-
 	"github.com/sirupsen/logrus"
 )
 
-func NullLogger() logrus.FieldLogger {
-	logger := logrus.New()
-	logger.Out = io.Discard
-	return logger
-}
+func NullLogger() logrus.FieldLogger { _ = "STUB: not implemented"; return *new(logrus.FieldLogger) }

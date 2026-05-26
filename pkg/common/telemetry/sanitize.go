@@ -29,25 +29,11 @@ var (
 
 // sanitize takes the input string and replaces all groups of
 // invalid characters with the valid replacement character.
-func sanitize(val string) string {
-	return _invalidCharsRegex.ReplaceAllString(val, _replaceChar)
-}
+func sanitize(val string) string { _ = "STUB: not implemented"; return "" }
 
 // sanitizeLabel take the input name and value, sanitize the
 // name and value, and return the resulting telemetry label.
-func sanitizeLabel(name, val string) Label {
-	return Label{
-		Name:  sanitize(name),
-		Value: sanitize(val),
-	}
-}
+func sanitizeLabel(name, val string) Label { _ = "STUB: not implemented"; return *new(Label) }
 
 // SanitizeLabels sanitize all given labels
-func SanitizeLabels(labels []Label) []Label {
-	sanitizedLabels := make([]Label, len(labels))
-	for i, label := range labels {
-		sanitizedLabels[i] = sanitizeLabel(label.Name, label.Value)
-	}
-
-	return sanitizedLabels
-}
+func SanitizeLabels(labels []Label) []Label { _ = "STUB: not implemented"; return nil }

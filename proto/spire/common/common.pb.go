@@ -7,11 +7,10 @@
 package common
 
 import (
+	sync "sync"
+
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
 )
 
 const (
@@ -28,35 +27,19 @@ type Empty struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Empty) Reset() {
-	*x = Empty{}
-	mi := &file_spire_common_common_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *Empty) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *Empty) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *Empty) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*Empty) ProtoMessage() {}
+func (*Empty) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *Empty) ProtoReflect() protoreflect.Message {
-	mi := &file_spire_common_common_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use Empty.ProtoReflect.Descriptor instead.
-func (*Empty) Descriptor() ([]byte, []int) {
-	return file_spire_common_common_proto_rawDescGZIP(), []int{0}
-}
+func (*Empty) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 // * A type which contains attestation data for specific platform.
 type AttestationData struct {
@@ -69,49 +52,23 @@ type AttestationData struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *AttestationData) Reset() {
-	*x = AttestationData{}
-	mi := &file_spire_common_common_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *AttestationData) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *AttestationData) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *AttestationData) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*AttestationData) ProtoMessage() {}
+func (*AttestationData) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *AttestationData) ProtoReflect() protoreflect.Message {
-	mi := &file_spire_common_common_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use AttestationData.ProtoReflect.Descriptor instead.
-func (*AttestationData) Descriptor() ([]byte, []int) {
-	return file_spire_common_common_proto_rawDescGZIP(), []int{1}
-}
+func (*AttestationData) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *AttestationData) GetType() string {
-	if x != nil {
-		return x.Type
-	}
-	return ""
-}
+func (x *AttestationData) GetType() string { _ = "STUB: not implemented"; return "" }
 
-func (x *AttestationData) GetData() []byte {
-	if x != nil {
-		return x.Data
-	}
-	return nil
-}
+func (x *AttestationData) GetData() []byte { _ = "STUB: not implemented"; return nil }
 
 // * A type which describes the conditions under which a registration
 // entry is matched.
@@ -126,49 +83,23 @@ type Selector struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Selector) Reset() {
-	*x = Selector{}
-	mi := &file_spire_common_common_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *Selector) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *Selector) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *Selector) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*Selector) ProtoMessage() {}
+func (*Selector) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *Selector) ProtoReflect() protoreflect.Message {
-	mi := &file_spire_common_common_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use Selector.ProtoReflect.Descriptor instead.
-func (*Selector) Descriptor() ([]byte, []int) {
-	return file_spire_common_common_proto_rawDescGZIP(), []int{2}
-}
+func (*Selector) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *Selector) GetType() string {
-	if x != nil {
-		return x.Type
-	}
-	return ""
-}
+func (x *Selector) GetType() string { _ = "STUB: not implemented"; return "" }
 
-func (x *Selector) GetValue() string {
-	if x != nil {
-		return x.Value
-	}
-	return ""
-}
+func (x *Selector) GetValue() string { _ = "STUB: not implemented"; return "" }
 
 // * Represents a type with a list of Selector.
 type Selectors struct {
@@ -179,42 +110,21 @@ type Selectors struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Selectors) Reset() {
-	*x = Selectors{}
-	mi := &file_spire_common_common_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *Selectors) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *Selectors) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *Selectors) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*Selectors) ProtoMessage() {}
+func (*Selectors) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *Selectors) ProtoReflect() protoreflect.Message {
-	mi := &file_spire_common_common_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use Selectors.ProtoReflect.Descriptor instead.
-func (*Selectors) Descriptor() ([]byte, []int) {
-	return file_spire_common_common_proto_rawDescGZIP(), []int{3}
-}
+func (*Selectors) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *Selectors) GetEntries() []*Selector {
-	if x != nil {
-		return x.Entries
-	}
-	return nil
-}
+func (x *Selectors) GetEntries() []*Selector { _ = "STUB: not implemented"; return nil }
 
 // Represents an attested SPIRE agent
 type AttestedNode struct {
@@ -241,98 +151,37 @@ type AttestedNode struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *AttestedNode) Reset() {
-	*x = AttestedNode{}
-	mi := &file_spire_common_common_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *AttestedNode) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *AttestedNode) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *AttestedNode) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*AttestedNode) ProtoMessage() {}
+func (*AttestedNode) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *AttestedNode) ProtoReflect() protoreflect.Message {
-	mi := &file_spire_common_common_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use AttestedNode.ProtoReflect.Descriptor instead.
-func (*AttestedNode) Descriptor() ([]byte, []int) {
-	return file_spire_common_common_proto_rawDescGZIP(), []int{4}
-}
+func (*AttestedNode) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *AttestedNode) GetSpiffeId() string {
-	if x != nil {
-		return x.SpiffeId
-	}
-	return ""
-}
+func (x *AttestedNode) GetSpiffeId() string { _ = "STUB: not implemented"; return "" }
 
-func (x *AttestedNode) GetAttestationDataType() string {
-	if x != nil {
-		return x.AttestationDataType
-	}
-	return ""
-}
+func (x *AttestedNode) GetAttestationDataType() string { _ = "STUB: not implemented"; return "" }
 
-func (x *AttestedNode) GetCertSerialNumber() string {
-	if x != nil {
-		return x.CertSerialNumber
-	}
-	return ""
-}
+func (x *AttestedNode) GetCertSerialNumber() string { _ = "STUB: not implemented"; return "" }
 
-func (x *AttestedNode) GetCertNotAfter() int64 {
-	if x != nil {
-		return x.CertNotAfter
-	}
-	return 0
-}
+func (x *AttestedNode) GetCertNotAfter() int64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *AttestedNode) GetNewCertSerialNumber() string {
-	if x != nil {
-		return x.NewCertSerialNumber
-	}
-	return ""
-}
+func (x *AttestedNode) GetNewCertSerialNumber() string { _ = "STUB: not implemented"; return "" }
 
-func (x *AttestedNode) GetNewCertNotAfter() int64 {
-	if x != nil {
-		return x.NewCertNotAfter
-	}
-	return 0
-}
+func (x *AttestedNode) GetNewCertNotAfter() int64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *AttestedNode) GetSelectors() []*Selector {
-	if x != nil {
-		return x.Selectors
-	}
-	return nil
-}
+func (x *AttestedNode) GetSelectors() []*Selector { _ = "STUB: not implemented"; return nil }
 
-func (x *AttestedNode) GetCanReattest() bool {
-	if x != nil {
-		return x.CanReattest
-	}
-	return false
-}
+func (x *AttestedNode) GetCanReattest() bool { _ = "STUB: not implemented"; return false }
 
-func (x *AttestedNode) GetAgentVersion() string {
-	if x != nil {
-		return x.AgentVersion
-	}
-	return ""
-}
+func (x *AttestedNode) GetAgentVersion() string { _ = "STUB: not implemented"; return "" }
 
 // * This is a curated record that the Server uses to set up and
 // manage the various registered nodes and workloads that are controlled by it.
@@ -379,145 +228,52 @@ type RegistrationEntry struct {
 	sizeCache            protoimpl.SizeCache
 }
 
-func (x *RegistrationEntry) Reset() {
-	*x = RegistrationEntry{}
-	mi := &file_spire_common_common_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *RegistrationEntry) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *RegistrationEntry) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *RegistrationEntry) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*RegistrationEntry) ProtoMessage() {}
+func (*RegistrationEntry) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *RegistrationEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_spire_common_common_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use RegistrationEntry.ProtoReflect.Descriptor instead.
-func (*RegistrationEntry) Descriptor() ([]byte, []int) {
-	return file_spire_common_common_proto_rawDescGZIP(), []int{5}
-}
+func (*RegistrationEntry) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *RegistrationEntry) GetSelectors() []*Selector {
-	if x != nil {
-		return x.Selectors
-	}
-	return nil
-}
+func (x *RegistrationEntry) GetSelectors() []*Selector { _ = "STUB: not implemented"; return nil }
 
-func (x *RegistrationEntry) GetParentId() string {
-	if x != nil {
-		return x.ParentId
-	}
-	return ""
-}
+func (x *RegistrationEntry) GetParentId() string { _ = "STUB: not implemented"; return "" }
 
-func (x *RegistrationEntry) GetSpiffeId() string {
-	if x != nil {
-		return x.SpiffeId
-	}
-	return ""
-}
+func (x *RegistrationEntry) GetSpiffeId() string { _ = "STUB: not implemented"; return "" }
 
-func (x *RegistrationEntry) GetX509SvidTtl() int32 {
-	if x != nil {
-		return x.X509SvidTtl
-	}
-	return 0
-}
+func (x *RegistrationEntry) GetX509SvidTtl() int32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *RegistrationEntry) GetFederatesWith() []string {
-	if x != nil {
-		return x.FederatesWith
-	}
-	return nil
-}
+func (x *RegistrationEntry) GetFederatesWith() []string { _ = "STUB: not implemented"; return nil }
 
-func (x *RegistrationEntry) GetEntryId() string {
-	if x != nil {
-		return x.EntryId
-	}
-	return ""
-}
+func (x *RegistrationEntry) GetEntryId() string { _ = "STUB: not implemented"; return "" }
 
-func (x *RegistrationEntry) GetAdmin() bool {
-	if x != nil {
-		return x.Admin
-	}
-	return false
-}
+func (x *RegistrationEntry) GetAdmin() bool { _ = "STUB: not implemented"; return false }
 
-func (x *RegistrationEntry) GetDownstream() bool {
-	if x != nil {
-		return x.Downstream
-	}
-	return false
-}
+func (x *RegistrationEntry) GetDownstream() bool { _ = "STUB: not implemented"; return false }
 
-func (x *RegistrationEntry) GetEntryExpiry() int64 {
-	if x != nil {
-		return x.EntryExpiry
-	}
-	return 0
-}
+func (x *RegistrationEntry) GetEntryExpiry() int64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *RegistrationEntry) GetDnsNames() []string {
-	if x != nil {
-		return x.DnsNames
-	}
-	return nil
-}
+func (x *RegistrationEntry) GetDnsNames() []string { _ = "STUB: not implemented"; return nil }
 
-func (x *RegistrationEntry) GetRevisionNumber() int64 {
-	if x != nil {
-		return x.RevisionNumber
-	}
-	return 0
-}
+func (x *RegistrationEntry) GetRevisionNumber() int64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *RegistrationEntry) GetStoreSvid() bool {
-	if x != nil {
-		return x.StoreSvid
-	}
-	return false
-}
+func (x *RegistrationEntry) GetStoreSvid() bool { _ = "STUB: not implemented"; return false }
 
-func (x *RegistrationEntry) GetJwtSvidTtl() int32 {
-	if x != nil {
-		return x.JwtSvidTtl
-	}
-	return 0
-}
+func (x *RegistrationEntry) GetJwtSvidTtl() int32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *RegistrationEntry) GetHint() string {
-	if x != nil {
-		return x.Hint
-	}
-	return ""
-}
+func (x *RegistrationEntry) GetHint() string { _ = "STUB: not implemented"; return "" }
 
-func (x *RegistrationEntry) GetCreatedAt() int64 {
-	if x != nil {
-		return x.CreatedAt
-	}
-	return 0
-}
+func (x *RegistrationEntry) GetCreatedAt() int64 { _ = "STUB: not implemented"; return 0 }
 
 func (x *RegistrationEntry) GetAdditionalAttributes() *RegistrationEntry_AdditionalAttributes {
-	if x != nil {
-		return x.AdditionalAttributes
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -542,131 +298,51 @@ type RegistrationEntryMask struct {
 	sizeCache            protoimpl.SizeCache
 }
 
-func (x *RegistrationEntryMask) Reset() {
-	*x = RegistrationEntryMask{}
-	mi := &file_spire_common_common_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *RegistrationEntryMask) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *RegistrationEntryMask) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *RegistrationEntryMask) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*RegistrationEntryMask) ProtoMessage() {}
+func (*RegistrationEntryMask) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *RegistrationEntryMask) ProtoReflect() protoreflect.Message {
-	mi := &file_spire_common_common_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use RegistrationEntryMask.ProtoReflect.Descriptor instead.
 func (*RegistrationEntryMask) Descriptor() ([]byte, []int) {
-	return file_spire_common_common_proto_rawDescGZIP(), []int{6}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (x *RegistrationEntryMask) GetSelectors() bool {
-	if x != nil {
-		return x.Selectors
-	}
-	return false
-}
+func (x *RegistrationEntryMask) GetSelectors() bool { _ = "STUB: not implemented"; return false }
 
-func (x *RegistrationEntryMask) GetParentId() bool {
-	if x != nil {
-		return x.ParentId
-	}
-	return false
-}
+func (x *RegistrationEntryMask) GetParentId() bool { _ = "STUB: not implemented"; return false }
 
-func (x *RegistrationEntryMask) GetSpiffeId() bool {
-	if x != nil {
-		return x.SpiffeId
-	}
-	return false
-}
+func (x *RegistrationEntryMask) GetSpiffeId() bool { _ = "STUB: not implemented"; return false }
 
-func (x *RegistrationEntryMask) GetX509SvidTtl() bool {
-	if x != nil {
-		return x.X509SvidTtl
-	}
-	return false
-}
+func (x *RegistrationEntryMask) GetX509SvidTtl() bool { _ = "STUB: not implemented"; return false }
 
-func (x *RegistrationEntryMask) GetFederatesWith() bool {
-	if x != nil {
-		return x.FederatesWith
-	}
-	return false
-}
+func (x *RegistrationEntryMask) GetFederatesWith() bool { _ = "STUB: not implemented"; return false }
 
-func (x *RegistrationEntryMask) GetEntryId() bool {
-	if x != nil {
-		return x.EntryId
-	}
-	return false
-}
+func (x *RegistrationEntryMask) GetEntryId() bool { _ = "STUB: not implemented"; return false }
 
-func (x *RegistrationEntryMask) GetAdmin() bool {
-	if x != nil {
-		return x.Admin
-	}
-	return false
-}
+func (x *RegistrationEntryMask) GetAdmin() bool { _ = "STUB: not implemented"; return false }
 
-func (x *RegistrationEntryMask) GetDownstream() bool {
-	if x != nil {
-		return x.Downstream
-	}
-	return false
-}
+func (x *RegistrationEntryMask) GetDownstream() bool { _ = "STUB: not implemented"; return false }
 
-func (x *RegistrationEntryMask) GetEntryExpiry() bool {
-	if x != nil {
-		return x.EntryExpiry
-	}
-	return false
-}
+func (x *RegistrationEntryMask) GetEntryExpiry() bool { _ = "STUB: not implemented"; return false }
 
-func (x *RegistrationEntryMask) GetDnsNames() bool {
-	if x != nil {
-		return x.DnsNames
-	}
-	return false
-}
+func (x *RegistrationEntryMask) GetDnsNames() bool { _ = "STUB: not implemented"; return false }
 
-func (x *RegistrationEntryMask) GetStoreSvid() bool {
-	if x != nil {
-		return x.StoreSvid
-	}
-	return false
-}
+func (x *RegistrationEntryMask) GetStoreSvid() bool { _ = "STUB: not implemented"; return false }
 
-func (x *RegistrationEntryMask) GetJwtSvidTtl() bool {
-	if x != nil {
-		return x.JwtSvidTtl
-	}
-	return false
-}
+func (x *RegistrationEntryMask) GetJwtSvidTtl() bool { _ = "STUB: not implemented"; return false }
 
-func (x *RegistrationEntryMask) GetHint() bool {
-	if x != nil {
-		return x.Hint
-	}
-	return false
-}
+func (x *RegistrationEntryMask) GetHint() bool { _ = "STUB: not implemented"; return false }
 
 func (x *RegistrationEntryMask) GetAdditionalAttributes() bool {
-	if x != nil {
-		return x.AdditionalAttributes
-	}
+	_ = "STUB: not implemented"
 	return false
 }
 
@@ -679,40 +355,25 @@ type RegistrationEntries struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *RegistrationEntries) Reset() {
-	*x = RegistrationEntries{}
-	mi := &file_spire_common_common_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *RegistrationEntries) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *RegistrationEntries) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *RegistrationEntries) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*RegistrationEntries) ProtoMessage() {}
+func (*RegistrationEntries) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *RegistrationEntries) ProtoReflect() protoreflect.Message {
-	mi := &file_spire_common_common_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use RegistrationEntries.ProtoReflect.Descriptor instead.
 func (*RegistrationEntries) Descriptor() ([]byte, []int) {
-	return file_spire_common_common_proto_rawDescGZIP(), []int{7}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *RegistrationEntries) GetEntries() []*RegistrationEntry {
-	if x != nil {
-		return x.Entries
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -725,49 +386,23 @@ type Certificate struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Certificate) Reset() {
-	*x = Certificate{}
-	mi := &file_spire_common_common_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *Certificate) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *Certificate) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *Certificate) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*Certificate) ProtoMessage() {}
+func (*Certificate) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *Certificate) ProtoReflect() protoreflect.Message {
-	mi := &file_spire_common_common_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use Certificate.ProtoReflect.Descriptor instead.
-func (*Certificate) Descriptor() ([]byte, []int) {
-	return file_spire_common_common_proto_rawDescGZIP(), []int{8}
-}
+func (*Certificate) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *Certificate) GetDerBytes() []byte {
-	if x != nil {
-		return x.DerBytes
-	}
-	return nil
-}
+func (x *Certificate) GetDerBytes() []byte { _ = "STUB: not implemented"; return nil }
 
-func (x *Certificate) GetTaintedKey() bool {
-	if x != nil {
-		return x.TaintedKey
-	}
-	return false
-}
+func (x *Certificate) GetTaintedKey() bool { _ = "STUB: not implemented"; return false }
 
 // * PublicKey represents a PKIX encoded public key
 type PublicKey struct {
@@ -784,63 +419,27 @@ type PublicKey struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PublicKey) Reset() {
-	*x = PublicKey{}
-	mi := &file_spire_common_common_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *PublicKey) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *PublicKey) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *PublicKey) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*PublicKey) ProtoMessage() {}
+func (*PublicKey) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *PublicKey) ProtoReflect() protoreflect.Message {
-	mi := &file_spire_common_common_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use PublicKey.ProtoReflect.Descriptor instead.
-func (*PublicKey) Descriptor() ([]byte, []int) {
-	return file_spire_common_common_proto_rawDescGZIP(), []int{9}
-}
+func (*PublicKey) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *PublicKey) GetPkixBytes() []byte {
-	if x != nil {
-		return x.PkixBytes
-	}
-	return nil
-}
+func (x *PublicKey) GetPkixBytes() []byte { _ = "STUB: not implemented"; return nil }
 
-func (x *PublicKey) GetKid() string {
-	if x != nil {
-		return x.Kid
-	}
-	return ""
-}
+func (x *PublicKey) GetKid() string { _ = "STUB: not implemented"; return "" }
 
-func (x *PublicKey) GetNotAfter() int64 {
-	if x != nil {
-		return x.NotAfter
-	}
-	return 0
-}
+func (x *PublicKey) GetNotAfter() int64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *PublicKey) GetTaintedKey() bool {
-	if x != nil {
-		return x.TaintedKey
-	}
-	return false
-}
+func (x *PublicKey) GetTaintedKey() bool { _ = "STUB: not implemented"; return false }
 
 type Bundle struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -862,77 +461,31 @@ type Bundle struct {
 	sizeCache      protoimpl.SizeCache
 }
 
-func (x *Bundle) Reset() {
-	*x = Bundle{}
-	mi := &file_spire_common_common_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *Bundle) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *Bundle) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *Bundle) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*Bundle) ProtoMessage() {}
+func (*Bundle) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *Bundle) ProtoReflect() protoreflect.Message {
-	mi := &file_spire_common_common_proto_msgTypes[10]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use Bundle.ProtoReflect.Descriptor instead.
-func (*Bundle) Descriptor() ([]byte, []int) {
-	return file_spire_common_common_proto_rawDescGZIP(), []int{10}
-}
+func (*Bundle) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *Bundle) GetTrustDomainId() string {
-	if x != nil {
-		return x.TrustDomainId
-	}
-	return ""
-}
+func (x *Bundle) GetTrustDomainId() string { _ = "STUB: not implemented"; return "" }
 
-func (x *Bundle) GetRootCas() []*Certificate {
-	if x != nil {
-		return x.RootCas
-	}
-	return nil
-}
+func (x *Bundle) GetRootCas() []*Certificate { _ = "STUB: not implemented"; return nil }
 
-func (x *Bundle) GetJwtSigningKeys() []*PublicKey {
-	if x != nil {
-		return x.JwtSigningKeys
-	}
-	return nil
-}
+func (x *Bundle) GetJwtSigningKeys() []*PublicKey { _ = "STUB: not implemented"; return nil }
 
-func (x *Bundle) GetRefreshHint() int64 {
-	if x != nil {
-		return x.RefreshHint
-	}
-	return 0
-}
+func (x *Bundle) GetRefreshHint() int64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *Bundle) GetSequenceNumber() uint64 {
-	if x != nil {
-		return x.SequenceNumber
-	}
-	return 0
-}
+func (x *Bundle) GetSequenceNumber() uint64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *Bundle) GetWitSigningKeys() []*PublicKey {
-	if x != nil {
-		return x.WitSigningKeys
-	}
-	return nil
-}
+func (x *Bundle) GetWitSigningKeys() []*PublicKey { _ = "STUB: not implemented"; return nil }
 
 type BundleMask struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
@@ -946,77 +499,31 @@ type BundleMask struct {
 	sizeCache       protoimpl.SizeCache
 }
 
-func (x *BundleMask) Reset() {
-	*x = BundleMask{}
-	mi := &file_spire_common_common_proto_msgTypes[11]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *BundleMask) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *BundleMask) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *BundleMask) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*BundleMask) ProtoMessage() {}
+func (*BundleMask) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *BundleMask) ProtoReflect() protoreflect.Message {
-	mi := &file_spire_common_common_proto_msgTypes[11]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use BundleMask.ProtoReflect.Descriptor instead.
-func (*BundleMask) Descriptor() ([]byte, []int) {
-	return file_spire_common_common_proto_rawDescGZIP(), []int{11}
-}
+func (*BundleMask) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *BundleMask) GetRootCas() bool {
-	if x != nil {
-		return x.RootCas
-	}
-	return false
-}
+func (x *BundleMask) GetRootCas() bool { _ = "STUB: not implemented"; return false }
 
-func (x *BundleMask) GetJwtSigningKeys() bool {
-	if x != nil {
-		return x.JwtSigningKeys
-	}
-	return false
-}
+func (x *BundleMask) GetJwtSigningKeys() bool { _ = "STUB: not implemented"; return false }
 
-func (x *BundleMask) GetRefreshHint() bool {
-	if x != nil {
-		return x.RefreshHint
-	}
-	return false
-}
+func (x *BundleMask) GetRefreshHint() bool { _ = "STUB: not implemented"; return false }
 
-func (x *BundleMask) GetSequenceNumber() bool {
-	if x != nil {
-		return x.SequenceNumber
-	}
-	return false
-}
+func (x *BundleMask) GetSequenceNumber() bool { _ = "STUB: not implemented"; return false }
 
-func (x *BundleMask) GetX509TaintedKeys() bool {
-	if x != nil {
-		return x.X509TaintedKeys
-	}
-	return false
-}
+func (x *BundleMask) GetX509TaintedKeys() bool { _ = "STUB: not implemented"; return false }
 
-func (x *BundleMask) GetWitSigningKeys() bool {
-	if x != nil {
-		return x.WitSigningKeys
-	}
-	return false
-}
+func (x *BundleMask) GetWitSigningKeys() bool { _ = "STUB: not implemented"; return false }
 
 type AttestedNodeMask struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
@@ -1031,84 +538,33 @@ type AttestedNodeMask struct {
 	sizeCache           protoimpl.SizeCache
 }
 
-func (x *AttestedNodeMask) Reset() {
-	*x = AttestedNodeMask{}
-	mi := &file_spire_common_common_proto_msgTypes[12]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *AttestedNodeMask) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *AttestedNodeMask) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *AttestedNodeMask) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*AttestedNodeMask) ProtoMessage() {}
+func (*AttestedNodeMask) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *AttestedNodeMask) ProtoReflect() protoreflect.Message {
-	mi := &file_spire_common_common_proto_msgTypes[12]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use AttestedNodeMask.ProtoReflect.Descriptor instead.
-func (*AttestedNodeMask) Descriptor() ([]byte, []int) {
-	return file_spire_common_common_proto_rawDescGZIP(), []int{12}
-}
+func (*AttestedNodeMask) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *AttestedNodeMask) GetAttestationDataType() bool {
-	if x != nil {
-		return x.AttestationDataType
-	}
-	return false
-}
+func (x *AttestedNodeMask) GetAttestationDataType() bool { _ = "STUB: not implemented"; return false }
 
-func (x *AttestedNodeMask) GetCertSerialNumber() bool {
-	if x != nil {
-		return x.CertSerialNumber
-	}
-	return false
-}
+func (x *AttestedNodeMask) GetCertSerialNumber() bool { _ = "STUB: not implemented"; return false }
 
-func (x *AttestedNodeMask) GetCertNotAfter() bool {
-	if x != nil {
-		return x.CertNotAfter
-	}
-	return false
-}
+func (x *AttestedNodeMask) GetCertNotAfter() bool { _ = "STUB: not implemented"; return false }
 
-func (x *AttestedNodeMask) GetNewCertSerialNumber() bool {
-	if x != nil {
-		return x.NewCertSerialNumber
-	}
-	return false
-}
+func (x *AttestedNodeMask) GetNewCertSerialNumber() bool { _ = "STUB: not implemented"; return false }
 
-func (x *AttestedNodeMask) GetNewCertNotAfter() bool {
-	if x != nil {
-		return x.NewCertNotAfter
-	}
-	return false
-}
+func (x *AttestedNodeMask) GetNewCertNotAfter() bool { _ = "STUB: not implemented"; return false }
 
-func (x *AttestedNodeMask) GetCanReattest() bool {
-	if x != nil {
-		return x.CanReattest
-	}
-	return false
-}
+func (x *AttestedNodeMask) GetCanReattest() bool { _ = "STUB: not implemented"; return false }
 
-func (x *AttestedNodeMask) GetAgentVersion() bool {
-	if x != nil {
-		return x.AgentVersion
-	}
-	return false
-}
+func (x *AttestedNodeMask) GetAgentVersion() bool { _ = "STUB: not implemented"; return false }
 
 // * This nested message is reserved to contain a number of optional fields
 // controlling the various aspects of the agent's behaviour with respect to a
@@ -1127,40 +583,28 @@ type RegistrationEntry_AdditionalAttributes struct {
 	sizeCache               protoimpl.SizeCache
 }
 
-func (x *RegistrationEntry_AdditionalAttributes) Reset() {
-	*x = RegistrationEntry_AdditionalAttributes{}
-	mi := &file_spire_common_common_proto_msgTypes[13]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *RegistrationEntry_AdditionalAttributes) Reset() { _ = "STUB: not implemented"; return }
 
 func (x *RegistrationEntry_AdditionalAttributes) String() string {
-	return protoimpl.X.MessageStringOf(x)
+	_ = "STUB: not implemented"
+	return ""
 }
 
-func (*RegistrationEntry_AdditionalAttributes) ProtoMessage() {}
+func (*RegistrationEntry_AdditionalAttributes) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *RegistrationEntry_AdditionalAttributes) ProtoReflect() protoreflect.Message {
-	mi := &file_spire_common_common_proto_msgTypes[13]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use RegistrationEntry_AdditionalAttributes.ProtoReflect.Descriptor instead.
 func (*RegistrationEntry_AdditionalAttributes) Descriptor() ([]byte, []int) {
-	return file_spire_common_common_proto_rawDescGZIP(), []int{5, 0}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *RegistrationEntry_AdditionalAttributes) GetDisableX509SvidPrefetch() bool {
-	if x != nil {
-		return x.DisableX509SvidPrefetch
-	}
+	_ = "STUB: not implemented"
 	return false
 }
 
@@ -1276,12 +720,7 @@ var (
 	file_spire_common_common_proto_rawDescData []byte
 )
 
-func file_spire_common_common_proto_rawDescGZIP() []byte {
-	file_spire_common_common_proto_rawDescOnce.Do(func() {
-		file_spire_common_common_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_spire_common_common_proto_rawDesc), len(file_spire_common_common_proto_rawDesc)))
-	})
-	return file_spire_common_common_proto_rawDescData
-}
+func file_spire_common_common_proto_rawDescGZIP() []byte { _ = "STUB: not implemented"; return nil }
 
 var file_spire_common_common_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_spire_common_common_proto_goTypes = []any{
@@ -1316,27 +755,5 @@ var file_spire_common_common_proto_depIdxs = []int32{
 	0,  // [0:8] is the sub-list for field type_name
 }
 
-func init() { file_spire_common_common_proto_init() }
-func file_spire_common_common_proto_init() {
-	if File_spire_common_common_proto != nil {
-		return
-	}
-	file_spire_common_common_proto_msgTypes[5].OneofWrappers = []any{}
-	type x struct{}
-	out := protoimpl.TypeBuilder{
-		File: protoimpl.DescBuilder{
-			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_spire_common_common_proto_rawDesc), len(file_spire_common_common_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   14,
-			NumExtensions: 0,
-			NumServices:   0,
-		},
-		GoTypes:           file_spire_common_common_proto_goTypes,
-		DependencyIndexes: file_spire_common_common_proto_depIdxs,
-		MessageInfos:      file_spire_common_common_proto_msgTypes,
-	}.Build()
-	File_spire_common_common_proto = out.File
-	file_spire_common_common_proto_goTypes = nil
-	file_spire_common_common_proto_depIdxs = nil
-}
+func init()                                { file_spire_common_common_proto_init() }
+func file_spire_common_common_proto_init() { _ = "STUB: not implemented"; return }

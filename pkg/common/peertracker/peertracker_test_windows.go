@@ -5,14 +5,10 @@ package peertracker
 import (
 	"io"
 	"net"
-	"os"
 	"os/exec"
 	"testing"
 
-	"github.com/Microsoft/go-winio"
 	"github.com/sirupsen/logrus"
-	"github.com/spiffe/spire/test/spiretest"
-	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -27,43 +23,22 @@ type fakePeer struct {
 	t             *testing.T
 }
 
-func (f *fakePeer) killGrandchild() {
-	if f.grandchildPID == 0 {
-		f.t.Fatal("no known grandchild")
-	}
+func (f *fakePeer) killGrandchild() { _ = "STUB: not implemented"; return }
 
-	process, err := os.FindProcess(f.grandchildPID)
-	if err != nil {
-		f.t.Fatalf("unable to find process: %v", err)
-	}
-	if err = process.Kill(); err != nil {
-		f.t.Fatalf("unable to kill grandchild: %v", err)
-	}
+// Wait for the process to exit, so we are sure that we can
+// clean up the directory containing the executable
 
-	// Wait for the process to exit, so we are sure that we can
-	// clean up the directory containing the executable
-	if _, err := process.Wait(); err != nil {
-		f.t.Fatalf("wait failed: %v", err)
-	}
-	f.grandchildPID = 0
-}
-
-func addr(*testing.T) net.Addr {
-	return spiretest.GetRandNamedPipeAddr()
-}
+func addr(*testing.T) net.Addr { _ = "STUB: not implemented"; return *new(net.Addr) }
 
 func listener(t *testing.T, log *logrus.Logger, addr net.Addr) *Listener {
-	listener, err := (&ListenerFactory{Log: log}).ListenPipe(addr.String(), nil)
-	require.NoError(t, err)
-
-	return listener
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func childExecCommand(childPath string, addr net.Addr) *exec.Cmd {
+	_ = "STUB: not implemented"
 	// #nosec G204 test code
-	return exec.Command(childPath, "-namedPipeName", addr.String())
+	return nil
 }
 
-func dial(addr net.Addr) (net.Conn, error) {
-	return winio.DialPipe(addr.String(), nil)
-}
+func dial(addr net.Addr) (net.Conn, error) { _ = "STUB: not implemented"; return *new(net.Conn), nil }

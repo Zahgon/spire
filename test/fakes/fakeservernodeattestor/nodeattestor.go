@@ -1,15 +1,10 @@
 package fakeservernodeattestor
 
 import (
-	"fmt"
 	"testing"
 
 	nodeattestorv1 "github.com/spiffe/spire-plugin-sdk/proto/spire/plugin/server/nodeattestor/v1"
-	"github.com/spiffe/spire/pkg/common/catalog"
 	"github.com/spiffe/spire/pkg/server/plugin/nodeattestor"
-	"github.com/spiffe/spire/test/plugintest"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 const (
@@ -44,17 +39,8 @@ type Config struct {
 }
 
 func New(t *testing.T, name string, config Config) nodeattestor.NodeAttestor {
-	if config.TrustDomain == "" {
-		config.TrustDomain = defaultTrustDomain
-	}
-	plugin := &nodeAttestor{
-		name:   name,
-		config: config,
-	}
-
-	v1 := new(nodeattestor.V1)
-	plugintest.Load(t, catalog.MakeBuiltIn(name, nodeattestorv1.NodeAttestorPluginServer(plugin)), v1)
-	return v1
+	_ = "STUB: not implemented"
+	return *new(nodeattestor.NodeAttestor)
 }
 
 type nodeAttestor struct {
@@ -65,58 +51,10 @@ type nodeAttestor struct {
 }
 
 func (p *nodeAttestor) Attest(stream nodeattestorv1.NodeAttestor_AttestServer) (err error) {
-	req, err := stream.Recv()
-	if err != nil {
-		return err
-	}
-
-	payload := req.GetPayload()
-	if payload == nil {
-		return status.Error(codes.InvalidArgument, "request is missing payload")
-	}
-
-	id, ok := p.config.Payloads[string(payload)]
-	if !ok {
-		return status.Errorf(codes.FailedPrecondition, "no ID configured for attestation data %q", string(payload))
-	}
-
-	// challenge/response loop
-	for _, challenge := range p.config.Challenges[id] {
-		if err := stream.Send(&nodeattestorv1.AttestResponse{
-			Response: &nodeattestorv1.AttestResponse_Challenge{
-				Challenge: []byte(challenge),
-			},
-		}); err != nil {
-			return err
-		}
-
-		responseReq, err := stream.Recv()
-		if err != nil {
-			return err
-		}
-
-		challengeResponse := responseReq.GetChallengeResponse()
-		if challenge != string(challengeResponse) {
-			return status.Errorf(codes.InvalidArgument, "invalid response to echo challenge %q: got %q", challenge, string(challengeResponse))
-		}
-	}
-
-	resp := &nodeattestorv1.AttestResponse{
-		Response: &nodeattestorv1.AttestResponse_AgentAttributes{
-			AgentAttributes: &nodeattestorv1.AgentAttributes{
-				SpiffeId:       p.getAgentID(id),
-				SelectorValues: p.config.Selectors[id],
-			},
-		},
-	}
-
-	return stream.Send(resp)
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (p *nodeAttestor) getAgentID(id string) string {
-	if p.config.ReturnLiteral {
-		return id
-	}
+// challenge/response loop
 
-	return fmt.Sprintf("spiffe://%s/spire/agent/%s/%s", p.config.TrustDomain, p.name, id)
-}
+func (p *nodeAttestor) getAgentID(id string) string { _ = "STUB: not implemented"; return "" }

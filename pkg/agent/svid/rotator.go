@@ -4,24 +4,14 @@ import (
 	"context"
 	"crypto"
 	"crypto/x509"
-	"errors"
-	"fmt"
 	"sync"
 
 	"github.com/andres-erbsen/clock"
 	"github.com/imkira/go-observer"
 	"github.com/spiffe/go-spiffe/v2/bundle/spiffebundle"
-	agentv1 "github.com/spiffe/spire-api-sdk/proto/spire/api/server/agent/v1"
-	node_attestor "github.com/spiffe/spire/pkg/agent/attestor/node"
 	"github.com/spiffe/spire/pkg/agent/client"
 	"github.com/spiffe/spire/pkg/agent/plugin/keymanager"
 	"github.com/spiffe/spire/pkg/common/backoff"
-	"github.com/spiffe/spire/pkg/common/nodeutil"
-	"github.com/spiffe/spire/pkg/common/rotationutil"
-	"github.com/spiffe/spire/pkg/common/telemetry"
-	telemetry_agent "github.com/spiffe/spire/pkg/common/telemetry/agent"
-	"github.com/spiffe/spire/pkg/common/util"
-	"github.com/spiffe/spire/pkg/common/x509util"
 	"google.golang.org/grpc"
 )
 
@@ -79,302 +69,82 @@ type State struct {
 
 // Run runs the rotator. It monitors the server SVID for expiration and rotates
 // as necessary. It also watches for changes to the trust bundle.
-func (r *rotator) Run(ctx context.Context) error {
-	err := util.RunTasks(ctx, r.runRotation, r.processBundleUpdates)
-	r.c.Log.Debug("Stopping SVID rotator")
-	r.client.Release()
-	return err
-}
+func (r *rotator) Run(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
-func (r *rotator) runRotation(ctx context.Context) error {
-	if r.hooks.runRotatorSignal != nil {
-		r.hooks.runRotatorSignal <- struct{}{}
-	}
+func (r *rotator) runRotation(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
-	for {
-		err := r.rotateSVIDIfNeeded(ctx)
-		state, ok := r.state.Value().(State)
-		if !ok {
-			return fmt.Errorf("unexpected value type: %T", r.state.Value())
-		}
+// Since our X509 cert has expired, and we weren't able to carry out a rotation request, we're probably unrecoverable without re-attesting.
 
-		switch {
-		case err != nil && rotationutil.X509Expired(r.clk.Now(), state.SVID[0]):
-			r.c.Log.WithError(err).Errorf("Could not %s", rotationError(state))
-			// Since our X509 cert has expired, and we weren't able to carry out a rotation request, we're probably unrecoverable without re-attesting.
-			return fmt.Errorf("current SVID has already expired and %s failed: %w", rotationError(state), err)
-		case err != nil && nodeutil.ShouldAgentReattest(err):
-			r.c.Log.WithError(err).Errorf("Could not %s", rotationError(state))
-			return err
-		case err != nil && nodeutil.ShouldAgentShutdown(err):
-			r.c.Log.WithError(err).Errorf("Could not %s", rotationError(state))
-			return err
-		case err != nil:
-			// Just log the error and wait for next rotation
-			r.c.Log.WithError(err).Errorf("Could not %s", rotationError(state))
-		default:
-			r.backoff.Reset()
-		}
-
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case <-r.clk.After(r.backoff.NextBackOff()):
-		}
-	}
-}
+// Just log the error and wait for next rotation
 
 func (r *rotator) processBundleUpdates(ctx context.Context) error {
-	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case <-r.c.BundleStream.Changes():
-			r.bsm.Lock()
-			r.c.BundleStream.Next()
-			r.bsm.Unlock()
-		}
-	}
-}
-
-func (r *rotator) State() State {
-	return r.state.Value().(State)
-}
-
-func (r *rotator) Subscribe() observer.Stream {
-	return r.state.Observe()
-}
-
-func (r *rotator) IsTainted() bool {
-	r.rotMtx.RLock()
-	defer r.rotMtx.RUnlock()
-
-	return r.tainted
-}
-
-func (r *rotator) setTainted(tainted bool) {
-	r.rotMtx.Lock()
-	defer r.rotMtx.Unlock()
-
-	r.tainted = tainted
-}
-
-func (r *rotator) NotifyTaintedAuthorities(taintedAuthorities []*x509.Certificate) error {
-	state, ok := r.state.Value().(State)
-	if !ok {
-		return fmt.Errorf("unexpected state value type: %T", r.state.Value())
-	}
-
-	if r.IsTainted() {
-		r.c.Log.Debug("Agent SVID already tainted")
-		return nil
-	}
-
-	tainted, err := x509util.IsSignedByRoot(state.SVID, taintedAuthorities)
-	if err != nil {
-		return fmt.Errorf("failed to check if SVID is tainted: %w", err)
-	}
-
-	if tainted {
-		r.c.Log.Info("Agent SVID is tainted by a root authority, forcing rotation")
-		r.setTainted(tainted)
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (r *rotator) GetRotationMtx() *sync.RWMutex {
-	return r.rotMtx
+func (r *rotator) State() State { _ = "STUB: not implemented"; return *new(State) }
+
+func (r *rotator) Subscribe() observer.Stream {
+	_ = "STUB: not implemented"
+	return *new(observer.Stream)
 }
 
-func (r *rotator) SetRotationFinishedHook(f func()) {
-	r.hooks.rotationFinishedHook = f
+func (r *rotator) IsTainted() bool { _ = "STUB: not implemented"; return false }
+
+func (r *rotator) setTainted(tainted bool) { _ = "STUB: not implemented"; return }
+
+func (r *rotator) NotifyTaintedAuthorities(taintedAuthorities []*x509.Certificate) error {
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (r *rotator) Reattest(ctx context.Context) error {
-	state, ok := r.state.Value().(State)
-	if !ok {
-		return fmt.Errorf("unexpected value type: %T", r.state.Value())
-	}
+func (r *rotator) GetRotationMtx() *sync.RWMutex { _ = "STUB: not implemented"; return nil }
 
-	if !state.Reattestable {
-		return errors.New("attestation method is not re-attestable")
-	}
+func (r *rotator) SetRotationFinishedHook(f func()) { _ = "STUB: not implemented"; return }
 
-	err := r.reattest(ctx)
-	if err == nil && r.hooks.rotationFinishedHook != nil {
-		r.hooks.rotationFinishedHook()
-	}
-
-	return err
-}
+func (r *rotator) Reattest(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
 func (r *rotator) rotateSVIDIfNeeded(ctx context.Context) (err error) {
-	state, ok := r.state.Value().(State)
-	if !ok {
-		return fmt.Errorf("unexpected value type: %T", r.state.Value())
-	}
-
-	if r.c.RotationStrategy.ShouldRotateX509(r.clk.Now(), state.SVID[0]) || r.IsTainted() {
-		if state.Reattestable {
-			err = r.reattest(ctx)
-		} else {
-			err = r.rotateSVID(ctx)
-		}
-
-		if err == nil && r.hooks.rotationFinishedHook != nil {
-			r.hooks.rotationFinishedHook()
-		}
-	}
-
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // reattest goes through the full attestation process with the server and gets a new SVID.
-func (r *rotator) reattest(ctx context.Context) (err error) {
-	counter := telemetry_agent.StartReattestAgentCall(r.c.Metrics)
-	defer counter.Done(&err)
+func (r *rotator) reattest(ctx context.Context) (err error) { _ = "STUB: not implemented"; return nil }
 
-	// Get the mtx before starting the reattestation
-	// In this way, the client do not create new connections until the new SVID is received
-	r.rotMtx.Lock()
-	defer r.rotMtx.Unlock()
-	r.c.Log.Debug("Reattesting node")
+// Get the mtx before starting the reattestation
+// In this way, the client do not create new connections until the new SVID is received
 
-	bundle, err := r.getBundle()
-	if err != nil {
-		return err
-	}
-
-	key, err := r.generateKey(ctx)
-	if err != nil {
-		return err
-	}
-
-	csr, err := util.MakeCSRWithoutURISAN(key)
-	if err != nil {
-		return err
-	}
-
-	conn, err := r.serverConn(bundle)
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	stream := &node_attestor.ServerStream{Client: agentv1.NewAgentClient(conn), Csr: csr, Log: r.c.Log}
-	if err := r.c.NodeAttestor.Attest(ctx, stream); err != nil {
-		return err
-	}
-	r.c.Log.WithField(telemetry.SPIFFEID, stream.SVID[0].URIs[0].String()).Info("Successfully reattested node")
-
-	s := State{
-		SVID:         stream.SVID,
-		Key:          key,
-		Reattestable: stream.Reattestable,
-	}
-
-	r.state.Update(s)
-	r.tainted = false
-
-	// We must release the client because its underlying connection is tied to an
-	// expired SVID, so next time the client is used, it will get a new connection with
-	// the most up-to-date SVID.
-	r.client.Release()
-
-	return nil
-}
+// We must release the client because its underlying connection is tied to an
+// expired SVID, so next time the client is used, it will get a new connection with
+// the most up-to-date SVID.
 
 // rotateSVID asks SPIRE's server for a new agent's SVID.
 func (r *rotator) rotateSVID(ctx context.Context) (err error) {
-	counter := telemetry_agent.StartRotateAgentSVIDCall(r.c.Metrics)
-	defer counter.Done(&err)
-
-	// Get the mtx before starting the rotation
-	// In this way, the client do not create new connections until the new SVID is received
-	r.rotMtx.Lock()
-	defer r.rotMtx.Unlock()
-	r.c.Log.Debug("Rotating agent SVID")
-
-	key, err := r.generateKey(ctx)
-	if err != nil {
-		return err
-	}
-
-	csr, err := util.MakeCSRWithoutURISAN(key)
-	if err != nil {
-		return err
-	}
-
-	svid, err := r.client.RenewSVID(ctx, csr)
-	if err != nil {
-		return err
-	}
-
-	certs, err := x509.ParseCertificates(svid.CertChain)
-	if err != nil {
-		return err
-	}
-	r.c.Log.WithField(telemetry.SPIFFEID, certs[0].URIs[0].String()).Info("Successfully rotated agent SVID")
-
-	s := State{
-		SVID: certs,
-		Key:  key,
-	}
-
-	r.state.Update(s)
-	r.tainted = false
-
-	// We must release the client because its underlying connection is tied to an
-	// expired SVID, so next time the client is used, it will get a new connection with
-	// the most up-to-date SVID.
-	r.client.Release()
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
+// Get the mtx before starting the rotation
+// In this way, the client do not create new connections until the new SVID is received
+
+// We must release the client because its underlying connection is tied to an
+// expired SVID, so next time the client is used, it will get a new connection with
+// the most up-to-date SVID.
+
 func (r *rotator) getBundle() (*spiffebundle.Bundle, error) {
-	r.bsm.RLock()
-	bundles := r.c.BundleStream.Value()
-	r.bsm.RUnlock()
-
-	bundle := bundles[r.c.TrustDomain]
-	if bundle == nil {
-		return nil, errors.New("bundle not found")
-	}
-
-	return bundle, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (r *rotator) generateKey(ctx context.Context) (keymanager.Key, error) {
-	state, ok := r.state.Value().(State)
-	if !ok {
-		return nil, fmt.Errorf("unexpected value type: %T", r.state.Value())
-	}
-
-	var existingKey keymanager.Key
-	if state.Key != nil {
-		existingKey, ok = state.Key.(keymanager.Key)
-		if !ok {
-			return nil, fmt.Errorf("unexpected value type: %T", state.Key)
-		}
-	}
-
-	return r.c.SVIDKeyManager.GenerateKey(ctx, existingKey)
+	_ = "STUB: not implemented"
+	return *new(keymanager.Key), nil
 }
 
 func (r *rotator) serverConn(bundle *spiffebundle.Bundle) (*grpc.ClientConn, error) {
-	return client.NewServerGRPCClient(client.ServerClientConfig{
-		Address:     r.c.ServerAddr,
-		TrustDomain: r.c.TrustDomain,
-		GetBundle:   bundle.X509Authorities,
-		TLSPolicy:   r.c.TLSPolicy,
-	})
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func rotationError(state State) string {
-	if state.Reattestable {
-		return "reattest agent"
-	}
-
-	return "rotate agent SVID"
-}
+func rotationError(state State) string { _ = "STUB: not implemented"; return "" }

@@ -5,7 +5,6 @@ package log
 import (
 	"context"
 	"os"
-	"os/signal"
 
 	"golang.org/x/sys/unix"
 )
@@ -17,11 +16,8 @@ const (
 
 // ReopenOnSignal returns a function compatible with RunTasks.
 func ReopenOnSignal(logger *Logger, reopener Reopener) func(context.Context) error {
-	return func(ctx context.Context) error {
-		signalCh := make(chan os.Signal, 1)
-		signal.Notify(signalCh, reopenSignal)
-		return reopenOnSignal(ctx, logger, reopener, signalCh)
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func reopenOnSignal(
@@ -30,15 +26,8 @@ func reopenOnSignal(
 	reopener Reopener,
 	signalCh chan os.Signal,
 ) error {
-	for {
-		select {
-		case <-ctx.Done():
-			return nil
-		case <-signalCh:
-			if err := reopener.Reopen(); err != nil {
-				// never fail; best effort to log to old file descriptor
-				logger.WithError(err).Error(failedToReopenMsg)
-			}
-		}
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// never fail; best effort to log to old file descriptor

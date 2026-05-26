@@ -4,10 +4,6 @@ package clitest
 
 import (
 	"net"
-
-	"github.com/spiffe/spire/pkg/common/namedpipe"
 )
 
-func GetAddr(addr net.Addr) string {
-	return namedpipe.GetPipeName(addr.String())
-}
+func GetAddr(addr net.Addr) string { _ = "STUB: not implemented"; return "" }

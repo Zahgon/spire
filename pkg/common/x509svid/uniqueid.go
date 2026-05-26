@@ -1,11 +1,8 @@
 package x509svid
 
 import (
-	"crypto/sha256"
 	"crypto/x509/pkix"
 	"encoding/asn1"
-	"encoding/hex"
-	"io"
 
 	"github.com/spiffe/go-spiffe/v2/spiffeid"
 )
@@ -27,15 +24,8 @@ var (
 // somewhat-restricted depending on the registration scheme and how much
 // influence an attacker can have on workload registration.
 func UniqueIDAttribute(id spiffeid.ID) pkix.AttributeTypeAndValue {
-	return pkix.AttributeTypeAndValue{
-		Type:  uniqueIDOID,
-		Value: calculateUniqueIDValue(id),
-	}
+	_ = "STUB: not implemented"
+	return *new(pkix.AttributeTypeAndValue)
 }
 
-func calculateUniqueIDValue(id spiffeid.ID) string {
-	h := sha256.New()
-	_, _ = io.WriteString(h, id.String())
-	sum := h.Sum(nil)
-	return hex.EncodeToString(sum[:len(sum)/2])
-}
+func calculateUniqueIDValue(id spiffeid.ID) string { _ = "STUB: not implemented"; return "" }

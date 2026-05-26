@@ -6,6 +6,4 @@ import (
 	"net"
 )
 
-func GetAddr(addr net.Addr) string {
-	return addr.String()
-}
+func GetAddr(addr net.Addr) string { _ = "STUB: not implemented"; return "" }

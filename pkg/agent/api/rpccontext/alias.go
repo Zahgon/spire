@@ -5,33 +5,36 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/spiffe/spire/pkg/common/api"
-	"github.com/spiffe/spire/pkg/common/api/rpccontext"
 )
 
 func WithLogger(ctx context.Context, log logrus.FieldLogger) context.Context {
-	return rpccontext.WithLogger(ctx, log)
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }
 
 func Logger(ctx context.Context) logrus.FieldLogger {
-	return rpccontext.Logger(ctx)
+	_ = "STUB: not implemented"
+	return *new(logrus.FieldLogger)
 }
 
 func WithCallCounter(ctx context.Context, counter api.CallCounter) context.Context {
-	return rpccontext.WithCallCounter(ctx, counter)
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }
 
 func CallCounter(ctx context.Context) api.CallCounter {
-	return rpccontext.CallCounter(ctx)
+	_ = "STUB: not implemented"
+	return *new(api.CallCounter)
 }
 
-func AddMetricsLabel(ctx context.Context, name, value string) {
-	CallCounter(ctx).AddLabel(name, value)
-}
+func AddMetricsLabel(ctx context.Context, name, value string) { _ = "STUB: not implemented"; return }
 
 func WithNames(ctx context.Context, names api.Names) context.Context {
-	return rpccontext.WithNames(ctx, names)
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }
 
 func Names(ctx context.Context) (api.Names, bool) {
-	return rpccontext.Names(ctx)
+	_ = "STUB: not implemented"
+	return *new(api.Names), false
 }

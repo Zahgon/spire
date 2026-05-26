@@ -9,36 +9,36 @@ import (
 
 // StartGenerateKeyPairCall returns a CallCounter for GenerateKeyPair in the Agent KeyManager interface
 func StartGenerateKeyPairCall(m telemetry.Metrics) *telemetry.CallCounter {
-	cc := telemetry.StartCall(m, telemetry.AgentKeyManager, telemetry.GenerateKeyPair)
-	return cc
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartFetchPrivateKeyCall returns a CallCounter for FetchPrivateKey in the Agent KeyManager interface
 func StartFetchPrivateKeyCall(m telemetry.Metrics) *telemetry.CallCounter {
-	cc := telemetry.StartCall(m, telemetry.AgentKeyManager, telemetry.FetchPrivateKey)
-	return cc
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartStorePrivateKeyCall returns a CallCounter for StorePrivateKey in the Agent KeyManager interface
 func StartStorePrivateKeyCall(m telemetry.Metrics) *telemetry.CallCounter {
-	cc := telemetry.StartCall(m, telemetry.AgentKeyManager, telemetry.StorePrivateKey)
-	return cc
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartGenerateKeyCall returns a CallCounter for GenerateKey in the Agent KeyManager interface
 func StartGenerateKeyCall(m telemetry.Metrics) *telemetry.CallCounter {
-	cc := telemetry.StartCall(m, telemetry.AgentKeyManager, telemetry.GenerateKey)
-	return cc
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartGetKeyCall returns a CallCounter for GetKey in the Agent KeyManager interface
 func StartGetKeyCall(m telemetry.Metrics) *telemetry.CallCounter {
-	cc := telemetry.StartCall(m, telemetry.AgentKeyManager, telemetry.GetKey)
-	return cc
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartGetKeysCall returns a CallCounter for GetKeys in the Agent KeyManager interface
 func StartGetKeysCall(m telemetry.Metrics) *telemetry.CallCounter {
-	cc := telemetry.StartCall(m, telemetry.AgentKeyManager, telemetry.GetKeys)
-	return cc
+	_ = "STUB: not implemented"
+	return nil
 }

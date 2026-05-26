@@ -8,14 +8,8 @@ const (
 	socketFileNotFound = "No connection could be made because the target machine actively refused it."
 )
 
-func FileNotFound() string {
-	return fileNotFound
-}
+func FileNotFound() string { _ = "STUB: not implemented"; return "" }
 
-func PathNotFound() string {
-	return pathNotFound
-}
+func PathNotFound() string { _ = "STUB: not implemented"; return "" }
 
-func SocketFileNotFound() string {
-	return socketFileNotFound
-}
+func SocketFileNotFound() string { _ = "STUB: not implemented"; return "" }

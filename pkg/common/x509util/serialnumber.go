@@ -1,8 +1,6 @@
 package x509util
 
 import (
-	"crypto/rand"
-	"fmt"
 	"math/big"
 )
 
@@ -16,20 +14,13 @@ var (
 // "Effective September 30, 2016, CAs SHALL generate non-sequential Certificate serial numbers greater than
 // zero (0) containing at least 64 bits of output from a CSPRNG"
 func NewSerialNumber() (*big.Int, error) {
+	_ = "STUB: not implemented"
 	// Creates random integer in range [0,MaxUint128)
-	s, err := rand.Int(rand.Reader, maxUint128)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create random number: %w", err)
-	}
-
-	// Adds 1 to return serial number [1,MaxUint128]
-	return s.Add(s, one), nil
+	return nil, nil
 }
 
-func getMaxUint128() *big.Int {
-	m, ok := new(big.Int).SetString("340282366920938463463374607431768211455", 10) // (2^128 − 1)
-	if !ok {
-		panic("cannot parse value for max unsigned int 128")
-	}
-	return m
-}
+// Adds 1 to return serial number [1,MaxUint128]
+
+func getMaxUint128() *big.Int { _ = "STUB: not implemented"; return nil }
+
+// (2^128 − 1)

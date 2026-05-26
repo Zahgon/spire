@@ -1,7 +1,6 @@
 package log
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"sync"
@@ -38,53 +37,22 @@ type (
 )
 
 func NewReopenableFile(name string) (*ReopenableFile, error) {
-	file, err := os.OpenFile(name, fileFlags, fileMode)
-	if err != nil {
-		return nil, err
-	}
-	closeFile := func(f *os.File) error {
-		return f.Close()
-	}
-	return &ReopenableFile{
-		name:      name,
-		f:         file,
-		closeFunc: closeFile,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (r *ReopenableFile) Reopen() error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
+func (r *ReopenableFile) Reopen() error { _ = "STUB: not implemented"; return nil }
 
-	newFile, err := os.OpenFile(r.name, fileFlags, fileMode)
-	if err != nil {
-		return fmt.Errorf("unable to reopen %s: %w", r.name, err)
-	}
-
-	// Ignore errors closing old file descriptor since logger would be using
-	// file descriptor we fail to close. This could leak file descriptors.
-	_ = r.closeFunc(r.f)
-
-	r.f = newFile
-	return nil
-}
+// Ignore errors closing old file descriptor since logger would be using
+// file descriptor we fail to close. This could leak file descriptors.
 
 func (r *ReopenableFile) Write(b []byte) (n int, err error) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	return r.f.Write(b)
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
-func (r *ReopenableFile) Close() error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	return r.f.Close()
-}
+func (r *ReopenableFile) Close() error { _ = "STUB: not implemented"; return nil }
 
 // Name implements part of os.FileInfo without needing a lock on the
 // underlying file.
-func (r *ReopenableFile) Name() string {
-	return r.name
-}
+func (r *ReopenableFile) Name() string { _ = "STUB: not implemented"; return "" }

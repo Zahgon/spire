@@ -8,9 +8,6 @@ import (
 	configv1 "github.com/spiffe/spire-plugin-sdk/proto/spire/service/common/config/v1"
 	"github.com/spiffe/spire/pkg/common/catalog"
 	"github.com/spiffe/spire/pkg/common/plugin/sshpop"
-	"github.com/spiffe/spire/pkg/common/pluginconf"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type Plugin struct {
@@ -21,77 +18,24 @@ type Plugin struct {
 	sshclient *sshpop.Client
 }
 
-func BuiltIn() catalog.BuiltIn {
-	return builtin(New())
-}
+func BuiltIn() catalog.BuiltIn { _ = "STUB: not implemented"; return *new(catalog.BuiltIn) }
 
-func builtin(p *Plugin) catalog.BuiltIn {
-	return catalog.MakeBuiltIn(sshpop.PluginName,
-		nodeattestorv1.NodeAttestorPluginServer(p),
-		configv1.ConfigServiceServer(p),
-	)
-}
+func builtin(p *Plugin) catalog.BuiltIn { _ = "STUB: not implemented"; return *new(catalog.BuiltIn) }
 
-func New() *Plugin {
-	return &Plugin{}
-}
+func New() *Plugin { _ = "STUB: not implemented"; return nil }
 
 func (p *Plugin) AidAttestation(stream nodeattestorv1.NodeAttestor_AidAttestationServer) (err error) {
-	p.mu.RLock()
-	defer p.mu.RUnlock()
-
-	if p.sshclient == nil {
-		return status.Error(codes.FailedPrecondition, "not configured")
-	}
-	handshaker := p.sshclient.NewHandshake()
-
-	payload, err := handshaker.AttestationData()
-	if err != nil {
-		return err
-	}
-	if err := stream.Send(&nodeattestorv1.PayloadOrChallengeResponse{
-		Data: &nodeattestorv1.PayloadOrChallengeResponse_Payload{
-			Payload: payload,
-		},
-	}); err != nil {
-		return err
-	}
-
-	challengeReq, err := stream.Recv()
-	if err != nil {
-		return err
-	}
-	challengeRes, err := handshaker.RespondToChallenge(challengeReq.Challenge)
-	if err != nil {
-		return err
-	}
-
-	return stream.Send(&nodeattestorv1.PayloadOrChallengeResponse{
-		Data: &nodeattestorv1.PayloadOrChallengeResponse_ChallengeResponse{
-			ChallengeResponse: challengeRes,
-		},
-	})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Configure configures the Plugin.
 func (p *Plugin) Configure(_ context.Context, req *configv1.ConfigureRequest) (*configv1.ConfigureResponse, error) {
-	newConfig, _, err := pluginconf.Build(req, sshpop.BuildClientConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	p.mu.Lock()
-	p.sshclient = newConfig.NewClient()
-	p.mu.Unlock()
-
-	return &configv1.ConfigureResponse{}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (p *Plugin) Validate(_ context.Context, req *configv1.ValidateRequest) (*configv1.ValidateResponse, error) {
-	_, notes, err := pluginconf.Build(req, sshpop.BuildClientConfig)
-
-	return &configv1.ValidateResponse{
-		Valid: err == nil,
-		Notes: notes,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

@@ -117,8 +117,4 @@ type Config struct {
 	TLSPolicy tlspolicy.Policy
 }
 
-func New(c *Config) *Agent {
-	return &Agent{
-		c: c,
-	}
-}
+func New(c *Config) *Agent { _ = "STUB: not implemented"; return nil }

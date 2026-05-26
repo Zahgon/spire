@@ -1,11 +1,9 @@
 package spiretest
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
 )
 
 type LogEntry struct {
@@ -15,54 +13,31 @@ type LogEntry struct {
 }
 
 func AssertLogs(t *testing.T, entries []*logrus.Entry, expected []LogEntry) {
-	t.Helper()
-	assert.Equal(t, expected, convertLogEntries(entries), "unexpected logs")
+	_ = "STUB: not implemented"
+	return
 }
 
 func AssertLogsAnyOrder(t *testing.T, entries []*logrus.Entry, expected []LogEntry) {
-	t.Helper()
-	assert.ElementsMatch(t, expected, convertLogEntries(entries), "unexpected logs")
+	_ = "STUB: not implemented"
+	return
 }
 
 func AssertLastLogs(t *testing.T, entries []*logrus.Entry, expected []LogEntry) {
-	t.Helper()
-	removeLen := len(entries) - len(expected)
-	if removeLen > 0 {
-		assert.Equal(t, expected, convertLogEntries(entries[removeLen:]), "unexpected logs")
-		return
-	}
-	assert.Equal(t, expected, convertLogEntries(entries), "unexpected logs")
+	_ = "STUB: not implemented"
+	return
 }
 
 func AssertLogsContainEntries(t *testing.T, entries []*logrus.Entry, expectedEntries []LogEntry) {
-	t.Helper()
-	if len(expectedEntries) == 0 {
-		return
-	}
-
-	logEntries := convertLogEntries(entries)
-	for _, entry := range expectedEntries {
-		assert.Contains(t, logEntries, entry)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 func convertLogEntries(entries []*logrus.Entry) (out []LogEntry) {
-	for _, entry := range entries {
-		out = append(out, LogEntry{
-			Level:   entry.Level,
-			Message: entry.Message,
-			Data:    normalizeData(entry.Data),
-		})
-	}
-	return out
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func normalizeData(data logrus.Fields) logrus.Fields {
-	if len(data) == 0 {
-		return nil
-	}
-	for key, field := range data {
-		data[key] = fmt.Sprint(field)
-	}
-	return data
+	_ = "STUB: not implemented"
+	return *new(logrus.Fields)
 }

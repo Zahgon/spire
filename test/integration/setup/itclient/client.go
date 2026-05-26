@@ -3,13 +3,10 @@ package itclient
 import (
 	"context"
 	"crypto"
-	"crypto/tls"
 	"crypto/x509"
 	"flag"
-	"log"
 
 	"github.com/spiffe/go-spiffe/v2/spiffeid"
-	"github.com/spiffe/go-spiffe/v2/spiffetls/tlsconfig"
 	"github.com/spiffe/go-spiffe/v2/workloadapi"
 	agent "github.com/spiffe/spire-api-sdk/proto/spire/api/server/agent/v1"
 	bundle "github.com/spiffe/spire-api-sdk/proto/spire/api/server/bundle/v1"
@@ -18,8 +15,6 @@ import (
 	svid "github.com/spiffe/spire-api-sdk/proto/spire/api/server/svid/v1"
 	"github.com/spiffe/spire-api-sdk/proto/spire/api/server/trustdomain/v1"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
@@ -38,105 +33,53 @@ type Client struct {
 	source     *workloadapi.X509Source
 }
 
-func New(ctx context.Context) *Client {
-	flag.Parse()
+func New(ctx context.Context) *Client { _ = "STUB: not implemented"; return nil }
 
-	td := spiffeid.RequireTrustDomainFromString(*tdFlag)
+// Create X509Source
 
-	// Create X509Source
-	source, err := workloadapi.NewX509Source(ctx, workloadapi.WithClientOptions(workloadapi.WithAddr(*socketPathFlag), workloadapi.WithLogger(&logger{})))
-	if err != nil {
-		log.Fatalf("Unable to create X509Source: %v", err)
-	}
+// Create connection
 
-	// Create connection
-	tlsConfig := tlsconfig.MTLSClientConfig(source, source, tlsconfig.AuthorizeAny())
-	conn, err := grpc.NewClient(*serverAddrFlag, grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)))
-	if err != nil {
-		source.Close()
-		log.Fatalf("Error creating dial: %v", err)
-	}
+func NewInsecure() *Client { _ = "STUB: not implemented"; return nil }
 
-	return &Client{
-		Td:           td,
-		ExpectErrors: *expectErrorsFlag,
-		connection:   conn,
-		source:       source,
-	}
-}
-
-func NewInsecure() *Client {
-	flag.Parse()
-	tlsConfig := tls.Config{
-		InsecureSkipVerify: true, //nolint: gosec // this is intentional for the integration test
-	}
-	conn, err := grpc.NewClient(*serverAddrFlag,
-		grpc.WithTransportCredentials(credentials.NewTLS(&tlsConfig)))
-	if err != nil {
-		log.Fatalf("Error creating dial: %v", err)
-	}
-
-	return &Client{
-		ExpectErrors: *expectErrorsFlag,
-		connection:   conn,
-	}
-}
+//nolint: gosec // this is intentional for the integration test
 
 func NewWithCert(cert *x509.Certificate, key crypto.Signer) *Client {
-	flag.Parse()
-
-	tlsConfig := tls.Config{
-		GetClientCertificate: func(*tls.CertificateRequestInfo) (*tls.Certificate, error) {
-			return &tls.Certificate{
-				Certificate: [][]byte{cert.Raw},
-				PrivateKey:  key,
-			}, nil
-		},
-		InsecureSkipVerify: true, //nolint: gosec // this is intentional for the integration test
-	}
-	conn, err := grpc.NewClient(*serverAddrFlag,
-		grpc.WithTransportCredentials(credentials.NewTLS(&tlsConfig)))
-	if err != nil {
-		log.Fatalf("Error creating dial: %v", err)
-	}
-
-	return &Client{
-		ExpectErrors: *expectErrorsFlag,
-		connection:   conn,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (c *Client) Release() {
-	if c.connection != nil {
-		c.connection.Close()
-	}
-	if c.source != nil {
-		c.source.Close()
-	}
-}
+//nolint: gosec // this is intentional for the integration test
+
+func (c *Client) Release() { _ = "STUB: not implemented"; return }
 
 func (c *Client) BundleClient() bundle.BundleClient {
-	return bundle.NewBundleClient(c.connection)
+	_ = "STUB: not implemented"
+	return *new(bundle.BundleClient)
 }
 
 func (c *Client) EntryClient() entry.EntryClient {
-	return entry.NewEntryClient(c.connection)
+	_ = "STUB: not implemented"
+	return *new(entry.EntryClient)
 }
 
 func (c *Client) SVIDClient() svid.SVIDClient {
-	return svid.NewSVIDClient(c.connection)
+	_ = "STUB: not implemented"
+	return *new(svid.SVIDClient)
 }
 
 func (c *Client) AgentClient() agent.AgentClient {
-	return agent.NewAgentClient(c.connection)
+	_ = "STUB: not implemented"
+	return *new(agent.AgentClient)
 }
 
 func (c *Client) DebugClient() debug.DebugClient {
-	return debug.NewDebugClient(c.connection)
+	_ = "STUB: not implemented"
+	return *new(debug.DebugClient)
 }
 
 func (c *Client) TrustDomainClient() trustdomain.TrustDomainClient {
-	return trustdomain.NewTrustDomainClient(c.connection)
+	_ = "STUB: not implemented"
+	return *new(trustdomain.TrustDomainClient)
 }
 
 // Open a client ON THE SPIRE-SERVER container
@@ -146,48 +89,30 @@ type LocalServerClient struct {
 }
 
 func (c *LocalServerClient) AgentClient() agent.AgentClient {
-	return agent.NewAgentClient(c.connection)
+	_ = "STUB: not implemented"
+	return *new(agent.AgentClient)
 }
 
 func (c *LocalServerClient) BundleClient() bundle.BundleClient {
-	return bundle.NewBundleClient(c.connection)
+	_ = "STUB: not implemented"
+	return *new(bundle.BundleClient)
 }
 
 func (c *LocalServerClient) EntryClient() entry.EntryClient {
-	return entry.NewEntryClient(c.connection)
+	_ = "STUB: not implemented"
+	return *new(entry.EntryClient)
 }
 
-func (c *LocalServerClient) Release() {
-	c.connection.Close()
-}
+func (c *LocalServerClient) Release() { _ = "STUB: not implemented"; return }
 
-func NewLocalServerClient() *LocalServerClient {
-	flag.Parse()
-	conn, err := grpc.NewClient(*serverSocketPathFlag,
-		grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatalf("Error creating dial: %v", err)
-	}
-
-	return &LocalServerClient{
-		connection: conn,
-	}
-}
+func NewLocalServerClient() *LocalServerClient { _ = "STUB: not implemented"; return nil }
 
 type logger struct{}
 
-func (l *logger) Debugf(format string, args ...any) {
-	log.Printf(format, args...)
-}
+func (l *logger) Debugf(format string, args ...any) { _ = "STUB: not implemented"; return }
 
-func (l *logger) Infof(format string, args ...any) {
-	log.Printf(format, args...)
-}
+func (l *logger) Infof(format string, args ...any) { _ = "STUB: not implemented"; return }
 
-func (l *logger) Warnf(format string, args ...any) {
-	log.Printf(format, args...)
-}
+func (l *logger) Warnf(format string, args ...any) { _ = "STUB: not implemented"; return }
 
-func (l *logger) Errorf(format string, args ...any) {
-	log.Printf(format, args...)
-}
+func (l *logger) Errorf(format string, args ...any) { _ = "STUB: not implemented"; return }

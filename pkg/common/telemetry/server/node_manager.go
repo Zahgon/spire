@@ -8,7 +8,8 @@ import "github.com/spiffe/spire/pkg/common/telemetry"
 // StartNodeManagerPruneAttestedExpiredNodesCall returns metric for
 // for expired agent pruning
 func StartNodeManagerPruneAttestedExpiredNodesCall(m telemetry.Metrics) *telemetry.CallCounter {
-	return telemetry.StartCall(m, telemetry.Node, telemetry.Manager, telemetry.Prune)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // End Call Counters

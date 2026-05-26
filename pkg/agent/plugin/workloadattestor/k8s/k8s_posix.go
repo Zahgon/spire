@@ -4,37 +4,20 @@ package k8s
 
 import (
 	"io"
-	"log"
-	"os"
-	"path/filepath"
 	"regexp"
-	"strings"
-	"unicode"
 
 	"github.com/hashicorp/go-hclog"
 	"github.com/spiffe/spire/pkg/agent/common/cgroups"
-	"github.com/spiffe/spire/pkg/common/containerinfo"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"k8s.io/apimachinery/pkg/types"
 )
 
-func (p *Plugin) defaultKubeletCAPath() string {
-	return defaultKubeletCAPath
-}
+func (p *Plugin) defaultKubeletCAPath() string { _ = "STUB: not implemented"; return "" }
 
-func (p *Plugin) defaultTokenPath() string {
-	return defaultTokenPath
-}
+func (p *Plugin) defaultTokenPath() string { _ = "STUB: not implemented"; return "" }
 
 func createHelper(c *Plugin) ContainerHelper {
-	rootDir := c.rootDir
-	if rootDir == "" {
-		rootDir = "/"
-	}
-	return &containerHelper{
-		rootDir: rootDir,
-	}
+	_ = "STUB: not implemented"
+	return *new(ContainerHelper)
 }
 
 type containerHelper struct {
@@ -44,56 +27,27 @@ type containerHelper struct {
 }
 
 func (h *containerHelper) Configure(config *HCLConfig, log hclog.Logger) error {
-	h.verboseContainerLocatorLogs = config.VerboseContainerLocatorLogs
-	h.useNewContainerLocator = config.UseNewContainerLocator == nil || *config.UseNewContainerLocator
-	if h.useNewContainerLocator {
-		log.Info("Using the new container locator")
-	} else {
-		log.Warn("Using the legacy container locator. This option will removed in a future release.")
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (h *containerHelper) GetPodUIDAndContainerID(pID int32, log hclog.Logger) (types.UID, string, error) {
-	if !h.useNewContainerLocator {
-		cgroups, err := cgroups.GetCgroups(pID, dirFS(h.rootDir))
-		if err != nil {
-			return "", "", status.Errorf(codes.Internal, "unable to obtain cgroups: %v", err)
-		}
-		return getPodUIDAndContainerIDFromCGroups(cgroups)
-	}
-
-	extractor := containerinfo.Extractor{RootDir: h.rootDir, VerboseLogging: h.verboseContainerLocatorLogs}
-	return extractor.GetPodUIDAndContainerID(pID, log)
+	_ = "STUB: not implemented"
+	return *new(types.UID), "", nil
 }
 
 func getPodUIDAndContainerIDFromCGroups(cgroups []cgroups.Cgroup) (types.UID, string, error) {
-	var podUID types.UID
-	var containerID string
-	for _, cgroup := range cgroups {
-		candidatePodUID, candidateContainerID, ok := getPodUIDAndContainerIDFromCGroupPath(cgroup.GroupPath)
-		switch {
-		case !ok:
-			// Cgroup did not contain a container ID.
-			continue
-		case containerID == "":
-			// This is the first container ID found so far.
-			podUID = candidatePodUID
-			containerID = candidateContainerID
-		case containerID != candidateContainerID:
-			// More than one container ID found in the cgroups.
-			return "", "", status.Errorf(codes.FailedPrecondition, "multiple container IDs found in cgroups (%s, %s)",
-				containerID, candidateContainerID)
-		case podUID != candidatePodUID:
-			// More than one pod UID found in the cgroups.
-			return "", "", status.Errorf(codes.FailedPrecondition, "multiple pod UIDs found in cgroups (%s, %s)",
-				podUID, candidatePodUID)
-		}
-	}
-
-	return podUID, containerID, nil
+	_ = "STUB: not implemented"
+	return *new(types.UID), "", nil
 }
+
+// Cgroup did not contain a container ID.
+
+// This is the first container ID found so far.
+
+// More than one container ID found in the cgroups.
+
+// More than one pod UID found in the cgroups.
 
 // regexes listed here have to exclusively match a cgroup path
 // the regexes must include two named groups "poduid" and "containerid"
@@ -131,30 +85,17 @@ var cgroupREs = []*regexp.Regexp{
 }
 
 func reSubMatchMap(r *regexp.Regexp, str string) map[string]string {
-	match := r.FindStringSubmatch(str)
-	if match == nil {
-		return nil
-	}
-	subMatchMap := make(map[string]string)
-	for i, name := range r.SubexpNames() {
-		if i != 0 {
-			subMatchMap[name] = match[i]
-		}
-	}
-	return subMatchMap
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func isValidCGroupPathMatches(matches map[string]string) bool {
-	if matches == nil {
-		return false
-	}
-	if matches["mustnotmatch"] != "" {
-		return false
-	}
-	return true
+	_ = "STUB: not implemented"
+	return false
 }
 
 func getPodUIDAndContainerIDFromCGroupPath(cgroupPath string) (types.UID, string, bool) {
+	_ = "STUB: not implemented"
 	// We are only interested in kube pods entries, for example:
 	// - /kubepods/burstable/pod2c48913c-b29f-11e7-9350-020968147796/9bca8d63d5fa610783847915bcff0ecac1273e5b4bed3f6fa1b07350e0135961
 	// - /docker/8d461fa5765781bcf5f7eb192f101bc3103d4b932e26236f43feecfa20664f96/kubepods/besteffort/poddaa5c7ee-3484-4533-af39-3591564fd03e/aff34703e5e1f89443e9a1bffcc80f43f74d4808a2dd22c8f88c08547b323934
@@ -165,44 +106,17 @@ func getPodUIDAndContainerIDFromCGroupPath(cgroupPath string) (types.UID, string
 	// First trim off any .scope suffix. This allows for a cleaner regex since
 	// we don't have to muck with greediness. TrimSuffix is no-copy so this
 	// is cheap.
-	cgroupPath = strings.TrimSuffix(cgroupPath, ".scope")
-
-	var matchResults map[string]string
-	for _, regex := range cgroupREs {
-		matches := reSubMatchMap(regex, cgroupPath)
-		if isValidCGroupPathMatches(matches) {
-			if matchResults != nil {
-				log.Printf("More than one regex matches for cgroup %s", cgroupPath)
-				return "", "", false
-			}
-			matchResults = matches
-		}
-	}
-
-	if matchResults != nil {
-		var podUID types.UID
-		if matchResults["poduid"] != "" {
-			podUID = canonicalizePodUID(matchResults["poduid"])
-		}
-		return podUID, matchResults["containerid"], true
-	}
-	return "", "", false
+	return *new(types.UID), "", false
 }
 
 // canonicalizePodUID converts a Pod UID, as represented in a cgroup path, into
 // a canonical form. Practically this means that we convert any punctuation to
 // dashes, which is how the UID is represented within Kubernetes.
-func canonicalizePodUID(uid string) types.UID {
-	return types.UID(strings.Map(func(r rune) rune {
-		if unicode.IsPunct(r) {
-			r = '-'
-		}
-		return r
-	}, uid))
-}
+func canonicalizePodUID(uid string) types.UID { _ = "STUB: not implemented"; return *new(types.UID) }
 
 type dirFS string
 
 func (d dirFS) Open(p string) (io.ReadCloser, error) {
-	return os.Open(filepath.Join(string(d), p))
+	_ = "STUB: not implemented"
+	return *new(io.ReadCloser), nil
 }

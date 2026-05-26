@@ -27,77 +27,13 @@ type UpstreamCA struct {
 }
 
 func NewUpstreamCA(keypair x509util.Keypair, trustDomain spiffeid.TrustDomain, options UpstreamCAOptions) *UpstreamCA {
-	if options.Backdate <= 0 {
-		options.Backdate = DefaultUpstreamCABackdate
-	}
-	if options.Clock == nil {
-		options.Clock = clock.New()
-	}
-
-	return &UpstreamCA{
-		keypair:     keypair,
-		trustDomain: trustDomain,
-		options:     options,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (ca *UpstreamCA) SignCSR(ctx context.Context, csrDER []byte, preferredTTL time.Duration) (*x509.Certificate, error) {
-	csr, err := ParseAndValidateCSR(csrDER, ca.trustDomain)
-	if err != nil {
-		return nil, err
-	}
-
-	keyID, err := x509util.GetSubjectKeyID(csr.PublicKey)
-	if err != nil {
-		return nil, err
-	}
-
-	// Use the default TTL setting unless a preferred TTL is specified.
-	caTTL := DefaultUpstreamCATTL
-	if preferredTTL > 0 {
-		caTTL = preferredTTL
-	}
-
-	now := ca.options.Clock.Now()
-	notBefore := now.Add(-ca.options.Backdate)
-	notAfter := now.Add(caTTL)
-
-	caCert, err := ca.keypair.GetCertificate(ctx)
-	if err != nil {
-		return nil, err
-	}
-	if notAfter.After(caCert.NotAfter) {
-		notAfter = caCert.NotAfter
-	}
-
-	serialNumber, err := x509util.NewSerialNumber()
-	if err != nil {
-		return nil, err
-	}
-
-	template := &x509.Certificate{
-		SerialNumber: serialNumber,
-		RawSubject:   csr.RawSubject,
-		URIs:         csr.URIs,
-		NotBefore:    notBefore,
-		NotAfter:     notAfter,
-		SubjectKeyId: keyID,
-		KeyUsage: x509.KeyUsageCertSign |
-			x509.KeyUsageCRLSign,
-		BasicConstraintsValid: true,
-		IsCA:                  true,
-		ExtraExtensions:       csr.Extensions,
-	}
-
-	certDER, err := ca.keypair.CreateCertificate(ctx, template, csr.PublicKey)
-	if err != nil {
-		return nil, err
-	}
-
-	cert, err := x509.ParseCertificate(certDER)
-	if err != nil {
-		return nil, err
-	}
-
-	return cert, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Use the default TTL setting unless a preferred TTL is specified.

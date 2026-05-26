@@ -10,25 +10,29 @@ import (
 // StartCreateJoinTokenCall return metric
 // for server's datastore, on creating a join token.
 func StartCreateJoinTokenCall(m telemetry.Metrics) *telemetry.CallCounter {
-	return telemetry.StartCall(m, telemetry.Datastore, telemetry.JoinToken, telemetry.Create)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartDeleteJoinTokenCall return metric
 // for server's datastore, on deleting a join token.
 func StartDeleteJoinTokenCall(m telemetry.Metrics) *telemetry.CallCounter {
-	return telemetry.StartCall(m, telemetry.Datastore, telemetry.JoinToken, telemetry.Delete)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartFetchJoinTokenCall return metric
 // for server's datastore, on fetching a join token.
 func StartFetchJoinTokenCall(m telemetry.Metrics) *telemetry.CallCounter {
-	return telemetry.StartCall(m, telemetry.Datastore, telemetry.JoinToken, telemetry.Fetch)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartPruneJoinTokenCall return metric
 // for server's datastore, on pruning join tokens.
 func StartPruneJoinTokenCall(m telemetry.Metrics) *telemetry.CallCounter {
-	return telemetry.StartCall(m, telemetry.Datastore, telemetry.JoinToken, telemetry.Prune)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // End Call Counters

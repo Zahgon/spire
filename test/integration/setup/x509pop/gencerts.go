@@ -1,34 +1,23 @@
 package main
 
 import (
-	"bytes"
 	"crypto"
-	"crypto/ecdsa"
-	"crypto/elliptic"
-	"crypto/rand"
 	"crypto/x509"
 	"crypto/x509/pkix"
-	"encoding/pem"
 	"flag"
 	"fmt"
 	"math/big"
 	"net/url"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 )
 
 type stringArrayFlag []string
 
-func (s *stringArrayFlag) String() string {
-	return strings.Join(*s, ";")
-}
+func (s *stringArrayFlag) String() string { _ = "STUB: not implemented"; return "" }
 
-func (s *stringArrayFlag) Set(value string) error {
-	*s = append(*s, value)
-	return nil
-}
+func (s *stringArrayFlag) Set(value string) error { _ = "STUB: not implemented"; return nil }
 
 func main() {
 	var trustDomain string
@@ -79,52 +68,23 @@ func main() {
 }
 
 func createRootCertificate(key crypto.Signer, tmpl *x509.Certificate) *x509.Certificate {
-	return createCertificate(key, tmpl, key, tmpl)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func createCertificate(key crypto.Signer, tmpl *x509.Certificate, parentKey crypto.Signer, parent *x509.Certificate) *x509.Certificate {
-	certDER, err := x509.CreateCertificate(rand.Reader, tmpl, parent, key.Public(), parentKey)
-	checkErr(err)
-	cert, err := x509.ParseCertificate(certDER)
-	checkErr(err)
-	return cert
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func generateKey() crypto.Signer {
-	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	checkErr(err)
-	return key
-}
+func generateKey() crypto.Signer { _ = "STUB: not implemented"; return *new(crypto.Signer) }
 
-func writeKey(path string, key crypto.Signer) {
-	keyBytes, err := x509.MarshalPKCS8PrivateKey(key)
-	checkErr(err)
-	pemBytes := pem.EncodeToMemory(&pem.Block{
-		Type:  "PRIVATE KEY",
-		Bytes: keyBytes,
-	})
-	writeFile(path, pemBytes, 0o644) // This key is used only for testing purposes.
-}
+func writeKey(path string, key crypto.Signer) { _ = "STUB: not implemented"; return }
 
-func writeCerts(path string, certs ...*x509.Certificate) {
-	data := new(bytes.Buffer)
-	for _, cert := range certs {
-		err := pem.Encode(data, &pem.Block{
-			Type:  "CERTIFICATE",
-			Bytes: cert.Raw,
-		})
-		checkErr(err)
-	}
-	writeFile(path, data.Bytes(), 0o644)
-}
+// This key is used only for testing purposes.
 
-func writeFile(path string, data []byte, mode os.FileMode) {
-	err := os.WriteFile(path, data, mode)
-	checkErr(err)
-}
+func writeCerts(path string, certs ...*x509.Certificate) { _ = "STUB: not implemented"; return }
 
-func checkErr(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
+func writeFile(path string, data []byte, mode os.FileMode) { _ = "STUB: not implemented"; return }
+
+func checkErr(err error) { _ = "STUB: not implemented"; return }

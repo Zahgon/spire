@@ -5,62 +5,43 @@ import (
 	"net"
 
 	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/peer"
 )
 
 type grpcCredentials struct{}
 
 func NewCredentials() credentials.TransportCredentials {
-	return &grpcCredentials{}
+	_ = "STUB: not implemented"
+	return *new(credentials.TransportCredentials)
 }
 
 func (c *grpcCredentials) ClientHandshake(_ context.Context, _ string, conn net.Conn) (net.Conn, credentials.AuthInfo, error) {
-	conn.Close()
-	return conn, AuthInfo{}, ErrInvalidConnection
+	_ = "STUB: not implemented"
+	return *new(net.Conn), *new(credentials.AuthInfo), nil
 }
 
 func (c *grpcCredentials) ServerHandshake(conn net.Conn) (net.Conn, credentials.AuthInfo, error) {
-	wrappedCon, ok := conn.(*Conn)
-	if !ok {
-		conn.Close()
-		return conn, AuthInfo{}, ErrInvalidConnection
-	}
-
-	return wrappedCon, wrappedCon.Info, nil
+	_ = "STUB: not implemented"
+	return *new(net.Conn), *new(credentials.AuthInfo), nil
 }
 
 func (c *grpcCredentials) Info() credentials.ProtocolInfo {
-	return credentials.ProtocolInfo{
-		SecurityProtocol: authType,
-		SecurityVersion:  "0.2",
-		ServerName:       "spire-agent",
-	}
+	_ = "STUB: not implemented"
+	return *new(credentials.ProtocolInfo)
 }
 
 func (c *grpcCredentials) Clone() credentials.TransportCredentials {
-	credentialsCopy := *c
-	return &credentialsCopy
+	_ = "STUB: not implemented"
+	return *new(credentials.TransportCredentials)
 }
 
-func (c *grpcCredentials) OverrideServerName(_ string) error {
-	return nil
-}
+func (c *grpcCredentials) OverrideServerName(_ string) error { _ = "STUB: not implemented"; return nil }
 
 func WatcherFromContext(ctx context.Context) (Watcher, bool) {
-	ai, ok := AuthInfoFromContext(ctx)
-	if !ok {
-		return nil, false
-	}
-
-	return ai.Watcher, true
+	_ = "STUB: not implemented"
+	return *new(Watcher), false
 }
 
 func AuthInfoFromContext(ctx context.Context) (AuthInfo, bool) {
-	peer, ok := peer.FromContext(ctx)
-	if !ok {
-		return AuthInfo{}, false
-	}
-
-	ai, ok := peer.AuthInfo.(AuthInfo)
-	return ai, ok
+	_ = "STUB: not implemented"
+	return *new(AuthInfo), false
 }

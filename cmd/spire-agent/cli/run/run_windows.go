@@ -3,47 +3,33 @@
 package run
 
 import (
-	"errors"
 	"flag"
 	"net"
 
-	"github.com/spiffe/spire/cmd/spire-agent/cli/common"
 	"github.com/spiffe/spire/pkg/agent"
-	"github.com/spiffe/spire/pkg/common/namedpipe"
 )
 
-func (c *agentConfig) addOSFlags(flags *flag.FlagSet) {
-	flags.StringVar(&c.Experimental.NamedPipeName, "namedPipeName", "", "Pipe name to bind the SPIRE Agent API named pipe")
-}
+func (c *agentConfig) addOSFlags(flags *flag.FlagSet) { _ = "STUB: not implemented"; return }
 
-func (c *agentConfig) setPlatformDefaults() {
-	c.Experimental.NamedPipeName = common.DefaultNamedPipeName
-}
+func (c *agentConfig) setPlatformDefaults() { _ = "STUB: not implemented"; return }
 
 func (c *agentConfig) getAddr() (net.Addr, error) {
-	return namedpipe.AddrFromName(c.Experimental.NamedPipeName), nil
+	_ = "STUB: not implemented"
+	return *new(net.Addr), nil
 }
 
 func (c *agentConfig) getAdminAddr() (net.Addr, error) {
-	return namedpipe.AddrFromName(c.Experimental.AdminNamedPipeName), nil
+	_ = "STUB: not implemented"
+	return *new(net.Addr), nil
 }
 
-func (c *agentConfig) hasAdminAddr() bool {
-	return c.Experimental.AdminNamedPipeName != ""
-}
+func (c *agentConfig) hasAdminAddr() bool { _ = "STUB: not implemented"; return false }
 
 // validateOS performs windows specific validations of the agent config
-func (c *agentConfig) validateOS() error {
-	if c.SocketPath != "" {
-		return errors.New("invalid configuration: socket_path is not supported in this platform; please use named_pipe_name instead")
-	}
-	if c.AdminSocketPath != "" {
-		return errors.New("invalid configuration: admin_socket_path is not supported in this platform; please use admin_named_pipe_name instead")
-	}
-	return nil
-}
+func (c *agentConfig) validateOS() error { _ = "STUB: not implemented"; return nil }
 
 func prepareEndpoints(*agent.Config) error {
+	_ = "STUB: not implemented"
 	// Nothing to do in this platform
 	return nil
 }

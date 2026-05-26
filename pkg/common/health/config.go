@@ -1,9 +1,6 @@
 package health
 
 import (
-	"net"
-	"strings"
-
 	"github.com/hashicorp/hcl/hcl/token"
 )
 
@@ -22,37 +19,13 @@ type Config struct {
 }
 
 // getAddress returns an address suitable for use as http.Server.Addr.
-func (c *Config) getAddress() string {
-	host := "localhost"
-	if c.BindAddress != "" {
-		host = strings.Trim(c.BindAddress, "[]")
-	}
-
-	port := "80"
-	if c.BindPort != "" {
-		port = c.BindPort
-	}
-
-	return net.JoinHostPort(host, port)
-}
+func (c *Config) getAddress() string { _ = "STUB: not implemented"; return "" }
 
 // getReadyPath returns the configured value or a default
-func (c *Config) getReadyPath() string {
-	if c.ReadyPath == "" {
-		return "/ready"
-	}
-
-	return c.ReadyPath
-}
+func (c *Config) getReadyPath() string { _ = "STUB: not implemented"; return "" }
 
 // getLivePath returns the configured value or a default
-func (c *Config) getLivePath() string {
-	if c.LivePath == "" {
-		return "/live"
-	}
-
-	return c.LivePath
-}
+func (c *Config) getLivePath() string { _ = "STUB: not implemented"; return "" }
 
 // Details are additional data to be used when the system is ready
 type Details struct {

@@ -2,7 +2,6 @@ package docker
 
 import (
 	"context"
-	"math"
 	"time"
 
 	"github.com/andres-erbsen/clock"
@@ -20,37 +19,15 @@ type retryer struct {
 	initialBackoff time.Duration
 }
 
-func newRetryer() *retryer {
-	return &retryer{
-		clock:          clock.New(),
-		numRetries:     defaultNumRetries,
-		initialBackoff: defaultInitialBackoff,
-	}
-}
+func newRetryer() *retryer { _ = "STUB: not implemented"; return nil }
 
 func (r *retryer) Retry(ctx context.Context, fn func() error) error {
-	if r.disabled {
-		return fn()
-	}
-	// try once plus the number of retries
-	for i := 0; ; i++ {
-		err := fn()
-		if err == nil {
-			return nil
-		}
-		// don't wait another backoff cycle if we've already maxed out on retries
-		if i == r.numRetries {
-			return err
-		}
-		backoff := r.initialBackoff * time.Duration(exponentialBackoff(i))
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case <-r.clock.After(backoff):
-		}
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func exponentialBackoff(c int) float64 {
-	return math.Pow(2, float64(c))
-}
+// try once plus the number of retries
+
+// don't wait another backoff cycle if we've already maxed out on retries
+
+func exponentialBackoff(c int) float64 { _ = "STUB: not implemented"; return 0 }

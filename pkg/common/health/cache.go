@@ -2,14 +2,11 @@ package health
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"sync"
 	"time"
 
 	"github.com/andres-erbsen/clock"
 	"github.com/sirupsen/logrus"
-	"github.com/spiffe/spire/pkg/common/telemetry"
 )
 
 type checkState struct {
@@ -37,12 +34,8 @@ type checkerSubsystem struct {
 }
 
 func newCache(log logrus.FieldLogger, clock clock.Clock) *cache {
-	return &cache{
-		checkerSubsystems: make(map[string]*checkerSubsystem),
-		log:               log,
-		clk:               clock,
-		startupComplete:   make(chan struct{}, 1),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 type cache struct {
@@ -59,200 +52,47 @@ type cache struct {
 }
 
 func (c *cache) addCheck(name string, checkable Checkable) error {
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
-
-	if _, ok := c.checkerSubsystems[name]; ok {
-		return fmt.Errorf("check %q has already been added", name)
-	}
-
-	c.checkerSubsystems[name] = &checkerSubsystem{
-		checkable: checkable,
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (c *cache) getCheckerSubsystems() map[string]*checkerSubsystem {
-	c.mtx.RLock()
-	defer c.mtx.RUnlock()
-
-	checkerSubsystems := make(map[string]*checkerSubsystem, len(c.checkerSubsystems))
-	for k, v := range c.checkerSubsystems {
-		checkerSubsystems[k] = &checkerSubsystem{
-			checkable: v.checkable,
-			state:     v.state,
-		}
-	}
-	return checkerSubsystems
-}
-
-func (c *cache) getStatuses() map[string]checkState {
-	c.mtx.RLock()
-	defer c.mtx.RUnlock()
-
-	statuses := make(map[string]checkState, len(c.checkerSubsystems))
-	for k, v := range c.checkerSubsystems {
-		statuses[k] = v.state
-	}
-
-	return statuses
-}
-
-func (c *cache) start(ctx context.Context) error {
-	c.mtx.RLock()
-	defer c.mtx.RUnlock()
-
-	if len(c.checkerSubsystems) < 1 {
-		return errors.New("no health checks defined")
-	}
-
-	c.startRunner(ctx)
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (c *cache) startRunner(ctx context.Context) {
-	c.log.Debug("Initializing health checkers")
-	seenStartupError := make(map[string]string)
-	checkFunc := func() {
-		for name, checker := range c.getCheckerSubsystems() {
-			state, err := verifyStatus(checker.checkable)
+func (c *cache) getStatuses() map[string]checkState { _ = "STUB: not implemented"; return nil }
 
-			checkState := checkState{
-				details:   state,
-				checkTime: c.clk.Now(),
-			}
-			if err != nil {
-				if state.Started == nil || *state.Started {
-					c.log.WithField("check", name).
-						WithError(err).
-						Error("Health check has failed")
-				} else {
-					strErr := err.Error()
-					if val, ok := seenStartupError[name]; !ok || val != strErr {
-						c.log.WithField("check", name).
-							WithError(err).
-							Warn("Health check has failed. Starting up still.")
-						seenStartupError[name] = strErr
-					}
-				}
-				checkState.err = err
-			}
+func (c *cache) start(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
-			c.setStatus(name, checker.state, checkState)
-		}
-		if c.hooks.statusUpdated != nil {
-			c.hooks.statusUpdated <- struct{}{}
-		}
-	}
+func (c *cache) startRunner(ctx context.Context) { _ = "STUB: not implemented"; return }
 
-	startSteadyStateHealthCheckCh := make(chan struct{})
-	// Run health check in a tighter loop until we get an initial ready + live state
-	go func() {
-		for {
-			checkFunc()
+// Run health check in a tighter loop until we get an initial ready + live state
 
-			allReady := true
-			allLive := true
-			for _, status := range c.getStatuses() {
-				if !status.details.Ready {
-					allReady = false
-					break
-				}
-
-				if !status.details.Live {
-					allLive = false
-					break
-				}
-			}
-
-			if allReady && allLive {
-				break
-			}
-
-			select {
-			case <-c.clk.After(readyCheckInitialInterval):
-			case <-ctx.Done():
-				return
-			}
-		}
-
-		startSteadyStateHealthCheckCh <- struct{}{}
-	}()
-
-	go func() {
-		defer func() {
-			c.log.Debug("Finishing health checker")
-		}()
-
-		// Wait until initial ready + live state is achieved, then periodically check health at a longer interval
-		<-startSteadyStateHealthCheckCh
-		for {
-			select {
-			case <-c.clk.After(readyCheckInterval):
-			case <-ctx.Done():
-				return
-			}
-
-			checkFunc()
-		}
-	}()
-}
+// Wait until initial ready + live state is achieved, then periodically check health at a longer interval
 
 func (c *cache) setStatus(name string, prevState checkState, state checkState) {
-	c.embellishState(name, &prevState, &state)
-
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
-
-	// We are sure that checker exists in this place, to be able to check
-	// status of a subsystem we must call the checker inside this map
-	c.checkerSubsystems[name].state = state
+	_ = "STUB: not implemented"
+	return
 }
+
+// We are sure that checker exists in this place, to be able to check
+// status of a subsystem we must call the checker inside this map
 
 func (c *cache) embellishState(name string, prevState, state *checkState) {
-	switch {
-	case state.err == nil && prevState.err == nil:
-	// All fine continue
-	case state.err != nil && prevState.err == nil:
-		// State start to fail, add log and set failures tracking
-		c.log.WithFields(logrus.Fields{
-			telemetry.Check:   name,
-			telemetry.Details: state.details,
-			telemetry.Error:   state.err.Error(),
-		}).Warn("Health check failed")
-
-		state.timeOfFirstFailure = c.clk.Now()
-		state.contiguousFailures = 1
-
-	case state.err != nil && prevState.err != nil:
-		// Error still happening, carry the time of first failure from the previous state
-		state.timeOfFirstFailure = prevState.timeOfFirstFailure
-		state.contiguousFailures = prevState.contiguousFailures + 1
-
-	case state.err == nil && prevState.err != nil:
-		// Current state has no error, notify about error recovering
-		failureSeconds := c.clk.Now().Sub(prevState.timeOfFirstFailure).Seconds()
-		c.log.WithFields(logrus.Fields{
-			telemetry.Check:    name,
-			telemetry.Details:  state.details,
-			telemetry.Error:    prevState.err.Error(),
-			telemetry.Failures: prevState.contiguousFailures,
-			telemetry.Duration: failureSeconds,
-		}).Info("Health check recovered")
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
+// All fine continue
+
+// State start to fail, add log and set failures tracking
+
+// Error still happening, carry the time of first failure from the previous state
+
+// Current state has no error, notify about error recovering
+
 func verifyStatus(check Checkable) (State, error) {
-	state := check.CheckHealth()
-	var err error
-	switch {
-	case state.Ready && state.Live:
-	case state.Ready && !state.Live:
-		err = errors.New("subsystem is not live")
-	case !state.Ready && state.Live:
-		err = errors.New("subsystem is not ready")
-	case !state.Ready && !state.Live:
-		err = errors.New("subsystem is not live or ready")
-	}
-	return state, err
+	_ = "STUB: not implemented"
+	return *new(State), nil
 }

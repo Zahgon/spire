@@ -3,36 +3,21 @@ package x509pop
 import (
 	"context"
 	"crypto"
-	"crypto/tls"
-	"encoding/json"
-	"strings"
 	"sync"
 
-	"github.com/hashicorp/hcl"
-	"github.com/spiffe/go-spiffe/v2/workloadapi"
 	nodeattestorv1 "github.com/spiffe/spire-plugin-sdk/proto/spire/plugin/agent/nodeattestor/v1"
 	configv1 "github.com/spiffe/spire-plugin-sdk/proto/spire/service/common/config/v1"
 	"github.com/spiffe/spire/pkg/common/catalog"
-	"github.com/spiffe/spire/pkg/common/plugin/x509pop"
 	"github.com/spiffe/spire/pkg/common/pluginconf"
-	"github.com/spiffe/spire/pkg/common/util"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 const (
 	pluginName = "x509pop"
 )
 
-func BuiltIn() catalog.BuiltIn {
-	return builtin(New())
-}
+func BuiltIn() catalog.BuiltIn { _ = "STUB: not implemented"; return *new(catalog.BuiltIn) }
 
-func builtin(p *Plugin) catalog.BuiltIn {
-	return catalog.MakeBuiltIn(pluginName,
-		nodeattestorv1.NodeAttestorPluginServer(p),
-		configv1.ConfigServiceServer(p))
-}
+func builtin(p *Plugin) catalog.BuiltIn { _ = "STUB: not implemented"; return *new(catalog.BuiltIn) }
 
 type configData struct {
 	privateKey         crypto.PrivateKey
@@ -47,23 +32,8 @@ type Config struct {
 }
 
 func buildConfig(coreConfig catalog.CoreConfig, hclText string, status *pluginconf.Status) *Config {
-	newConfig := new(Config)
-	if err := hcl.Decode(newConfig, hclText); err != nil {
-		status.ReportErrorf("unable to decode configuration: %v", err)
-		return nil
-	}
-
-	if newConfig.SpiffeEndpointSocket == "" {
-		if newConfig.PrivateKeyPath == "" {
-			status.ReportError("private_key_path is required")
-		}
-
-		if newConfig.CertificatePath == "" {
-			status.ReportError("certificate_path is required")
-		}
-	}
-
-	return newConfig
+	_ = "STUB: not implemented"
+	return nil
 }
 
 type Plugin struct {
@@ -74,142 +44,42 @@ type Plugin struct {
 	c *Config
 }
 
-func New() *Plugin {
-	return &Plugin{}
-}
+func New() *Plugin { _ = "STUB: not implemented"; return nil }
 
 func (p *Plugin) AidAttestation(stream nodeattestorv1.NodeAttestor_AidAttestationServer) (err error) {
-	data, err := p.loadConfigData(stream.Context())
-	if err != nil {
-		return err
-	}
-
-	// send the attestation data back to the agent
-	if err := stream.Send(&nodeattestorv1.PayloadOrChallengeResponse{
-		Data: &nodeattestorv1.PayloadOrChallengeResponse_Payload{
-			Payload: data.attestationPayload,
-		},
-	}); err != nil {
-		return err
-	}
-
-	// receive challenge
-	resp, err := stream.Recv()
-	if err != nil {
-		return err
-	}
-
-	challenge := new(x509pop.Challenge)
-	if err := json.Unmarshal(resp.Challenge, challenge); err != nil {
-		return status.Errorf(codes.Internal, "unable to unmarshal challenge: %v", err)
-	}
-
-	// calculate and send the challenge response
-	response, err := x509pop.CalculateResponse(data.privateKey, challenge)
-	if err != nil {
-		return status.Errorf(codes.Internal, "failed to calculate challenge response: %v", err)
-	}
-
-	responseBytes, err := json.Marshal(response)
-	if err != nil {
-		return status.Errorf(codes.Internal, "unable to marshal challenge response: %v", err)
-	}
-
-	return stream.Send(&nodeattestorv1.PayloadOrChallengeResponse{
-		Data: &nodeattestorv1.PayloadOrChallengeResponse_ChallengeResponse{
-			ChallengeResponse: responseBytes,
-		},
-	})
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// send the attestation data back to the agent
+
+// receive challenge
+
+// calculate and send the challenge response
 
 func (p *Plugin) Configure(ctx context.Context, req *configv1.ConfigureRequest) (*configv1.ConfigureResponse, error) {
-	newConfig, _, err := pluginconf.Build(req, buildConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	// make sure the configuration produces valid data
-	if _, err := loadConfigData(ctx, newConfig, false); err != nil {
-		return nil, err
-	}
-
-	p.m.Lock()
-	defer p.m.Unlock()
-	p.c = newConfig
-
-	return &configv1.ConfigureResponse{}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// make sure the configuration produces valid data
 
 func (p *Plugin) Validate(_ context.Context, req *configv1.ValidateRequest) (*configv1.ValidateResponse, error) {
-	_, notes, err := pluginconf.Build(req, buildConfig)
-
-	return &configv1.ValidateResponse{
-		Valid: err == nil,
-		Notes: notes,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (p *Plugin) getConfig() *Config {
-	p.m.Lock()
-	defer p.m.Unlock()
-	return p.c
-}
+func (p *Plugin) getConfig() *Config { _ = "STUB: not implemented"; return nil }
 
 func (p *Plugin) loadConfigData(ctx context.Context) (*configData, error) {
-	config := p.getConfig()
-	if config == nil {
-		return nil, status.Error(codes.FailedPrecondition, "not configured")
-	}
-	return loadConfigData(ctx, config, true)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // TODO: this needs more attention.  Parts of it might belong in buildConfig
 func loadConfigData(ctx context.Context, config *Config, inAttest bool) (*configData, error) {
-	var certificates [][]byte
-	var privateKey crypto.PrivateKey
-
-	if config.SpiffeEndpointSocket != "" {
-		if inAttest {
-			svid, err := workloadapi.FetchX509SVID(ctx, workloadapi.WithAddr(config.SpiffeEndpointSocket))
-			if err != nil {
-				return nil, status.Errorf(codes.Unavailable, "unable to fetch SVID from workload API: %v", err)
-			}
-			privateKey = svid.PrivateKey
-			for _, cert := range svid.Certificates {
-				certificates = append(certificates, cert.Raw)
-			}
-		}
-	} else {
-		certificate, err := tls.LoadX509KeyPair(config.CertificatePath, config.PrivateKeyPath)
-		if err != nil {
-			return nil, status.Errorf(codes.InvalidArgument, "unable to load keypair: %v", err)
-		}
-
-		privateKey = certificate.PrivateKey
-		certificates = certificate.Certificate
-
-		// Append intermediate certificates if IntermediatesPath is set.
-		if strings.TrimSpace(config.IntermediatesPath) != "" {
-			intermediates, err := util.LoadCertificates(config.IntermediatesPath)
-			if err != nil {
-				return nil, status.Errorf(codes.InvalidArgument, "unable to load intermediate certificates: %v", err)
-			}
-
-			for _, cert := range intermediates {
-				certificates = append(certificates, cert.Raw)
-			}
-		}
-	}
-
-	attestationPayload, err := json.Marshal(x509pop.AttestationData{
-		Certificates: certificates,
-	})
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "unable to marshal attestation data: %v", err)
-	}
-
-	return &configData{
-		privateKey:         privateKey,
-		attestationPayload: attestationPayload,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Append intermediate certificates if IntermediatesPath is set.

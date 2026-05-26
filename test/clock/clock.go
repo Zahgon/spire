@@ -24,134 +24,69 @@ type Mock struct {
 }
 
 // NewMock creates a mock clock which can be precisely controlled
-func NewMock(t testing.TB) *Mock {
-	return NewMockAt(t, time.Now())
-}
+func NewMock(t testing.TB) *Mock { _ = "STUB: not implemented"; return nil }
 
 // NewMockAt creates a mock clock which can be precisely controlled at a specific time.
-func NewMockAt(t testing.TB, now time.Time) *Mock {
-	m := &Mock{
-		Mock:    clock.NewMock(),
-		t:       t,
-		timerC:  make(chan time.Duration, 1),
-		afterC:  make(chan time.Duration, 1),
-		tickerC: make(chan time.Duration, 1),
-		sleepC:  make(chan time.Duration, 1),
-	}
+func NewMockAt(t testing.TB, now time.Time) *Mock { _ = "STUB: not implemented"; return nil }
 
-	// TLS verification is being done using a realtime clock so we set the mock clock to
-	// the current time, truncated to a second which is the granularity available to asn1.
-	// This ensures that when tests create a certificate with a lifetime of 3 seconds, it
-	// is exactly 3 seconds (relative to the mock clock).
-	//
-	// TODO: plumb the clock into the TLS configs. (Clock).Now should be passed to "crypto/tls".(Config).Time
-	// and then this can be removed as a clock could be use with a zero value at that point.
-	m.Set(now.Truncate(time.Second))
-	return m
-}
+// TLS verification is being done using a realtime clock so we set the mock clock to
+// the current time, truncated to a second which is the granularity available to asn1.
+// This ensures that when tests create a certificate with a lifetime of 3 seconds, it
+// is exactly 3 seconds (relative to the mock clock).
+//
+// TODO: plumb the clock into the TLS configs. (Clock).Now should be passed to "crypto/tls".(Config).Time
+// and then this can be removed as a clock could be use with a zero value at that point.
 
 func (m *Mock) SetAfterHook(h func(time.Duration) <-chan time.Time) {
-	m.afterHook = h
+	_ = "STUB: not implemented"
+	return
 }
 
-func (m *Mock) TimerCh() <-chan time.Duration {
-	return m.timerC
-}
+func (m *Mock) TimerCh() <-chan time.Duration { _ = "STUB: not implemented"; return nil }
 
 func (m *Mock) WaitForAfterCh() <-chan time.Duration {
-	return m.afterC
+	_ = "STUB: not implemented"
+
+	// WaitForTimer waits up to the specified timeout for Timer to be called on the clock.
+	return nil
 }
 
-// WaitForTimer waits up to the specified timeout for Timer to be called on the clock.
 func (m *Mock) WaitForTimer(timeout time.Duration, format string, args ...any) {
-	select {
-	case <-m.timerC:
-	case <-time.After(timeout):
-		m.t.Fatalf(format, args...)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // WaitForAfter waits up to the specified timeout for After to be called on the clock.
 func (m *Mock) WaitForAfter(timeout time.Duration, format string, args ...any) {
-	select {
-	case <-m.afterC:
-	case <-time.After(timeout):
-		m.t.Fatalf(format, args...)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // WaitForTicker waits up to the specified timeout for a Ticker to be created from the clock.
 func (m *Mock) WaitForTicker(timeout time.Duration, format string, args ...any) {
-	m.WaitForTickerMulti(timeout, 1, format, args...)
+	_ = "STUB: not implemented"
+	return
 }
 
 func (m *Mock) WaitForTickerMulti(timeout time.Duration, count int32, format string, args ...any) {
-	deadlineChan := time.After(timeout)
-	for {
-		select {
-		case <-m.tickerC:
-			if m.tickerCount.Load() >= count {
-				m.tickerCount.Add(-1 * count)
-				return
-			}
-		case <-deadlineChan:
-			m.t.Fatalf(format, args...)
-		}
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // WaitForSleep waits up to the specified timeout for a sleep to begin using the clock.
 func (m *Mock) WaitForSleep(timeout time.Duration, format string, args ...any) {
-	select {
-	case <-m.sleepC:
-	case <-time.After(timeout):
-		m.t.Fatalf(format, args...)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // Timer creates a new Timer containing a channel that will send the time with a period specified by the duration argument.
-func (m *Mock) Timer(d time.Duration) *clock.Timer {
-	c := m.Mock.Timer(d)
-	select {
-	case m.timerC <- d:
-	default:
-	}
-
-	return c
-}
+func (m *Mock) Timer(d time.Duration) *clock.Timer { _ = "STUB: not implemented"; return nil }
 
 // After waits for the duration to elapse and then sends the current time on the returned channel.
-func (m *Mock) After(d time.Duration) <-chan time.Time {
-	if m.afterHook != nil {
-		return m.afterHook(d)
-	}
-	c := m.Mock.After(d)
-	select {
-	case m.afterC <- d:
-	default:
-	}
-
-	return c
-}
+func (m *Mock) After(d time.Duration) <-chan time.Time { _ = "STUB: not implemented"; return nil }
 
 // Ticker returns a new Ticker containing a channel that will send the time with a period specified by the duration argument.
-func (m *Mock) Ticker(d time.Duration) *clock.Ticker {
-	c := m.Mock.Ticker(d)
-	m.tickerCount.Add(int32(1))
-	select {
-	case m.tickerC <- d:
-	default:
-	}
-
-	return c
-}
+func (m *Mock) Ticker(d time.Duration) *clock.Ticker { _ = "STUB: not implemented"; return nil }
 
 // Sleep pauses the current goroutine for at least the duration d
-func (m *Mock) Sleep(d time.Duration) {
-	timer := m.Mock.Timer(d)
-	select {
-	case m.sleepC <- d:
-	default:
-	}
-	<-timer.C
-}
+func (m *Mock) Sleep(d time.Duration) { _ = "STUB: not implemented"; return }

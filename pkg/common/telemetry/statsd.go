@@ -2,8 +2,6 @@ package telemetry
 
 import (
 	"context"
-
-	"github.com/hashicorp/go-metrics"
 )
 
 type statsdRunner struct {
@@ -11,33 +9,18 @@ type statsdRunner struct {
 }
 
 func newStatsdRunner(c *MetricsConfig) (sinkRunner, error) {
-	runner := &statsdRunner{}
-
-	for _, sc := range c.FileConfig.Statsd {
-		sink, err := metrics.NewStatsdSink(sc.Address)
-		if err != nil {
-			return nil, err
-		}
-
-		runner.loadedSinks = append(runner.loadedSinks, sink)
-	}
-
-	return runner, nil
+	_ = "STUB: not implemented"
+	return *new(sinkRunner), nil
 }
 
-func (s *statsdRunner) isConfigured() bool {
-	return len(s.loadedSinks) > 0
-}
+func (s *statsdRunner) isConfigured() bool { _ = "STUB: not implemented"; return false }
 
-func (s *statsdRunner) sinks() []Sink {
-	return s.loadedSinks
-}
+func (s *statsdRunner) sinks() []Sink { _ = "STUB: not implemented"; return nil }
 
 func (s *statsdRunner) run(context.Context) error {
+	_ = "STUB: not implemented"
 	// Nothing to do here
 	return nil
 }
 
-func (s *statsdRunner) requiresTypePrefix() bool {
-	return false
-}
+func (s *statsdRunner) requiresTypePrefix() bool { _ = "STUB: not implemented"; return false }

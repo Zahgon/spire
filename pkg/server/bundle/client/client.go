@@ -3,16 +3,11 @@ package client
 import (
 	"context"
 	"crypto/x509"
-	"errors"
-	"fmt"
 	"io"
 	"net/http"
 
 	"github.com/spiffe/go-spiffe/v2/bundle/spiffebundle"
-	"github.com/spiffe/go-spiffe/v2/bundle/x509bundle"
 	"github.com/spiffe/go-spiffe/v2/spiffeid"
-	"github.com/spiffe/go-spiffe/v2/spiffetls/tlsconfig"
-	"github.com/spiffe/spire/pkg/common/bundleutil"
 	"github.com/spiffe/spire/pkg/common/tlspolicy"
 )
 
@@ -58,64 +53,15 @@ type client struct {
 }
 
 func NewClient(config ClientConfig) (Client, error) {
-	transport := newTransport()
-	if config.SPIFFEAuth != nil {
-		endpointID := config.SPIFFEAuth.EndpointSpiffeID
-		if endpointID.IsZero() {
-			return nil, fmt.Errorf("no SPIFFE ID specified for federation with %q", config.TrustDomain.Name())
-		}
-
-		bundle := x509bundle.FromX509Authorities(endpointID.TrustDomain(), config.SPIFFEAuth.RootCAs)
-
-		authorizer := tlsconfig.AuthorizeID(endpointID)
-
-		transport.TLSClientConfig = tlsconfig.TLSClientConfig(bundle, authorizer)
-
-		err := tlspolicy.ApplyPolicy(transport.TLSClientConfig, config.TLSPolicy)
-		if err != nil {
-			return nil, err
-		}
-	}
-	if config.mutateTransportHook != nil {
-		config.mutateTransportHook(transport)
-	}
-	return &client{
-		c:      config,
-		client: &http.Client{Transport: transport},
-	}, nil
+	_ = "STUB: not implemented"
+	return *new(Client), nil
 }
 
 func (c *client) FetchBundle(context.Context) (*spiffebundle.Bundle, error) {
-	resp, err := c.client.Get(c.c.EndpointURL)
-	if err != nil {
-		var hostnameError x509.HostnameError
-		if errors.As(err, &hostnameError) && c.c.SPIFFEAuth == nil && len(hostnameError.Certificate.URIs) > 0 {
-			if id, idErr := spiffeid.FromString(hostnameError.Certificate.URIs[0].String()); idErr == nil {
-				return nil, fmt.Errorf("failed to authenticate bundle endpoint using web authentication but the server certificate contains SPIFFE ID %q: maybe use https_spiffe instead of https_web: %w", id, err)
-			}
-		}
-		return nil, fmt.Errorf("failed to fetch bundle: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status %d fetching bundle: %s", resp.StatusCode, tryRead(resp.Body))
-	}
-
-	b, err := bundleutil.Decode(c.c.TrustDomain, resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	return b, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func tryRead(r io.Reader) string {
-	b := make([]byte, 1024)
-	n, _ := r.Read(b)
-	return string(b[:n])
-}
+func tryRead(r io.Reader) string { _ = "STUB: not implemented"; return "" }
 
-func newTransport() *http.Transport {
-	return http.DefaultTransport.(*http.Transport).Clone()
-}
+func newTransport() *http.Transport { _ = "STUB: not implemented"; return nil }

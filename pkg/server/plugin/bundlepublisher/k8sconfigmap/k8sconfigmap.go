@@ -2,22 +2,15 @@ package k8sconfigmap
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"sync"
 
 	"github.com/hashicorp/go-hclog"
-	"github.com/hashicorp/hcl"
 	"github.com/spiffe/spire-plugin-sdk/pluginsdk/support/bundleformat"
 	bundlepublisherv1 "github.com/spiffe/spire-plugin-sdk/proto/spire/plugin/server/bundlepublisher/v1"
 	"github.com/spiffe/spire-plugin-sdk/proto/spire/plugin/types"
 	configv1 "github.com/spiffe/spire-plugin-sdk/proto/spire/service/common/config/v1"
 	"github.com/spiffe/spire/pkg/common/catalog"
 	"github.com/spiffe/spire/pkg/common/pluginconf"
-	"github.com/spiffe/spire/pkg/server/plugin/bundlepublisher/common"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/proto"
 )
 
 const (
@@ -30,13 +23,14 @@ type pluginHooks struct {
 
 // BuiltIn returns a new BundlePublisher built-in plugin.
 func BuiltIn() catalog.BuiltIn {
-	return builtin(New())
+	_ = "STUB: not implemented"
+	return *
+
+	// New creates a new k8s_configmap BundlePublisher plugin instance.
+	new(catalog.BuiltIn)
 }
 
-// New creates a new k8s_configmap BundlePublisher plugin instance.
-func New() *Plugin {
-	return newPlugin(newK8sClient)
-}
+func New() *Plugin { _ = "STUB: not implemented"; return nil }
 
 // Config holds the configuration of the plugin.
 type Config struct {
@@ -67,61 +61,8 @@ type Cluster struct {
 
 // buildConfig builds the plugin configuration from the provided HCL config.
 func buildConfig(coreConfig catalog.CoreConfig, hclText string, status *pluginconf.Status) *Config {
-	newConfig := new(Config)
-
-	if err := hcl.Decode(newConfig, hclText); err != nil {
-		status.ReportErrorf("unable to decode configuration: %v", err)
-		return nil
-	}
-
-	if len(newConfig.Clusters) == 0 {
-		status.ReportInfo("No clusters configured, bundle will not be published")
-	}
-
-	for id, cluster := range newConfig.Clusters {
-		if cluster.Format == "" {
-			status.ReportErrorf("missing bundle format in cluster %q", id)
-			return nil
-		}
-		if cluster.Namespace == "" {
-			status.ReportErrorf("missing namespace in cluster %q", id)
-			return nil
-		}
-		if cluster.ConfigMapName == "" {
-			status.ReportErrorf("missing configmap name in cluster %q", id)
-			return nil
-		}
-		if cluster.ConfigMapKey == "" {
-			status.ReportErrorf("missing configmap key in cluster %q", id)
-			return nil
-		}
-		bundleFormat, err := bundleformat.FromString(cluster.Format)
-		if err != nil {
-			status.ReportErrorf("could not parse bundle format from cluster %q: %v", id, err)
-			return nil
-		}
-
-		switch bundleFormat {
-		case bundleformat.JWKS:
-		case bundleformat.SPIFFE:
-		case bundleformat.PEM:
-		default:
-			status.ReportErrorf("bundle format %q is not supported", cluster.Format)
-			return nil
-		}
-		cluster.bundleFormat = bundleFormat
-
-		if cluster.RefreshHint != "" {
-			refreshHint, err := common.ParseRefreshHint(cluster.RefreshHint, status)
-			if err != nil {
-				status.ReportErrorf("could not parse refresh_hint from cluster %q: %v", id, err)
-				return nil
-			}
-			cluster.parsedRefreshHint = refreshHint
-		}
-	}
-
-	return newConfig
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Plugin is the main representation of this bundle publisher plugin.
@@ -141,147 +82,48 @@ type Plugin struct {
 
 // SetLogger sets a logger in the plugin.
 func (p *Plugin) SetLogger(log hclog.Logger) {
-	p.log = log
+	_ = "STUB: not implemented"
+
+	// Configure configures the plugin.
+	return
 }
 
-// Configure configures the plugin.
 func (p *Plugin) Configure(ctx context.Context, req *configv1.ConfigureRequest) (*configv1.ConfigureResponse, error) {
-	newConfig, notes, err := pluginconf.Build(req, buildConfig)
-	if err != nil {
-		return nil, err
-	}
-	for _, note := range notes {
-		p.log.Warn(note)
-	}
-
-	for id := range newConfig.Clusters {
-		k8sClient, err := p.hooks.newK8sClientFunc(newConfig.Clusters[id].KubeConfigPath)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to create Kubernetes client for cluster %q: %v", id, err)
-		}
-		newConfig.Clusters[id].k8sClient = k8sClient
-	}
-
-	p.setConfig(newConfig)
-	p.setBundle(nil)
-	return &configv1.ConfigureResponse{}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // PublishBundle puts the bundle in the configured Kubernetes ConfigMap.
 func (p *Plugin) PublishBundle(ctx context.Context, req *bundlepublisherv1.PublishBundleRequest) (*bundlepublisherv1.PublishBundleResponse, error) {
-	config, err := p.getConfig()
-	if err != nil {
-		return nil, err
-	}
-
-	if req.Bundle == nil {
-		return nil, status.Error(codes.InvalidArgument, "missing bundle in request")
-	}
-
-	currentBundle := p.getBundle()
-	if proto.Equal(req.Bundle, currentBundle) {
-		// Bundle not changed. No need to publish.
-		return &bundlepublisherv1.PublishBundleResponse{}, nil
-	}
-
-	var allErrors error
-	for id, cluster := range config.Clusters {
-		bundleToPublish := proto.Clone(req.Bundle).(*types.Bundle)
-
-		if cluster.parsedRefreshHint != 0 {
-			bundleToPublish.RefreshHint = cluster.parsedRefreshHint
-		}
-
-		formatter := bundleformat.NewFormatter(bundleToPublish)
-		bundleBytes, err := formatter.Format(cluster.bundleFormat)
-		if err != nil {
-			allErrors = errors.Join(allErrors, fmt.Errorf("could not format bundle when publishing to cluster %q: %w", id, err))
-			continue
-		}
-
-		log := p.log.With(
-			"cluster_id", id,
-			"format", cluster.bundleFormat,
-			"kubeconfig_path", cluster.KubeConfigPath,
-			"namespace", cluster.Namespace,
-			"configmap", cluster.ConfigMapName,
-			"key", cluster.ConfigMapKey,
-		)
-
-		if err := cluster.k8sClient.ApplyConfigMap(ctx, cluster, bundleBytes); err != nil {
-			allErrors = errors.Join(allErrors, fmt.Errorf("failed to apply ConfigMap for cluster %q: %w", id, err))
-			continue
-		}
-
-		log.Debug("Bundle published to Kubernetes ConfigMap")
-	}
-
-	if allErrors != nil {
-		return nil, status.Error(codes.Internal, allErrors.Error())
-	}
-
-	p.setBundle(req.Bundle)
-	return &bundlepublisherv1.PublishBundleResponse{}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Bundle not changed. No need to publish.
 
 // Validate validates the configuration of the plugin.
 func (p *Plugin) Validate(ctx context.Context, req *configv1.ValidateRequest) (*configv1.ValidateResponse, error) {
-	_, notes, err := pluginconf.Build(req, buildConfig)
-
-	return &configv1.ValidateResponse{
-		Valid: err == nil,
-		Notes: notes,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // getBundle gets the latest bundle that the plugin has.
-func (p *Plugin) getBundle() *types.Bundle {
-	p.bundleMtx.RLock()
-	defer p.bundleMtx.RUnlock()
-
-	return p.bundle
-}
+func (p *Plugin) getBundle() *types.Bundle { _ = "STUB: not implemented"; return nil }
 
 // getConfig gets the configuration of the plugin.
-func (p *Plugin) getConfig() (*Config, error) {
-	p.configMtx.RLock()
-	defer p.configMtx.RUnlock()
-
-	if p.config == nil {
-		return nil, status.Error(codes.FailedPrecondition, "not configured")
-	}
-	return p.config, nil
-}
+func (p *Plugin) getConfig() (*Config, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // setBundle updates the current bundle in the plugin with the provided bundle.
-func (p *Plugin) setBundle(bundle *types.Bundle) {
-	p.bundleMtx.Lock()
-	defer p.bundleMtx.Unlock()
-
-	p.bundle = bundle
-}
+func (p *Plugin) setBundle(bundle *types.Bundle) { _ = "STUB: not implemented"; return }
 
 // setConfig sets the configuration for the plugin.
-func (p *Plugin) setConfig(config *Config) {
-	p.configMtx.Lock()
-	defer p.configMtx.Unlock()
-
-	p.config = config
-}
+func (p *Plugin) setConfig(config *Config) { _ = "STUB: not implemented"; return }
 
 // builtin creates a new BundlePublisher built-in plugin.
-func builtin(p *Plugin) catalog.BuiltIn {
-	return catalog.MakeBuiltIn(pluginName,
-		bundlepublisherv1.BundlePublisherPluginServer(p),
-		configv1.ConfigServiceServer(p),
-	)
-}
+func builtin(p *Plugin) catalog.BuiltIn { _ = "STUB: not implemented"; return *new(catalog.BuiltIn) }
 
 // newPlugin returns a new plugin instance.
 func newPlugin(newK8sClientFunc func(string) (kubernetesClient, error)) *Plugin {
-	return &Plugin{
-		hooks: pluginHooks{
-			newK8sClientFunc: newK8sClientFunc,
-		},
-	}
+	_ = "STUB: not implemented"
+	return nil
 }

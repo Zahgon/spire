@@ -22,36 +22,36 @@ type keyVaultClient struct {
 }
 
 func (c *keyVaultClient) CreateKey(ctx context.Context, name string, parameters azkeys.CreateKeyParameters, options *azkeys.CreateKeyOptions) (azkeys.CreateKeyResponse, error) {
-	return c.client.CreateKey(ctx, name, parameters, options)
+	_ = "STUB: not implemented"
+	return *new(azkeys.CreateKeyResponse), nil
 }
 
 func (c *keyVaultClient) DeleteKey(ctx context.Context, name string, options *azkeys.DeleteKeyOptions) (azkeys.DeleteKeyResponse, error) {
-	return c.client.DeleteKey(ctx, name, options)
+	_ = "STUB: not implemented"
+	return *new(azkeys.DeleteKeyResponse), nil
 }
 
 func (c *keyVaultClient) UpdateKey(ctx context.Context, name string, version string, parameters azkeys.UpdateKeyParameters, options *azkeys.UpdateKeyOptions) (azkeys.UpdateKeyResponse, error) {
-	return c.client.UpdateKey(ctx, name, version, parameters, options)
+	_ = "STUB: not implemented"
+	return *new(azkeys.UpdateKeyResponse), nil
 }
 
 func (c *keyVaultClient) GetKey(ctx context.Context, name string, version string, options *azkeys.GetKeyOptions) (azkeys.GetKeyResponse, error) {
-	return c.client.GetKey(ctx, name, version, options)
+	_ = "STUB: not implemented"
+	return *new(azkeys.GetKeyResponse), nil
 }
 
 func (c *keyVaultClient) NewListKeyPropertiesPager(options *azkeys.ListKeyPropertiesOptions) *runtime.Pager[azkeys.ListKeyPropertiesResponse] {
-	return c.client.NewListKeyPropertiesPager(options)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (c *keyVaultClient) Sign(ctx context.Context, name string, version string, parameters azkeys.SignParameters, options *azkeys.SignOptions) (azkeys.SignResponse, error) {
-	return c.client.Sign(ctx, name, version, parameters, options)
+	_ = "STUB: not implemented"
+	return *new(azkeys.SignResponse), nil
 }
 
 func newKeyVaultClient(creds azcore.TokenCredential, keyVaultURI string) (cloudKeyManagementService, error) {
-	client, err := azkeys.NewClient(keyVaultURI, creds, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return &keyVaultClient{
-		client: client,
-	}, nil
+	_ = "STUB: not implemented"
+	return *new(cloudKeyManagementService), nil
 }

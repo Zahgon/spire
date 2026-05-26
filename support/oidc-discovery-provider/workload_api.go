@@ -1,9 +1,7 @@
 package main
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"net"
 	"sync"
 	"time"
@@ -14,8 +12,6 @@ import (
 	"github.com/spiffe/go-spiffe/v2/bundle/jwtbundle"
 	"github.com/spiffe/go-spiffe/v2/spiffeid"
 	"github.com/spiffe/go-spiffe/v2/workloadapi"
-	"github.com/spiffe/spire/pkg/common/telemetry"
-	"github.com/spiffe/spire/pkg/common/util"
 )
 
 const (
@@ -45,133 +41,39 @@ type WorkloadAPISource struct {
 }
 
 func NewWorkloadAPISource(config WorkloadAPISourceConfig) (*WorkloadAPISource, error) {
-	if config.PollInterval <= 0 {
-		config.PollInterval = DefaultWorkloadAPIPollInterval
-	}
-	if config.Clock == nil {
-		config.Clock = clock.New()
-	}
-	var opts []workloadapi.ClientOption
-	if config.Addr != nil {
-		o, err := util.GetWorkloadAPIClientOption(config.Addr)
-		if err != nil {
-			return nil, err
-		}
-		opts = append(opts, o)
-	}
-
-	trustDomain, err := spiffeid.TrustDomainFromString(config.TrustDomain)
-	if err != nil {
-		return nil, err
-	}
-
-	client, err := workloadapi.New(context.Background(), opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	ctx, cancel := context.WithCancel(context.Background())
-	s := &WorkloadAPISource{
-		log:         config.Log,
-		clock:       config.Clock,
-		cancel:      cancel,
-		trustDomain: trustDomain,
-	}
-
-	s.wg.Go(func() {
-		s.pollEvery(ctx, client, config.PollInterval)
-	})
-	return s, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (s *WorkloadAPISource) Close() error {
-	s.cancel()
-	s.wg.Wait()
-	return nil
-}
+func (s *WorkloadAPISource) Close() error { _ = "STUB: not implemented"; return nil }
 
 func (s *WorkloadAPISource) FetchKeySet() (*jose.JSONWebKeySet, time.Time, bool) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	if s.jwks == nil {
-		return nil, time.Time{}, false
-	}
-	return s.jwks, s.modTime, true
+	_ = "STUB: not implemented"
+	return nil, *new(time.Time), false
 }
 
 func (s *WorkloadAPISource) LastSuccessfulPoll() time.Time {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.pollTime
+	_ = "STUB: not implemented"
+	return *new(time.Time)
 }
 
 func (s *WorkloadAPISource) pollEvery(ctx context.Context, client *workloadapi.Client, interval time.Duration) {
-	defer client.Close()
-
-	s.log.WithField("interval", interval).Debug("Polling started")
-	for {
-		s.pollOnce(ctx, client)
-		select {
-		case <-ctx.Done():
-			s.log.WithError(ctx.Err()).Debug("Polling done")
-			return
-		case <-s.clock.After(interval):
-		}
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 func (s *WorkloadAPISource) pollOnce(ctx context.Context, client *workloadapi.Client) {
-	jwtBundles, err := client.FetchJWTBundles(ctx)
-	if err != nil {
-		s.log.WithError(err).Warn("Failed to fetch JWKS from the Workload API")
-		return
-	}
-
-	jwtBundle, ok := jwtBundles.Get(s.trustDomain)
-	if !ok {
-		s.log.WithField(telemetry.TrustDomainID, s.trustDomain.IDString()).Error("No bundle for trust domain in Workload API response")
-		return
-	}
-
-	// update pollTime when setJWKS was successful
-	if s.setJWKS(jwtBundle) == nil {
-		s.mu.Lock()
-		s.pollTime = s.clock.Now()
-		s.mu.Unlock()
-	}
+	_ = "STUB: not implemented"
+	return
 }
+
+// update pollTime when setJWKS was successful
 
 func (s *WorkloadAPISource) setJWKS(bundle *jwtbundle.Bundle) error {
-	rawBundle, err := bundle.Marshal()
-	if err != nil {
-		s.log.WithError(err).Error("Failed to marshal JWKS bundle received from the Workload API")
-		return err
-	}
-
-	// If the bundle hasn't changed, don't bother continuing
-	s.mu.RLock()
-	unchanged := s.rawBundle != nil && bytes.Equal(s.rawBundle, rawBundle)
-	s.mu.RUnlock()
-	if unchanged {
-		return nil
-	}
-
-	// Clean the JWKS
-	jwks := new(jose.JSONWebKeySet)
-	if err := json.Unmarshal(rawBundle, jwks); err != nil {
-		s.log.WithError(err).Error("Failed to parse trust domain bundle received from the Workload API")
-		return err
-	}
-	for i, key := range jwks.Keys {
-		key.Use = ""
-		jwks.Keys[i] = key
-	}
-
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.rawBundle = rawBundle
-	s.jwks = jwks
-	s.modTime = s.clock.Now()
-
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// If the bundle hasn't changed, don't bother continuing
+
+// Clean the JWKS

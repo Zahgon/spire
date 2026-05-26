@@ -7,31 +7,18 @@ import (
 )
 
 func Interceptors(middleware Middleware) (grpc.UnaryServerInterceptor, grpc.StreamServerInterceptor) {
-	return UnaryInterceptor(middleware), StreamInterceptor(middleware)
+	_ = "STUB: not implemented"
+	return *new(grpc.UnaryServerInterceptor), *new(grpc.StreamServerInterceptor)
 }
 
 func UnaryInterceptor(middleware Middleware) grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
-		ctx, err := middleware.Preprocess(ctx, info.FullMethod, req)
-		if err != nil {
-			return nil, err
-		}
-		resp, err := handler(ctx, req)
-		middleware.Postprocess(ctx, info.FullMethod, true, err)
-		return resp, err
-	}
+	_ = "STUB: not implemented"
+	return *new(grpc.UnaryServerInterceptor)
 }
 
 func StreamInterceptor(middleware Middleware) grpc.StreamServerInterceptor {
-	return func(srv any, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
-		ctx, err := middleware.Preprocess(ss.Context(), info.FullMethod, nil)
-		if err != nil {
-			return err
-		}
-		err = handler(srv, serverStream{ServerStream: ss, ctx: ctx})
-		middleware.Postprocess(ctx, info.FullMethod, true, err)
-		return err
-	}
+	_ = "STUB: not implemented"
+	return *new(grpc.StreamServerInterceptor)
 }
 
 type serverStream struct {
@@ -40,5 +27,6 @@ type serverStream struct {
 }
 
 func (ss serverStream) Context() context.Context {
-	return ss.ctx
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }

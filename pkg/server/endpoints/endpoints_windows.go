@@ -5,24 +5,21 @@ package endpoints
 import (
 	"net"
 
-	"github.com/Microsoft/go-winio"
 	"github.com/spiffe/spire/pkg/common/peertracker"
-	"github.com/spiffe/spire/pkg/common/sddl"
 )
 
 func (e *Endpoints) listen() (net.Listener, error) {
-	return winio.ListenPipe(e.LocalAddr.String(), &winio.PipeConfig{SecurityDescriptor: sddl.PrivateListener})
+	_ = "STUB: not implemented"
+	return *new(net.Listener), nil
 }
 
 func (e *Endpoints) listenWithAuditLog() (*peertracker.Listener, error) {
-	lf := &peertracker.ListenerFactory{
-		Log: e.Log,
-	}
-
-	return lf.ListenPipe(e.LocalAddr.String(), &winio.PipeConfig{SecurityDescriptor: sddl.PrivateListener})
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (e *Endpoints) restrictLocalAddr() error {
+	_ = "STUB: not implemented"
 	// Access control is already handled by the security
 	// descriptor associated with the named pipe.
 	// Nothing else is needed to be done here.
@@ -30,6 +27,7 @@ func (e *Endpoints) restrictLocalAddr() error {
 }
 
 func prepareLocalAddr(net.Addr) error {
+	_ = "STUB: not implemented"
 	// Nothing to do in this platform
 	return nil
 }

@@ -12,25 +12,29 @@ import (
 // StartCAManagerPruneBundleCall returns metric for
 // for server CA manager bundle pruning
 func StartCAManagerPruneBundleCall(m telemetry.Metrics) *telemetry.CallCounter {
-	return telemetry.StartCall(m, telemetry.CA, telemetry.Manager, telemetry.Bundle, telemetry.Prune)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartServerCAManagerPrepareJWTKeyCall return metric for
 // Server CA Manager preparing a JWT Key
 func StartServerCAManagerPrepareJWTKeyCall(m telemetry.Metrics) *telemetry.CallCounter {
-	return telemetry.StartCall(m, telemetry.CA, telemetry.Manager, telemetry.JWTKey, telemetry.Prepare)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartServerCAManagerPrepareWITKeyCall return metric for
 // Server CA Manager preparing a WIT Key
 func StartServerCAManagerPrepareWITKeyCall(m telemetry.Metrics) *telemetry.CallCounter {
-	return telemetry.StartCall(m, telemetry.CA, telemetry.Manager, telemetry.WITKey, telemetry.Prepare)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartServerCAManagerPrepareX509CACall return metric for
 // Server CA Manager preparing an X509 CA
 func StartServerCAManagerPrepareX509CACall(m telemetry.Metrics) *telemetry.CallCounter {
-	return telemetry.StartCall(m, telemetry.CA, telemetry.Manager, telemetry.X509CA, telemetry.Prepare)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // End Call Counters
@@ -40,18 +44,8 @@ func StartServerCAManagerPrepareX509CACall(m telemetry.Metrics) *telemetry.CallC
 // SetX509CARotateGauge set gauge for X509 CA rotation,
 // expiration time and TTL of CA for a specific TrustDomain
 func SetX509CARotateGauge(m telemetry.Metrics, trustDomain string, expiration, now time.Time) {
-	m.SetPrecisionGaugeWithLabels(
-		[]string{telemetry.Manager, telemetry.X509CA, telemetry.Rotate, telemetry.Expiration},
-		float64(expiration.Unix()),
-		[]telemetry.Label{
-			{Name: telemetry.TrustDomainID, Value: trustDomain},
-		})
-	m.SetGaugeWithLabels(
-		[]string{telemetry.Manager, telemetry.X509CA, telemetry.Rotate, telemetry.TTL},
-		float32(expiration.Sub(now).Seconds()),
-		[]telemetry.Label{
-			{Name: telemetry.TrustDomainID, Value: trustDomain},
-		})
+	_ = "STUB: not implemented"
+	return
 }
 
 // End Gauge
@@ -60,44 +54,30 @@ func SetX509CARotateGauge(m telemetry.Metrics, trustDomain string, expiration, n
 
 // IncrActivateJWTKeyManagerCounter indicate activation
 // of JWT Key manager
-func IncrActivateJWTKeyManagerCounter(m telemetry.Metrics) {
-	m.IncrCounter([]string{telemetry.Manager, telemetry.JWTKey, telemetry.Activate}, 1)
-}
+func IncrActivateJWTKeyManagerCounter(m telemetry.Metrics) { _ = "STUB: not implemented"; return }
 
 // IncrActivateX509CAManagerCounter indicate activation
 // of X509 CA manager
-func IncrActivateX509CAManagerCounter(m telemetry.Metrics) {
-	m.IncrCounter([]string{telemetry.CA, telemetry.Manager, telemetry.X509CA, telemetry.Activate}, 1)
-}
+func IncrActivateX509CAManagerCounter(m telemetry.Metrics) { _ = "STUB: not implemented"; return }
 
 // IncrActivateWITKeyManagerCounter indicate activation
 // of WIT Key manager
-func IncrActivateWITKeyManagerCounter(m telemetry.Metrics) {
-	m.IncrCounter([]string{telemetry.Manager, telemetry.WITKey, telemetry.Activate}, 1)
-}
+func IncrActivateWITKeyManagerCounter(m telemetry.Metrics) { _ = "STUB: not implemented"; return }
 
 // IncrManagerPrunedBundleCounter indicate manager
 // having pruned a bundle
-func IncrManagerPrunedBundleCounter(m telemetry.Metrics) {
-	m.IncrCounter([]string{telemetry.CA, telemetry.Manager, telemetry.Bundle, telemetry.Pruned}, 1)
-}
+func IncrManagerPrunedBundleCounter(m telemetry.Metrics) { _ = "STUB: not implemented"; return }
 
 // IncrServerCASignJWTSVIDCounter indicate Server CA
 // signed a JWT SVID.
-func IncrServerCASignJWTSVIDCounter(m telemetry.Metrics) {
-	m.IncrCounter([]string{telemetry.ServerCA, telemetry.Sign, telemetry.JWTSVID}, 1)
-}
+func IncrServerCASignJWTSVIDCounter(m telemetry.Metrics) { _ = "STUB: not implemented"; return }
 
 // IncrServerCASignX509CACounter indicate Server CA
 // signed an X509 CA SVID.
-func IncrServerCASignX509CACounter(m telemetry.Metrics) {
-	m.IncrCounter([]string{telemetry.ServerCA, telemetry.Sign, telemetry.X509CASVID}, 1)
-}
+func IncrServerCASignX509CACounter(m telemetry.Metrics) { _ = "STUB: not implemented"; return }
 
 // IncrServerCASignX509Counter indicate Server CA
 // signed an X509 SVID.
-func IncrServerCASignX509Counter(m telemetry.Metrics) {
-	m.IncrCounter([]string{telemetry.ServerCA, telemetry.Sign, telemetry.X509SVID}, 1)
-}
+func IncrServerCASignX509Counter(m telemetry.Metrics) { _ = "STUB: not implemented"; return }
 
 // End Counters

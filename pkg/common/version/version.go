@@ -1,7 +1,5 @@
 package version
 
-import "fmt"
-
 const (
 	// Base is the base version for the codebase.
 	//
@@ -16,9 +14,4 @@ var (
 	githash = "unk"
 )
 
-func Version() string {
-	if gittag == "" {
-		return fmt.Sprintf("%s-dev-%s", Base, githash)
-	}
-	return gittag
-}
+func Version() string { _ = "STUB: not implemented"; return "" }

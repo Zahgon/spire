@@ -2,6 +2,4 @@
 
 package k8spsat
 
-func getDefaultTokenPath() string {
-	return defaultTokenPath
-}
+func getDefaultTokenPath() string { _ = "STUB: not implemented"; return "" }

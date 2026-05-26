@@ -1,12 +1,6 @@
 package k8s
 
 import (
-	"errors"
-	"fmt"
-	"net/url"
-	"path"
-	"strings"
-
 	"github.com/go-jose/go-jose/v4/jwt"
 	authv1 "k8s.io/api/authentication/v1"
 )
@@ -92,74 +86,27 @@ type PSATAttestationData struct {
 }
 
 func AgentID(pluginName, trustDomain, cluster, uuid string) string {
-	u := url.URL{
-		Scheme: "spiffe",
-		Host:   trustDomain,
-		Path:   path.Join("spire", "agent", pluginName, cluster, uuid),
-	}
-	return u.String()
+	_ = "STUB: not implemented"
+	return ""
 }
 
-func MakeSelectorValue(kind string, values ...string) string {
-	return fmt.Sprintf("%s:%s", kind, strings.Join(values, ":"))
-}
+func MakeSelectorValue(kind string, values ...string) string { _ = "STUB: not implemented"; return "" }
 
 // GetNamesFromTokenStatus parses a fully qualified k8s username like: 'system:serviceaccount:spire:spire-agent'
 // from tokenStatus. The string is split and the last two names are returned: namespace and service account name
 func GetNamesFromTokenStatus(tokenStatus *authv1.TokenReviewStatus) (string, string, error) {
-	username := tokenStatus.User.Username
-	if username == "" {
-		return "", "", errors.New("empty username")
-	}
-
-	names := strings.Split(username, ":")
-	if len(names) != 4 {
-		return "", "", fmt.Errorf("unexpected username format: %v", username)
-	}
-
-	if names[2] == "" {
-		return "", "", errors.New("missing namespace")
-	}
-
-	if names[3] == "" {
-		return "", "", errors.New("missing service account name")
-	}
-
-	return names[2], names[3], nil
+	_ = "STUB: not implemented"
+	return "", "", nil
 }
 
 // GetPodNameFromTokenStatus extracts pod name from a tokenReviewStatus type
 func GetPodNameFromTokenStatus(tokenStatus *authv1.TokenReviewStatus) (string, error) {
-	podName, ok := tokenStatus.User.Extra[k8sPodNameKey]
-	if !ok {
-		return "", errors.New("missing pod name")
-	}
-
-	if len(podName) != 1 {
-		return "", fmt.Errorf("expected 1 name but got: %d", len(podName))
-	}
-
-	if podName[0] == "" {
-		return "", errors.New("pod name is empty")
-	}
-
-	return podName[0], nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
 
 // GetPodUIDFromTokenStatus extracts pod UID from a tokenReviewStatus type
 func GetPodUIDFromTokenStatus(tokenStatus *authv1.TokenReviewStatus) (string, error) {
-	podUID, ok := tokenStatus.User.Extra[k8sPodUIDKey]
-	if !ok {
-		return "", errors.New("missing pod UID")
-	}
-
-	if len(podUID) != 1 {
-		return "", fmt.Errorf("expected 1 UID but got: %d", len(podUID))
-	}
-
-	if podUID[0] == "" {
-		return "", errors.New("pod UID is empty")
-	}
-
-	return podUID[0], nil
+	_ = "STUB: not implemented"
+	return "", nil
 }

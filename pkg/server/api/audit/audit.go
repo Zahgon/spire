@@ -1,14 +1,8 @@
 package audit
 
 import (
-	"maps"
-
 	"github.com/sirupsen/logrus"
 	"github.com/spiffe/spire-api-sdk/proto/spire/api/types"
-	"github.com/spiffe/spire/pkg/common/telemetry"
-	"github.com/spiffe/spire/pkg/common/util"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 const (
@@ -28,56 +22,32 @@ type logger struct {
 	log    logrus.FieldLogger
 }
 
-func New(l logrus.FieldLogger) Logger {
-	return &logger{
-		log: l.WithFields(logrus.Fields{
-			telemetry.Type: "audit",
-			// It is success by default, errors must change it
-			telemetry.Status: "success",
-		}),
-		fields: logrus.Fields{},
-	}
-}
+func New(l logrus.FieldLogger) Logger { _ = "STUB: not implemented"; return *new(Logger) }
 
-func (l *logger) AddFields(fields logrus.Fields) {
-	maps.Copy(l.fields, fields)
-}
+// It is success by default, errors must change it
 
-func (l *logger) Audit() {
-	l.log.WithFields(l.fields).Info(message)
-}
+func (l *logger) AddFields(fields logrus.Fields) { _ = "STUB: not implemented"; return }
 
-func (l *logger) AuditWithFields(fields logrus.Fields) {
-	l.log.WithFields(l.fields).WithFields(fields).Info(message)
-}
+func (l *logger) Audit() { _ = "STUB: not implemented"; return }
 
-func (l *logger) AuditWithError(err error) {
-	fields := fieldsFromError(err)
-	l.log.WithFields(l.fields).WithFields(fields).Info(message)
-}
+func (l *logger) AuditWithFields(fields logrus.Fields) { _ = "STUB: not implemented"; return }
+
+func (l *logger) AuditWithError(err error) { _ = "STUB: not implemented"; return }
 
 func (l *logger) AuditWithTypesStatus(fields logrus.Fields, s *types.Status) {
-	statusFields := fieldsFromStatus(s)
-	l.log.WithFields(statusFields).WithFields(fields).Info(message)
+	_ = "STUB: not implemented"
+	return
 }
 
 func fieldsFromStatus(s *types.Status) logrus.Fields {
-	err := status.Error(util.MustCast[codes.Code](s.Code), s.Message)
-	return fieldsFromError(err)
+	_ = "STUB: not implemented"
+	return *new(logrus.Fields)
 }
 
 func fieldsFromError(err error) logrus.Fields {
-	fields := logrus.Fields{}
-	// Unknown status is returned for non-proto status
-	statusErr, _ := status.FromError(err)
-	switch {
-	case statusErr.Code() == codes.OK:
-		fields[telemetry.Status] = "success"
-	default:
-		fields[telemetry.Status] = "error"
-		fields[telemetry.StatusCode] = statusErr.Code()
-		fields[telemetry.StatusMessage] = statusErr.Message()
-	}
+	_ = "STUB: not implemented"
+	return *
 
-	return fields
+	// Unknown status is returned for non-proto status
+	new(logrus.Fields)
 }

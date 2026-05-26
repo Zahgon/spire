@@ -14,9 +14,8 @@ type Plugin struct {
 }
 
 func (p *Plugin) Attest(_ context.Context, _ *workloadattestorv1.AttestRequest) (*workloadattestorv1.AttestResponse, error) {
-	return &workloadattestorv1.AttestResponse{
-		SelectorValues: []string{"attested"},
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func main() {

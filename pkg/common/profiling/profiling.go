@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"sync"
-	"time"
 )
 
 type Config struct {
@@ -76,99 +75,23 @@ var (
 // take effect.
 // Valid values for name are:
 // "goroutine", "threadcreate", "heap", "block", "mutex", "trace" and "cpu".
-func OverrideDumper(name string, dumper Dumper) error {
-	profM.Lock()
-	defer profM.Unlock()
-
-	if _, ok := dumpers[name]; ok {
-		dumpers[name] = dumper
-		return nil
-	}
-	return ErrUnknownProfile
-}
+func OverrideDumper(name string, dumper Dumper) error { _ = "STUB: not implemented"; return nil }
 
 // Run runs the profiling using the provided configuration until the context
 // has been cancelled.
-func Run(ctx context.Context, conf *Config) error {
-	profM.Lock()
-	defer profM.Unlock()
-
-	if prof != nil {
-		return ErrProfilerAlreadyStarted
-	}
-
-	configureDefaultDumpers(conf)
-
-	prof = &profiler{
-		c:       conf,
-		dumpers: getDumpers(conf.Profiles),
-	}
-
-	profM.Unlock()
-	err := prof.run(ctx)
-	profM.Lock()
-
-	prof = nil
-	return err
-}
+func Run(ctx context.Context, conf *Config) error { _ = "STUB: not implemented"; return nil }
 
 // getDumpers returns a map of valid dumpers, it filters out any non existent profile name.
-func getDumpers(profiles []string) map[string]Dumper {
-	result := map[string]Dumper{}
-	for _, name := range profiles {
-		if dumper, ok := dumpers[name]; ok {
-			result[name] = dumper
-		}
-	}
-	return result
-}
+func getDumpers(profiles []string) map[string]Dumper { _ = "STUB: not implemented"; return nil }
 
-func (p *profiler) run(ctx context.Context) error {
-	p.prepareDumpers()
-	if len(p.dumpers) == 0 {
-		return ErrNoDumpersActive
-	}
+func (p *profiler) run(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
-	ticker := time.NewTicker(time.Duration(p.c.Frequency) * time.Second)
-	defer ticker.Stop()
+func (p *profiler) prepareDumpers() { _ = "STUB: not implemented"; return }
 
-	for {
-		select {
-		case <-ticker.C:
-			p.dumpProfiles()
-		case <-ctx.Done():
-			p.releaseDumpers()
-			return nil
-		}
-	}
-}
+// Failed to prepare the dumper, delete it from valid dumpers.
 
-func (p *profiler) prepareDumpers() {
-	for name, dumper := range p.dumpers {
-		err := dumper.Prepare()
-		if err != nil {
-			// Failed to prepare the dumper, delete it from valid dumpers.
-			delete(p.dumpers, name)
-		}
-	}
-}
+func (p *profiler) dumpProfiles() { _ = "STUB: not implemented"; return }
 
-func (p *profiler) dumpProfiles() {
-	now := time.Now().Format("2006-01-02_150405")
-	for name, dumper := range p.dumpers {
-		_ = dumper.Dump(now, name)
-	}
-}
+func (p *profiler) releaseDumpers() { _ = "STUB: not implemented"; return }
 
-func (p *profiler) releaseDumpers() {
-	for _, dumper := range p.dumpers {
-		_ = dumper.Release()
-	}
-}
-
-func configureDefaultDumpers(conf *Config) {
-	profileDumper.c = conf
-	heapProfileDumper.dumper.c = conf
-	traceProfileDumper.c = conf
-	cpuProfileDumper.c = conf
-}
+func configureDefaultDumpers(conf *Config) { _ = "STUB: not implemented"; return }

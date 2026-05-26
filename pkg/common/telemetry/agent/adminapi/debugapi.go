@@ -8,13 +8,12 @@ import (
 
 // IncrDebugAPIConnectionCounter indicate Debug
 // API connection (some connection is made, running total count)
-func IncrDebugAPIConnectionCounter(m telemetry.Metrics) {
-	m.IncrCounter([]string{telemetry.DebugAPI, telemetry.Connection}, 1)
-}
+func IncrDebugAPIConnectionCounter(m telemetry.Metrics) { _ = "STUB: not implemented"; return }
 
 // SetDebugAPIConnectionGauge sets the number of active Debug API connections
 func SetDebugAPIConnectionGauge(m telemetry.Metrics, connections int32) {
-	m.SetGauge([]string{telemetry.DebugAPI, telemetry.Connections}, float32(connections))
+	_ = "STUB: not implemented"
+	return
 }
 
 // End Counters

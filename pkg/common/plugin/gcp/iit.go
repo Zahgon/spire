@@ -1,12 +1,9 @@
 package gcp
 
 import (
-	"strings"
-
 	"github.com/go-jose/go-jose/v4/jwt"
 	"github.com/spiffe/go-spiffe/v2/spiffeid"
 	"github.com/spiffe/spire/pkg/common/agentpathtemplate"
-	"github.com/spiffe/spire/pkg/common/idutil"
 )
 
 const (
@@ -47,14 +44,6 @@ type agentPathTemplateData struct {
 // the path is created using the given agentPathTemplate which is given access to a fully populated
 // IdentityToken object.
 func MakeAgentID(td spiffeid.TrustDomain, agentPathTemplate *agentpathtemplate.Template, identityMetadata IdentityToken) (spiffeid.ID, error) {
-	agentPath, err := agentPathTemplate.Execute(agentPathTemplateData{
-		ServiceAccount: strings.ReplaceAll(identityMetadata.Email, "@", "_"),
-		ComputeEngine:  identityMetadata.Google.ComputeEngine,
-		PluginName:     PluginName,
-	})
-	if err != nil {
-		return spiffeid.ID{}, err
-	}
-
-	return idutil.AgentID(td, agentPath)
+	_ = "STUB: not implemented"
+	return *new(spiffeid.ID), nil
 }

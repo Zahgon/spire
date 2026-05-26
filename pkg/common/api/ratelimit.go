@@ -9,5 +9,6 @@ type RateLimiter interface {
 type RateLimiterFunc func(ctx context.Context, count int) error
 
 func (fn RateLimiterFunc) RateLimit(ctx context.Context, count int) error {
-	return fn(ctx, count)
+	_ = "STUB: not implemented"
+	return nil
 }

@@ -10,13 +10,15 @@ import (
 // StartRotateAgentSVIDCall return metric for Agent's SVID
 // Rotation.
 func StartRotateAgentSVIDCall(m telemetry.Metrics) *telemetry.CallCounter {
-	return telemetry.StartCall(m, telemetry.AgentSVID, telemetry.Rotate)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartReattestAgentCall return metric for Agent's
 // Reattestation.
 func StartReattestAgentCall(m telemetry.Metrics) *telemetry.CallCounter {
-	return telemetry.StartCall(m, telemetry.Node, telemetry.Attest)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // End Call Counters

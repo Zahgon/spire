@@ -6,8 +6,6 @@ import (
 	hclog "github.com/hashicorp/go-hclog"
 	"github.com/spiffe/spire/pkg/common/container/process"
 	"github.com/spiffe/spire/pkg/common/pluginconf"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type OSConfig struct {
@@ -16,9 +14,8 @@ type OSConfig struct {
 }
 
 func (p *Plugin) createHelper(*dockerPluginConfig, *pluginconf.Status) *containerHelper {
-	return &containerHelper{
-		ph: process.CreateHelper(),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 type containerHelper struct {
@@ -26,13 +23,8 @@ type containerHelper struct {
 }
 
 func (h *containerHelper) getContainerIDAndSocket(pID int32, log hclog.Logger) (string, string, error) {
-	containerID, err := h.ph.GetContainerIDByProcess(pID, log)
-	if err != nil {
-		return "", "", status.Errorf(codes.Internal, "failed to get container ID: %v", err)
-	}
-	return containerID, "", nil
+	_ = "STUB: not implemented"
+	return "", "", nil
 }
 
-func getDockerHost(c *dockerPluginConfig) string {
-	return c.DockerHost
-}
+func getDockerHost(c *dockerPluginConfig) string { _ = "STUB: not implemented"; return "" }

@@ -26,17 +26,12 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-//nolint // forked code
+// nolint // forked code
 package autocert
 
 import (
 	"crypto/tls"
-	"log"
 	"net"
-	"os"
-	"path/filepath"
-	"runtime"
-	"time"
 )
 
 // NewListener returns a net.Listener that listens on the standard TLS
@@ -45,7 +40,7 @@ import (
 //
 // It enables one-line HTTPS servers:
 //
-//     log.Fatal(http.Serve(autocert.NewListener("example.com"), handler))
+//	log.Fatal(http.Serve(autocert.NewListener("example.com"), handler))
 //
 // NewListener is a convenience function for a common configuration.
 // More complex or custom configurations can use the autocert.Manager
@@ -68,19 +63,8 @@ import (
 // connections. The returned *tls.Conn are returned before their TLS
 // handshake has completed.
 func NewListener(domains ...string) net.Listener {
-	m := &Manager{
-		Prompt: AcceptTOS,
-	}
-	if len(domains) > 0 {
-		m.HostPolicy = HostWhitelist(domains...)
-	}
-	dir := cacheDir()
-	if err := os.MkdirAll(dir, 0700); err != nil {
-		log.Printf("warning: autocert.NewListener not using a cache: %v", err)
-	} else {
-		m.Cache = DirCache(dir)
-	}
-	return m.Listener()
+	_ = "STUB: not implemented"
+	return *new(net.Listener)
 }
 
 // Listener listens on the standard TLS port (443) on all interfaces
@@ -95,13 +79,7 @@ func NewListener(domains ...string) net.Listener {
 //
 // Unlike NewListener, it is the caller's responsibility to initialize
 // the Manager m's Prompt, Cache, HostPolicy, and other desired options.
-func (m *Manager) Listener() net.Listener {
-	ln := &listener{
-		conf: m.TLSConfig(),
-	}
-	ln.tcpListener, ln.tcpListenErr = net.Listen("tcp", ":443")
-	return ln
-}
+func (m *Manager) Listener() net.Listener { _ = "STUB: not implemented"; return *new(net.Listener) }
 
 type listener struct {
 	conf *tls.Config
@@ -111,70 +89,27 @@ type listener struct {
 }
 
 func (ln *listener) Accept() (net.Conn, error) {
-	if ln.tcpListenErr != nil {
-		return nil, ln.tcpListenErr
-	}
-	conn, err := ln.tcpListener.Accept()
-	if err != nil {
-		return nil, err
-	}
-	tcpConn := conn.(*net.TCPConn)
-
-	// Because Listener is a convenience function, help out with
-	// this too.  This is not possible for the caller to set once
-	// we return a *tcp.Conn wrapping an inaccessible net.Conn.
-	// If callers don't want this, they can do things the manual
-	// way and tweak as needed. But this is what net/http does
-	// itself, so copy that. If net/http changes, we can change
-	// here too.
-	tcpConn.SetKeepAlive(true)
-	tcpConn.SetKeepAlivePeriod(3 * time.Minute)
-
-	return tls.Server(tcpConn, ln.conf), nil
+	_ = "STUB: not implemented"
+	return *new(net.Conn), nil
 }
 
-func (ln *listener) Addr() net.Addr {
-	if ln.tcpListener != nil {
-		return ln.tcpListener.Addr()
-	}
-	// net.Listen failed. Return something non-nil in case callers
-	// call Addr before Accept:
-	return &net.TCPAddr{IP: net.IP{0, 0, 0, 0}, Port: 443}
-}
+// Because Listener is a convenience function, help out with
+// this too.  This is not possible for the caller to set once
+// we return a *tcp.Conn wrapping an inaccessible net.Conn.
+// If callers don't want this, they can do things the manual
+// way and tweak as needed. But this is what net/http does
+// itself, so copy that. If net/http changes, we can change
+// here too.
 
-func (ln *listener) Close() error {
-	if ln.tcpListenErr != nil {
-		return ln.tcpListenErr
-	}
-	return ln.tcpListener.Close()
-}
+func (ln *listener) Addr() net.Addr { _ = "STUB: not implemented"; return *new(net.Addr) }
 
-func homeDir() string {
-	if runtime.GOOS == "windows" {
-		return os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-	}
-	if h := os.Getenv("HOME"); h != "" {
-		return h
-	}
-	return "/"
-}
+// net.Listen failed. Return something non-nil in case callers
+// call Addr before Accept:
 
-func cacheDir() string {
-	const base = "golang-autocert"
-	switch runtime.GOOS {
-	case "darwin":
-		return filepath.Join(homeDir(), "Library", "Caches", base)
-	case "windows":
-		for _, ev := range []string{"APPDATA", "CSIDL_APPDATA", "TEMP", "TMP"} {
-			if v := os.Getenv(ev); v != "" {
-				return filepath.Join(v, base)
-			}
-		}
-		// Worst case:
-		return filepath.Join(homeDir(), base)
-	}
-	if xdg := os.Getenv("XDG_CACHE_HOME"); xdg != "" {
-		return filepath.Join(xdg, base)
-	}
-	return filepath.Join(homeDir(), ".cache", base)
-}
+func (ln *listener) Close() error { _ = "STUB: not implemented"; return nil }
+
+func homeDir() string { _ = "STUB: not implemented"; return "" }
+
+func cacheDir() string { _ = "STUB: not implemented"; return "" }
+
+// Worst case:

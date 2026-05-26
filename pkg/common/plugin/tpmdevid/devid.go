@@ -1,7 +1,5 @@
 package tpmdevid
 
-import "crypto/rand"
-
 const PluginName = "tpm_devid"
 
 type AttestationRequest struct {
@@ -32,11 +30,4 @@ type ChallengeResponse struct {
 	CredActivation []byte
 }
 
-func GetRandomBytes(size int) ([]byte, error) {
-	rndBytes := make([]byte, size)
-	_, err := rand.Read(rndBytes)
-	if err != nil {
-		return nil, err
-	}
-	return rndBytes, nil
-}
+func GetRandomBytes(size int) ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }

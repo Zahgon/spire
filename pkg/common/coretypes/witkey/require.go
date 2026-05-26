@@ -6,79 +6,57 @@ import (
 )
 
 func RequireFromCommonProto(pb *common.PublicKey) WITKey {
-	out, err := FromCommonProto(pb)
-	panicOnError(err)
-	return out
+	_ = "STUB: not implemented"
+	return *new(WITKey)
 }
 
 func RequireFromCommonProtos(pbs []*common.PublicKey) []WITKey {
-	out, err := FromCommonProtos(pbs)
-	panicOnError(err)
-	return out
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func RequireFromPluginProto(pb *plugintypes.WITKey) WITKey {
-	out, err := FromPluginProto(pb)
-	panicOnError(err)
-	return out
+	_ = "STUB: not implemented"
+	return *new(WITKey)
 }
 
 func RequireFromPluginProtos(pbs []*plugintypes.WITKey) []WITKey {
-	out, err := FromPluginProtos(pbs)
-	panicOnError(err)
-	return out
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func RequireToCommonFromPluginProto(pb *plugintypes.WITKey) *common.PublicKey {
-	out, err := ToCommonFromPluginProto(pb)
-	panicOnError(err)
-	return out
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func RequireToCommonFromPluginProtos(pbs []*plugintypes.WITKey) []*common.PublicKey {
-	out, err := ToCommonFromPluginProtos(pbs)
-	panicOnError(err)
-	return out
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func RequireToCommonProto(witKey WITKey) *common.PublicKey {
-	out, err := ToCommonProto(witKey)
-	panicOnError(err)
-	return out
-}
+func RequireToCommonProto(witKey WITKey) *common.PublicKey { _ = "STUB: not implemented"; return nil }
 
 func RequireToCommonProtos(witKeys []WITKey) []*common.PublicKey {
-	out, err := ToCommonProtos(witKeys)
-	panicOnError(err)
-	return out
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func RequireToPluginFromCommonProto(pb *common.PublicKey) *plugintypes.WITKey {
-	out, err := ToPluginFromCommonProto(pb)
-	panicOnError(err)
-	return out
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func RequireToPluginFromCommonProtos(pbs []*common.PublicKey) []*plugintypes.WITKey {
-	out, err := ToPluginFromCommonProtos(pbs)
-	panicOnError(err)
-	return out
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func RequireToPluginProto(witKey WITKey) *plugintypes.WITKey {
-	out, err := ToPluginProto(witKey)
-	panicOnError(err)
-	return out
-}
+func RequireToPluginProto(witKey WITKey) *plugintypes.WITKey { _ = "STUB: not implemented"; return nil }
 
 func RequireToPluginProtos(witKeys []WITKey) []*plugintypes.WITKey {
-	out, err := ToPluginProtos(witKeys)
-	panicOnError(err)
-	return out
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func panicOnError(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
+func panicOnError(err error) { _ = "STUB: not implemented"; return }

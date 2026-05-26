@@ -1,10 +1,5 @@
 package cliprinter
 
-import (
-	"fmt"
-	"strings"
-)
-
 const (
 	_ formatType = iota
 	json
@@ -16,23 +11,8 @@ const (
 type formatType int64
 
 func strToFormatType(f string) (formatType, error) {
-	switch strings.ToLower(f) {
-	case "json":
-		return json, nil
-	case "pretty", "prettyprint":
-		return pretty, nil
-	default:
-		return 0, fmt.Errorf("unknown format option: %q", f)
-	}
+	_ = "STUB: not implemented"
+	return *new(formatType), nil
 }
 
-func formatTypeToStr(f formatType) string {
-	switch f {
-	case json:
-		return "json"
-	case pretty:
-		return "pretty"
-	default:
-		return "unknown"
-	}
-}
+func formatTypeToStr(f formatType) string { _ = "STUB: not implemented"; return "" }

@@ -8,9 +8,8 @@ package plugin
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -34,16 +33,13 @@ type pluginInitClient struct {
 }
 
 func NewPluginInitClient(cc grpc.ClientConnInterface) PluginInitClient {
-	return &pluginInitClient{cc}
+	_ = "STUB: not implemented"
+	return *new(PluginInitClient)
 }
 
 func (c *pluginInitClient) Init(ctx context.Context, in *InitRequest, opts ...grpc.CallOption) (*InitResponse, error) {
-	out := new(InitResponse)
-	err := c.cc.Invoke(ctx, PluginInit_Init_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // PluginInitServer is the server API for PluginInit service.
@@ -59,37 +55,31 @@ type UnimplementedPluginInitServer struct {
 }
 
 func (UnimplementedPluginInitServer) Init(context.Context, *InitRequest) (*InitResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Init not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
-func (UnimplementedPluginInitServer) mustEmbedUnimplementedPluginInitServer() {}
 
-// UnsafePluginInitServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to PluginInitServer will
-// result in compilation errors.
+func (UnimplementedPluginInitServer) mustEmbedUnimplementedPluginInitServer() {
+	_ = "STUB: not implemented"
+
+	// UnsafePluginInitServer may be embedded to opt out of forward compatibility for this service.
+	// Use of this interface is not recommended, as added methods to PluginInitServer will
+	// result in compilation errors.
+	return
+}
+
 type UnsafePluginInitServer interface {
 	mustEmbedUnimplementedPluginInitServer()
 }
 
 func RegisterPluginInitServer(s grpc.ServiceRegistrar, srv PluginInitServer) {
-	s.RegisterService(&PluginInit_ServiceDesc, srv)
+	_ = "STUB: not implemented"
+	return
 }
 
 func _PluginInit_Init_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InitRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PluginInitServer).Init(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PluginInit_Init_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PluginInitServer).Init(ctx, req.(*InitRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // PluginInit_ServiceDesc is the grpc.ServiceDesc for PluginInit service.

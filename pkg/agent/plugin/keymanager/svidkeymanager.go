@@ -17,22 +17,18 @@ type SVIDKeyManager interface {
 }
 
 // Returns an SVIDKeyManager over the given KeyManager
-func ForSVID(km KeyManager) SVIDKeyManager {
-	return svidKeyManager{km: km}
-}
+func ForSVID(km KeyManager) SVIDKeyManager { _ = "STUB: not implemented"; return *new(SVIDKeyManager) }
 
 type svidKeyManager struct {
 	km KeyManager
 }
 
 func (s svidKeyManager) GenerateKey(ctx context.Context, currentKey Key) (Key, error) {
-	keyID := "agent-svid-A"
-	if currentKey != nil && currentKey.ID() == keyID {
-		keyID = "agent-svid-B"
-	}
-	return s.km.GenerateKey(ctx, keyID, ECP256)
+	_ = "STUB: not implemented"
+	return *new(Key), nil
 }
 
 func (s svidKeyManager) GetKeys(ctx context.Context) ([]Key, error) {
-	return s.km.GetKeys(ctx)
+	_ = "STUB: not implemented"
+	return nil, nil
 }

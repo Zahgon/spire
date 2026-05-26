@@ -10,17 +10,6 @@ type agentRecord struct {
 	Selectors selectorSet
 }
 
-func agentRecordByID(a, b agentRecord) bool {
-	return a.ID < b.ID
-}
+func agentRecordByID(a, b agentRecord) bool { _ = "STUB: not implemented"; return false }
 
-func agentRecordByExpiresAt(a, b agentRecord) bool {
-	switch {
-	case a.ExpiresAt < b.ExpiresAt:
-		return true
-	case a.ExpiresAt > b.ExpiresAt:
-		return false
-	default:
-		return a.ID < b.ID
-	}
-}
+func agentRecordByExpiresAt(a, b agentRecord) bool { _ = "STUB: not implemented"; return false }

@@ -2,21 +2,13 @@ package endpoints
 
 import (
 	"context"
-	"errors"
 	"net"
 
 	secret_v3 "github.com/envoyproxy/go-control-plane/envoy/service/secret/v3"
 	"github.com/sirupsen/logrus"
 	workload_pb "github.com/spiffe/go-spiffe/v2/proto/spiffe/workload"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/health/grpc_health_v1"
-	"google.golang.org/grpc/reflection"
 
-	healthv1 "github.com/spiffe/spire/pkg/agent/api/health/v1"
-	"github.com/spiffe/spire/pkg/agent/endpoints/sdsv3"
-	"github.com/spiffe/spire/pkg/agent/endpoints/workload"
-	"github.com/spiffe/spire/pkg/common/api/middleware"
-	"github.com/spiffe/spire/pkg/common/peertracker"
 	"github.com/spiffe/spire/pkg/common/telemetry"
 )
 
@@ -42,128 +34,18 @@ type Endpoints struct {
 	}
 }
 
-func New(c Config) *Endpoints {
-	attestor := PeerTrackerAttestor{Attestor: c.Attestor}
-
-	if c.newWorkloadAPIServer == nil {
-		c.newWorkloadAPIServer = func(c workload.Config) workload_pb.SpiffeWorkloadAPIServer {
-			return workload.New(c)
-		}
-	}
-	if c.newSDSv3Server == nil {
-		c.newSDSv3Server = func(c sdsv3.Config) secret_v3.SecretDiscoveryServiceServer {
-			return sdsv3.New(c)
-		}
-	}
-	if c.newHealthServer == nil {
-		c.newHealthServer = func(c healthv1.Config) grpc_health_v1.HealthServer {
-			return healthv1.New(c)
-		}
-	}
-
-	allowedClaims := make(map[string]struct{}, len(c.AllowedForeignJWTClaims))
-	for _, claim := range c.AllowedForeignJWTClaims {
-		allowedClaims[claim] = struct{}{}
-	}
-
-	workloadAPIServer := c.newWorkloadAPIServer(workload.Config{
-		Manager:                       c.Manager,
-		Attestor:                      attestor,
-		AllowUnauthenticatedVerifiers: c.AllowUnauthenticatedVerifiers,
-		AllowedForeignJWTClaims:       allowedClaims,
-		TrustDomain:                   c.TrustDomain,
-	})
-
-	sdsv3Server := c.newSDSv3Server(sdsv3.Config{
-		Attestor:                    attestor,
-		Manager:                     c.Manager,
-		DefaultSVIDName:             c.DefaultSVIDName,
-		DefaultBundleName:           c.DefaultBundleName,
-		DefaultAllBundlesName:       c.DefaultAllBundlesName,
-		DisableSPIFFECertValidation: c.DisableSPIFFECertValidation,
-	})
-
-	healthServer := c.newHealthServer(healthv1.Config{
-		Addr: c.BindAddr,
-	})
-
-	return &Endpoints{
-		addr:              c.BindAddr,
-		log:               c.Log,
-		metrics:           c.Metrics,
-		workloadAPIServer: workloadAPIServer,
-		sdsv3Server:       sdsv3Server,
-		healthServer:      healthServer,
-		hooks: struct {
-			listening chan struct{}
-		}{
-			listening: make(chan struct{}),
-		},
-	}
-}
+func New(c Config) *Endpoints { _ = "STUB: not implemented"; return nil }
 
 func (e *Endpoints) ListenAndServe(ctx context.Context) error {
-	unaryInterceptor, streamInterceptor := middleware.Interceptors(
-		Middleware(e.log, e.metrics),
-	)
-
-	server := grpc.NewServer(
-		grpc.Creds(peertracker.NewCredentials()),
-		grpc.UnaryInterceptor(unaryInterceptor),
-		grpc.StreamInterceptor(streamInterceptor),
-		grpc.ReadBufferSize(readBufferSize),
-	)
-
-	workload_pb.RegisterSpiffeWorkloadAPIServer(server, e.workloadAPIServer)
-	secret_v3.RegisterSecretDiscoveryServiceServer(server, e.sdsv3Server)
-	grpc_health_v1.RegisterHealthServer(server, e.healthServer)
-
-	reflection.Register(server)
-
-	l, err := e.createListener()
-	if err != nil {
-		return err
-	}
-	defer l.Close()
-
-	// Update the listening address with the actual address.
-	// If a TCP address was specified with port 0, this will
-	// update the address with the actual port that is used
-	// to listen.
-	e.addr = l.Addr()
-	e.log.WithFields(logrus.Fields{
-		telemetry.Network: e.addr.Network(),
-		telemetry.Address: e.addr,
-	}).Info("Starting Workload and SDS APIs")
-	e.triggerListeningHook()
-	errChan := make(chan error)
-	go func() { errChan <- server.Serve(l) }()
-
-	select {
-	case err = <-errChan:
-	case <-ctx.Done():
-		e.log.Info("Stopping Workload and SDS APIs")
-		server.Stop()
-		err = <-errChan
-		if errors.Is(err, grpc.ErrServerStopped) {
-			err = nil
-		}
-	}
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (e *Endpoints) triggerListeningHook() {
-	if e.hooks.listening != nil {
-		e.hooks.listening <- struct{}{}
-	}
-}
+// Update the listening address with the actual address.
+// If a TCP address was specified with port 0, this will
+// update the address with the actual port that is used
+// to listen.
 
-func (e *Endpoints) WaitForListening(listening chan struct{}) {
-	if e.hooks.listening == nil {
-		e.log.Warn("Listening hook not initialized, cannot wait for listening")
-		return
-	}
+func (e *Endpoints) triggerListeningHook() { _ = "STUB: not implemented"; return }
 
-	<-e.hooks.listening
-	listening <- struct{}{}
-}
+func (e *Endpoints) WaitForListening(listening chan struct{}) { _ = "STUB: not implemented"; return }

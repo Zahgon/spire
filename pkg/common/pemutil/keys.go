@@ -4,142 +4,84 @@ import (
 	"crypto"
 	"crypto/ecdsa"
 	"crypto/rsa"
-	"crypto/x509"
-	"encoding/pem"
-	"fmt"
 )
 
 func ParsePublicKey(pemBytes []byte) (crypto.PublicKey, error) {
-	block, err := parseBlock(pemBytes, publicKeyType)
-	if err != nil {
-		return nil, err
-	}
-	return block.Object, nil
+	_ = "STUB: not implemented"
+	return *new(crypto.PublicKey), nil
 }
 
 func LoadPublicKey(path string) (crypto.PublicKey, error) {
-	block, err := loadBlock(path, publicKeyType)
-	if err != nil {
-		return nil, err
-	}
-	return block.Object, nil
+	_ = "STUB: not implemented"
+	return *new(crypto.PublicKey), nil
 }
 
 func ParsePrivateKey(pemBytes []byte) (crypto.PrivateKey, error) {
-	block, err := parseBlock(pemBytes, privateKeyType, rsaPrivateKeyType, ecPrivateKeyType)
-	if err != nil {
-		return nil, err
-	}
-	return block.Object, nil
+	_ = "STUB: not implemented"
+	return *new(crypto.PrivateKey), nil
 }
 
 func LoadPrivateKey(path string) (crypto.PrivateKey, error) {
-	block, err := loadBlock(path, privateKeyType, rsaPrivateKeyType, ecPrivateKeyType)
-	if err != nil {
-		return nil, err
-	}
-	return block.Object, nil
+	_ = "STUB: not implemented"
+	return *new(crypto.PrivateKey), nil
 }
 
 func ParseSigner(pemBytes []byte) (crypto.Signer, error) {
-	privateKey, err := ParsePrivateKey(pemBytes)
-	if err != nil {
-		return nil, err
-	}
-	return signerFromPrivateKey(privateKey)
+	_ = "STUB: not implemented"
+	return *new(crypto.Signer), nil
 }
 
 func LoadSigner(path string) (crypto.Signer, error) {
-	privateKey, err := LoadPrivateKey(path)
-	if err != nil {
-		return nil, err
-	}
-	return signerFromPrivateKey(privateKey)
+	_ = "STUB: not implemented"
+	return *new(crypto.Signer), nil
 }
 
 func ParseRSAPrivateKey(pemBytes []byte) (*rsa.PrivateKey, error) {
-	block, err := parseBlock(pemBytes, privateKeyType, rsaPrivateKeyType)
-	if err != nil {
-		return nil, err
-	}
-	return rsaPrivateKeyFromObject(block.Object)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func LoadRSAPrivateKey(path string) (*rsa.PrivateKey, error) {
-	block, err := loadBlock(path, privateKeyType, rsaPrivateKeyType)
-	if err != nil {
-		return nil, err
-	}
-	return rsaPrivateKeyFromObject(block.Object)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func EncodeRSAPrivateKey(privateKey *rsa.PrivateKey) ([]byte, error) {
-	return pem.EncodeToMemory(&pem.Block{
-		Type:  "RSA PRIVATE KEY",
-		Bytes: x509.MarshalPKCS1PrivateKey(privateKey),
-	}), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func rsaPrivateKeyFromObject(object any) (*rsa.PrivateKey, error) {
-	key, ok := object.(*rsa.PrivateKey)
-	if !ok {
-		return nil, fmt.Errorf("expected %T; got %T", key, object)
-	}
-	return key, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func ParseECPrivateKey(pemBytes []byte) (*ecdsa.PrivateKey, error) {
-	block, err := parseBlock(pemBytes, privateKeyType, ecPrivateKeyType)
-	if err != nil {
-		return nil, err
-	}
-	return ecdsaPrivateKeyFromObject(block.Object)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func LoadECPrivateKey(path string) (*ecdsa.PrivateKey, error) {
-	block, err := loadBlock(path, privateKeyType, ecPrivateKeyType)
-	if err != nil {
-		return nil, err
-	}
-	return ecdsaPrivateKeyFromObject(block.Object)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func EncodeECPrivateKey(privateKey *ecdsa.PrivateKey) ([]byte, error) {
-	keyBytes, err := x509.MarshalECPrivateKey(privateKey)
-	if err != nil {
-		return nil, err
-	}
-
-	return pem.EncodeToMemory(&pem.Block{
-		Type:  "EC PRIVATE KEY",
-		Bytes: keyBytes,
-	}), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func EncodePKCS8PrivateKey(privateKey any) ([]byte, error) {
-	keyBytes, err := x509.MarshalPKCS8PrivateKey(privateKey)
-	if err != nil {
-		return nil, err
-	}
-
-	return pem.EncodeToMemory(&pem.Block{
-		Type:  "PRIVATE KEY",
-		Bytes: keyBytes,
-	}), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func ecdsaPrivateKeyFromObject(object any) (*ecdsa.PrivateKey, error) {
-	key, ok := object.(*ecdsa.PrivateKey)
-	if !ok {
-		return nil, fmt.Errorf("expected %T; got %T", key, object)
-	}
-	return key, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func signerFromPrivateKey(privateKey crypto.PrivateKey) (crypto.Signer, error) {
-	signer, ok := privateKey.(crypto.Signer)
-	if !ok {
-		return nil, fmt.Errorf("expected crypto.Signer; got %T", privateKey)
-	}
-	return signer, nil
+	_ = "STUB: not implemented"
+	return *new(crypto.Signer), nil
 }

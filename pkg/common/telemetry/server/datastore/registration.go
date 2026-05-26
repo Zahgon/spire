@@ -10,43 +10,50 @@ import (
 // StartCountRegistrationCall return metric
 // for server's datastore, on counting registrations.
 func StartCountRegistrationCall(m telemetry.Metrics) *telemetry.CallCounter {
-	return telemetry.StartCall(m, telemetry.Datastore, telemetry.RegistrationEntry, telemetry.Count)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartCreateRegistrationCall return metric
 // for server's datastore, on creating a registration.
 func StartCreateRegistrationCall(m telemetry.Metrics) *telemetry.CallCounter {
-	return telemetry.StartCall(m, telemetry.Datastore, telemetry.RegistrationEntry, telemetry.Create)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartDeleteRegistrationCall return metric
 // for server's datastore, on deleting a registration.
 func StartDeleteRegistrationCall(m telemetry.Metrics) *telemetry.CallCounter {
-	return telemetry.StartCall(m, telemetry.Datastore, telemetry.RegistrationEntry, telemetry.Delete)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartFetchRegistrationCall return metric
 // for server's datastore, on creating a registration.
 func StartFetchRegistrationCall(m telemetry.Metrics) *telemetry.CallCounter {
-	return telemetry.StartCall(m, telemetry.Datastore, telemetry.RegistrationEntry, telemetry.Fetch)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartListRegistrationCall return metric
 // for server's datastore, on listing registrations.
 func StartListRegistrationCall(m telemetry.Metrics) *telemetry.CallCounter {
-	return telemetry.StartCall(m, telemetry.Datastore, telemetry.RegistrationEntry, telemetry.List)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartPruneRegistrationCall return metric
 // for server's datastore, on pruning registrations.
 func StartPruneRegistrationCall(m telemetry.Metrics) *telemetry.CallCounter {
-	return telemetry.StartCall(m, telemetry.Datastore, telemetry.RegistrationEntry, telemetry.Prune)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartUpdateRegistrationCall return metric
 // for server's datastore, on updating a registration.
 func StartUpdateRegistrationCall(m telemetry.Metrics) *telemetry.CallCounter {
-	return telemetry.StartCall(m, telemetry.Datastore, telemetry.RegistrationEntry, telemetry.Update)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // End Call Counters

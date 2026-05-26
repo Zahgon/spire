@@ -16,23 +16,14 @@ var (
 	start = clk.Now()
 )
 
-func Uptime() time.Duration {
-	return clk.Now().Sub(start)
-}
+func Uptime() time.Duration { _ = "STUB: not implemented"; return *new(time.Duration) }
 
 func reportMetrics(ctx context.Context, interval time.Duration, m telemetry.Metrics) {
-	t := clk.Ticker(interval)
-	defer t.Stop()
-	for {
-		telemetry.EmitUptime(m, float64(Uptime()/time.Millisecond))
-		select {
-		case <-t.C:
-		case <-ctx.Done():
-			return
-		}
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 func ReportMetrics(ctx context.Context, metrics telemetry.Metrics) {
-	go reportMetrics(ctx, reportInterval, metrics)
+	_ = "STUB: not implemented"
+	return
 }

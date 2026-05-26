@@ -4,7 +4,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -54,9 +53,11 @@ type badHCServerPlugin struct {
 }
 
 func (p *badHCServerPlugin) GRPCServer(b *goplugin.GRPCBroker, s *grpc.Server) (err error) {
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (p *badHCServerPlugin) GRPCClient(ctx context.Context, b *goplugin.GRPCBroker, c *grpc.ClientConn) (any, error) {
-	return nil, errors.New("unimplemented")
+	_ = "STUB: not implemented"
+	return *new(any), nil
 }

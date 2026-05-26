@@ -8,7 +8,6 @@ import (
 	"github.com/spiffe/go-spiffe/v2/spiffeid"
 	attestor "github.com/spiffe/spire/pkg/agent/attestor/workload"
 	"github.com/spiffe/spire/pkg/agent/manager"
-	"github.com/spiffe/spire/pkg/common/peertracker"
 	"github.com/spiffe/spire/pkg/common/telemetry"
 )
 
@@ -31,11 +30,4 @@ type Config struct {
 	AuthorizedDelegates []string
 }
 
-func New(c *Config) *Endpoints {
-	return &Endpoints{
-		c: c,
-		listener: &peertracker.ListenerFactory{
-			Log: c.Log,
-		},
-	}
-}
+func New(c *Config) *Endpoints { _ = "STUB: not implemented"; return nil }

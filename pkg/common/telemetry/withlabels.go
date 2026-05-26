@@ -10,61 +10,51 @@ type withLabels struct {
 var _ Metrics = (*withLabels)(nil)
 
 func WithLabels(metrics Metrics, labels []Label) Metrics {
-	if len(labels) == 0 {
-		return metrics
-	}
-	return &withLabels{
-		metrics: metrics,
-		labels:  labels,
-	}
+	_ = "STUB: not implemented"
+	return *new(Metrics)
 }
 
-func (w *withLabels) SetGauge(key []string, val float32) {
-	w.metrics.SetGaugeWithLabels(key, val, w.labels)
-}
+func (w *withLabels) SetGauge(key []string, val float32) { _ = "STUB: not implemented"; return }
 
 func (w *withLabels) SetPrecisionGauge(key []string, val float64) {
-	w.metrics.SetPrecisionGaugeWithLabels(key, val, w.labels)
+	_ = "STUB: not implemented"
+	return
 }
 
 func (w *withLabels) SetGaugeWithLabels(key []string, val float32, labels []Label) {
-	w.metrics.SetGaugeWithLabels(key, val, w.combineLabels(labels))
+	_ = "STUB: not implemented"
+	return
 }
 
 func (w *withLabels) SetPrecisionGaugeWithLabels(key []string, val float64, labels []Label) {
-	w.metrics.SetPrecisionGaugeWithLabels(key, val, w.combineLabels(labels))
+	_ = "STUB: not implemented"
+	return
 }
 
-func (w *withLabels) EmitKey(key []string, val float32) {
-	w.metrics.EmitKey(key, val)
-}
+func (w *withLabels) EmitKey(key []string, val float32) { _ = "STUB: not implemented"; return }
 
-func (w *withLabels) IncrCounter(key []string, val float32) {
-	w.metrics.IncrCounterWithLabels(key, val, w.labels)
-}
+func (w *withLabels) IncrCounter(key []string, val float32) { _ = "STUB: not implemented"; return }
 
 func (w *withLabels) IncrCounterWithLabels(key []string, val float32, labels []Label) {
-	w.metrics.IncrCounterWithLabels(key, val, w.combineLabels(labels))
+	_ = "STUB: not implemented"
+	return
 }
 
-func (w *withLabels) AddSample(key []string, val float32) {
-	w.metrics.AddSampleWithLabels(key, val, w.labels)
-}
+func (w *withLabels) AddSample(key []string, val float32) { _ = "STUB: not implemented"; return }
 
 func (w *withLabels) AddSampleWithLabels(key []string, val float32, labels []Label) {
-	w.metrics.AddSampleWithLabels(key, val, w.combineLabels(labels))
+	_ = "STUB: not implemented"
+	return
 }
 
-func (w *withLabels) MeasureSince(key []string, start time.Time) {
-	w.metrics.MeasureSinceWithLabels(key, start, w.labels)
-}
+func (w *withLabels) MeasureSince(key []string, start time.Time) { _ = "STUB: not implemented"; return }
 
 func (w *withLabels) MeasureSinceWithLabels(key []string, start time.Time, labels []Label) {
-	w.metrics.MeasureSinceWithLabels(key, start, w.combineLabels(labels))
+	_ = "STUB: not implemented"
+	return
 }
 
 func (w *withLabels) combineLabels(labels []Label) (combined []Label) {
-	combined = append(combined, w.labels...)
-	combined = append(combined, labels...)
-	return combined
+	_ = "STUB: not implemented"
+	return nil
 }

@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"errors"
 	"net"
 
 	"google.golang.org/grpc/credentials"
@@ -15,32 +14,37 @@ import (
 // should instead be used, which provides mitigation against PID reuse and
 // related attacks.
 func UntrackedUDSCredentials() credentials.TransportCredentials {
-	return untrackedUDSCredentials{}
+	_ = "STUB: not implemented"
+	return *new(credentials.TransportCredentials)
 }
 
 type UntrackedUDSAuthInfo struct{}
 
-func (UntrackedUDSAuthInfo) AuthType() string { return "untracked-uds" }
+func (UntrackedUDSAuthInfo) AuthType() string { _ = "STUB: not implemented"; return "" }
 
 type untrackedUDSCredentials struct{}
 
 func (c untrackedUDSCredentials) ClientHandshake(_ context.Context, _ string, conn net.Conn) (net.Conn, credentials.AuthInfo, error) {
-	conn.Close()
-	return conn, nil, errors.New("untracked UDS credentials do not implement the client handshake")
+	_ = "STUB: not implemented"
+	return *new(net.Conn), *new(credentials.AuthInfo), nil
 }
 
 func (c untrackedUDSCredentials) ServerHandshake(conn net.Conn) (net.Conn, credentials.AuthInfo, error) {
-	return conn, UntrackedUDSAuthInfo{}, nil
+	_ = "STUB: not implemented"
+	return *new(net.Conn), *new(credentials.AuthInfo), nil
 }
 
 func (c untrackedUDSCredentials) Info() credentials.ProtocolInfo {
-	return credentials.ProtocolInfo{}
+	_ = "STUB: not implemented"
+	return *new(credentials.ProtocolInfo)
 }
 
 func (c untrackedUDSCredentials) Clone() credentials.TransportCredentials {
-	return untrackedUDSCredentials{}
+	_ = "STUB: not implemented"
+	return *new(credentials.TransportCredentials)
 }
 
 func (c untrackedUDSCredentials) OverrideServerName(_ string) error {
+	_ = "STUB: not implemented"
 	return nil
 }

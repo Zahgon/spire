@@ -5,13 +5,13 @@ type Repository struct {
 }
 
 func (repo *Repository) GetBundlePublishers() []BundlePublisher {
-	return repo.BundlePublishers
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (repo *Repository) AddBundlePublisher(bundlePublisher BundlePublisher) {
-	repo.BundlePublishers = append(repo.BundlePublishers, bundlePublisher)
+	_ = "STUB: not implemented"
+	return
 }
 
-func (repo *Repository) Clear() {
-	repo.BundlePublishers = nil
-}
+func (repo *Repository) Clear() { _ = "STUB: not implemented"; return }

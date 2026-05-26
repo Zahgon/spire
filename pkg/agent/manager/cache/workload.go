@@ -32,9 +32,7 @@ type WorkloadUpdate struct {
 	FederatedBundles map[spiffeid.TrustDomain]*spiffebundle.Bundle
 }
 
-func (u *WorkloadUpdate) HasIdentity() bool {
-	return len(u.Identities) > 0
-}
+func (u *WorkloadUpdate) HasIdentity() bool { _ = "STUB: not implemented"; return false }
 
 // X509SVID holds onto the SVID certificate chain and private key.
 type X509SVID struct {

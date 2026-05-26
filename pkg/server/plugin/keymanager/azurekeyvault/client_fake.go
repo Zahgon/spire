@@ -3,24 +3,12 @@ package azurekeyvault
 import (
 	"context"
 	"crypto"
-	"crypto/ecdsa"
-	"crypto/rand"
-	"crypto/rsa"
-	"errors"
-	"fmt"
-	"math/big"
-	"path"
-	"slices"
 	"sync"
 	"testing"
-	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
 	"github.com/Azure/azure-sdk-for-go/sdk/security/keyvault/azkeys"
 	"github.com/andres-erbsen/clock"
-	"github.com/spiffe/spire/test/testkey"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type kmsClientFake struct {
@@ -55,404 +43,96 @@ type fakeKeyEntry struct {
 }
 
 func newKMSClientFake(t *testing.T, vaultURI, trustDomain, serverID string, c *clock.Mock) *kmsClientFake {
-	return &kmsClientFake{
-		t:           t,
-		vaultURI:    vaultURI,
-		trustDomain: trustDomain,
-		serverID:    serverID,
-		store:       newFakeStore(c, t),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func newFakeStore(c *clock.Mock, t *testing.T) fakeStore {
-	testKeys := new(testkey.Keys)
-	return fakeStore{
-		fakeKeys:   make(map[string]*fakeKeyEntry),
-		clk:        c,
-		ec256Key:   testKeys.NewEC256(t),
-		ec384Key:   testKeys.NewEC384(t),
-		rsa2048Key: testKeys.NewRSA2048(t),
-		rsa4096Key: testKeys.NewRSA4096(t),
-	}
+	_ = "STUB: not implemented"
+	return *new(fakeStore)
 }
 
-func (fs *fakeStore) SaveKeyEntry(input *fakeKeyEntry) {
-	fs.mu.Lock()
-	defer fs.mu.Unlock()
+func (fs *fakeStore) SaveKeyEntry(input *fakeKeyEntry) { _ = "STUB: not implemented"; return }
 
-	fs.fakeKeys[input.KeyBundle.Key.KID.Name()] = input
-}
+func (fs *fakeStore) DeleteKeyEntry(keyName string) { _ = "STUB: not implemented"; return }
 
-func (fs *fakeStore) DeleteKeyEntry(keyName string) {
-	fs.mu.Lock()
-	defer fs.mu.Unlock()
-	delete(fs.fakeKeys, keyName)
-}
+func (k *kmsClientFake) setEntries(entries []fakeKeyEntry) { _ = "STUB: not implemented"; return }
 
-func (k *kmsClientFake) setEntries(entries []fakeKeyEntry) {
-	k.mu.Lock()
-	defer k.mu.Unlock()
-	if entries == nil {
-		return
-	}
-	for _, e := range entries {
-		if e.KeyBundle.Key != nil && e.KeyBundle.Key.KID != nil && e.KeyBundle.Key.KID.Name() != "" {
-			newEntry := e
-			k.store.SaveKeyEntry(&newEntry)
-		}
-	}
-}
+func (k *kmsClientFake) setCreateKeyErr(fakeError string) { _ = "STUB: not implemented"; return }
 
-func (k *kmsClientFake) setCreateKeyErr(fakeError string) {
-	k.mu.Lock()
-	defer k.mu.Unlock()
-	if fakeError != "" {
-		k.createKeyErr = errors.New(fakeError)
-	}
-}
+func (k *kmsClientFake) setGetKeyErr(fakeError string) { _ = "STUB: not implemented"; return }
 
-func (k *kmsClientFake) setGetKeyErr(fakeError string) {
-	k.mu.Lock()
-	defer k.mu.Unlock()
-	if fakeError != "" {
-		k.getKeyErr = errors.New(fakeError)
-	}
-}
+func (k *kmsClientFake) setGetPublicKeyErr(fakeError string) { _ = "STUB: not implemented"; return }
 
-func (k *kmsClientFake) setGetPublicKeyErr(fakeError string) {
-	k.mu.Lock()
-	defer k.mu.Unlock()
-	if fakeError != "" {
-		k.getPublicKeyErr = errors.New(fakeError)
-	}
-}
+func (k *kmsClientFake) setUpdateKeyErr(fakeError string) { _ = "STUB: not implemented"; return }
 
-func (k *kmsClientFake) setUpdateKeyErr(fakeError string) {
-	k.mu.Lock()
-	defer k.mu.Unlock()
-	if fakeError != "" {
-		k.updateKeyErr = errors.New(fakeError)
-	}
-}
+func (k *kmsClientFake) setDeleteKeyErr(fakeError error) { _ = "STUB: not implemented"; return }
 
-func (k *kmsClientFake) setDeleteKeyErr(fakeError error) {
-	k.mu.Lock()
-	defer k.mu.Unlock()
-	if fakeError != nil {
-		k.deleteKeyErr = fakeError
-	}
-}
+func (k *kmsClientFake) setSignDataErr(fakeError string) { _ = "STUB: not implemented"; return }
 
-func (k *kmsClientFake) setSignDataErr(fakeError string) {
-	k.mu.Lock()
-	defer k.mu.Unlock()
-	if fakeError != "" {
-		k.signErr = errors.New(fakeError)
-	}
-}
-
-func (k *kmsClientFake) setListKeysErr(fakeError string) {
-	k.mu.Lock()
-	defer k.mu.Unlock()
-	if fakeError != "" {
-		k.listKeysErr = errors.New(fakeError)
-	}
-}
+func (k *kmsClientFake) setListKeysErr(fakeError string) { _ = "STUB: not implemented"; return }
 
 func (k *kmsClientFake) CreateKey(_ context.Context, keyName string, parameters azkeys.CreateKeyParameters, _ *azkeys.CreateKeyOptions) (azkeys.CreateKeyResponse, error) {
-	k.mu.RLock()
-	defer k.mu.RUnlock()
-	if k.createKeyErr != nil {
-		return azkeys.CreateKeyResponse{}, k.createKeyErr
-	}
-
-	var publicKey *azkeys.JSONWebKey
-	var privateKey crypto.Signer
-	keyOperations := getKeyOperations()
-	kmsKeyID := path.Join(k.vaultURI, keyName)
-	switch {
-	case *parameters.Kty == azkeys.KeyTypeEC && *parameters.Curve == azkeys.CurveNameP256:
-		privateKey = k.store.ec256Key
-		publicKey = toECKey(privateKey.Public(), kmsKeyID, *parameters.Curve, keyOperations)
-	case *parameters.Kty == azkeys.KeyTypeEC && *parameters.Curve == azkeys.CurveNameP384:
-		privateKey = k.store.ec384Key
-		publicKey = toECKey(privateKey.Public(), kmsKeyID, *parameters.Curve, keyOperations)
-	case *parameters.Kty == azkeys.KeyTypeRSA && *parameters.KeySize == 2048:
-		privateKey = k.store.rsa2048Key
-		publicKey = toRSAKey(privateKey.Public(), kmsKeyID, keyOperations)
-	case *parameters.Kty == azkeys.KeyTypeRSA && *parameters.KeySize == 4096:
-		privateKey = k.store.rsa4096Key
-		publicKey = toRSAKey(privateKey.Public(), kmsKeyID, keyOperations)
-	default:
-		return azkeys.CreateKeyResponse{}, fmt.Errorf("unknown key type %q", *parameters.Kty)
-	}
-
-	keyAttr := &azkeys.KeyAttributes{
-		Enabled: new(true),
-		Created: new(time.Now()),
-		Updated: new(time.Now()),
-	}
-
-	tags := make(map[string]*string)
-	tags[tagNameServerTrustDomain] = new(k.trustDomain)
-	tags[tagNameServerID] = new(k.serverID)
-
-	keyBundle := &azkeys.KeyBundle{
-		Attributes: keyAttr,
-		Key:        publicKey,
-		Tags:       tags,
-	}
-
-	keyEntry := &fakeKeyEntry{
-		KeyBundle:  *keyBundle,
-		PrivateKey: privateKey,
-	}
-
-	k.store.SaveKeyEntry(keyEntry)
-	return azkeys.CreateKeyResponse{KeyBundle: *keyBundle}, nil
+	_ = "STUB: not implemented"
+	return *new(azkeys.CreateKeyResponse), nil
 }
 
 func (k *kmsClientFake) DeleteKey(_ context.Context, name string, _ *azkeys.DeleteKeyOptions) (azkeys.DeleteKeyResponse, error) {
-	k.mu.RLock()
-	defer k.mu.RUnlock()
-	if k.deleteKeyErr != nil {
-		return azkeys.DeleteKeyResponse{}, k.deleteKeyErr
-	}
-	keyEntry, err := k.store.fetchKeyEntry(name)
-	if err != nil {
-		return azkeys.DeleteKeyResponse{}, err
-	}
-
-	k.store.DeleteKeyEntry(keyEntry.KeyBundle.Key.KID.Name())
-
-	deletedKey := azkeys.DeletedKey{
-		Attributes: keyEntry.KeyBundle.Attributes,
-		Key:        keyEntry.KeyBundle.Key,
-	}
-
-	return azkeys.DeleteKeyResponse{DeletedKey: deletedKey}, nil
+	_ = "STUB: not implemented"
+	return *new(azkeys.DeleteKeyResponse), nil
 }
 
 func (k *kmsClientFake) UpdateKey(_ context.Context, name, _ string, _ azkeys.UpdateKeyParameters, _ *azkeys.UpdateKeyOptions) (azkeys.UpdateKeyResponse, error) {
-	k.mu.RLock()
-	defer k.mu.RUnlock()
-	if k.updateKeyErr != nil {
-		return azkeys.UpdateKeyResponse{}, k.updateKeyErr
-	}
-	keyEntry, err := k.store.fetchKeyEntry(name)
-	if err != nil {
-		return azkeys.UpdateKeyResponse{}, err
-	}
-
-	keyEntry.KeyBundle.Attributes.Updated = new(k.store.clk.Now())
-	k.store.SaveKeyEntry(keyEntry)
-
-	keyBundle := &azkeys.KeyBundle{
-		Attributes: keyEntry.KeyBundle.Attributes,
-		Key:        keyEntry.KeyBundle.Key,
-		Tags:       keyEntry.KeyBundle.Tags,
-	}
-
-	return azkeys.UpdateKeyResponse{KeyBundle: *keyBundle}, nil
+	_ = "STUB: not implemented"
+	return *new(azkeys.UpdateKeyResponse), nil
 }
 
 func (k *kmsClientFake) GetKey(_ context.Context, keyName, _ string, _ *azkeys.GetKeyOptions) (azkeys.GetKeyResponse, error) {
-	k.mu.RLock()
-	defer k.mu.RUnlock()
-	if k.getKeyErr != nil {
-		return azkeys.GetKeyResponse{}, k.getKeyErr
-	}
-	keyEntry, err := k.store.fetchKeyEntry(keyName)
-	if err != nil {
-		return azkeys.GetKeyResponse{}, err
-	}
-	keyBundle := &azkeys.KeyBundle{
-		Attributes: keyEntry.KeyBundle.Attributes,
-		Key:        keyEntry.KeyBundle.Key,
-		Tags:       keyEntry.KeyBundle.Tags,
-	}
-	return azkeys.GetKeyResponse{KeyBundle: *keyBundle}, err
+	_ = "STUB: not implemented"
+	return *new(azkeys.GetKeyResponse), nil
 }
 
 func (k *kmsClientFake) NewListKeyPropertiesPager(_ *azkeys.ListKeyPropertiesOptions) *runtime.Pager[azkeys.ListKeyPropertiesResponse] {
-	k.mu.RLock()
-	defer k.mu.RUnlock()
-
-	var listResp []*azkeys.KeyProperties
-	for _, keyEntry := range k.store.fetchKeyEntries() {
-		listResp = append(listResp, &azkeys.KeyProperties{
-			Attributes: keyEntry.KeyBundle.Attributes,
-			KID:        keyEntry.KeyBundle.Key.KID,
-			Tags:       keyEntry.KeyBundle.Tags,
-		})
-	}
-
-	return runtime.NewPager(runtime.PagingHandler[azkeys.ListKeyPropertiesResponse]{
-		More: func(page azkeys.ListKeyPropertiesResponse) bool {
-			return page.NextLink != nil && len(*page.NextLink) > 0
-		},
-		Fetcher: func(ctx context.Context, page *azkeys.ListKeyPropertiesResponse) (azkeys.ListKeyPropertiesResponse, error) {
-			if k.listKeysErr != nil {
-				return azkeys.ListKeyPropertiesResponse{}, k.listKeysErr
-			}
-
-			return azkeys.ListKeyPropertiesResponse{
-				KeyPropertiesListResult: azkeys.KeyPropertiesListResult{
-					NextLink: nil,
-					Value:    listResp,
-				},
-			}, nil
-		},
-	})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (k *kmsClientFake) Sign(_ context.Context, keyName, _ string, parameters azkeys.SignParameters, _ *azkeys.SignOptions) (azkeys.SignResponse, error) {
-	k.mu.RLock()
-	defer k.mu.RUnlock()
-
-	if k.signErr != nil {
-		return azkeys.SignResponse{}, k.signErr
-	}
-
-	entry, err := k.store.FetchKeyEntry(keyName)
-	if err != nil {
-		return azkeys.SignResponse{}, err
-	}
-
-	privateKey := entry.PrivateKey
-
-	signRSA := func(opts crypto.SignerOpts) ([]byte, error) {
-		if _, ok := privateKey.(*rsa.PrivateKey); !ok {
-			return nil, status.Errorf(codes.InvalidArgument, "invalid signing algorithm %q for RSA key", *parameters.Algorithm)
-		}
-		return privateKey.(*rsa.PrivateKey).Sign(rand.Reader, parameters.Value, opts)
-	}
-	signECDSA := func() ([]byte, error) {
-		if _, ok := privateKey.(*ecdsa.PrivateKey); !ok {
-			return nil, status.Errorf(codes.InvalidArgument, "invalid signing algorithm %q for ECDSA key", *parameters.Algorithm)
-		}
-
-		key := privateKey.(*ecdsa.PrivateKey)
-		// This is to produce an IEEE-P1363 encoded signature since that's how the azure signature is encoded
-		curveBits := key.Curve.Params().BitSize
-		keyBytes := curveBits / 8
-		if curveBits%8 > 0 {
-			keyBytes++
-		}
-		r, s, err := ecdsa.Sign(rand.Reader, key, parameters.Value)
-		if err != nil {
-			return nil, fmt.Errorf("failed to sign data using ecdsa: %w", err)
-		}
-
-		rBytes := r.Bytes()
-		rBytesPadded := make([]byte, keyBytes)
-		copy(rBytesPadded[keyBytes-len(rBytes):], rBytes)
-		sBytes := s.Bytes()
-		sBytesPadded := make([]byte, keyBytes)
-		copy(sBytesPadded[keyBytes-len(sBytes):], sBytes)
-		return append(rBytesPadded, sBytesPadded...), nil
-	}
-
-	var signature []byte
-	switch *parameters.Algorithm {
-	case azkeys.SignatureAlgorithmPS256:
-		signature, err = signRSA(&rsa.PSSOptions{Hash: crypto.SHA256, SaltLength: rsa.PSSSaltLengthEqualsHash})
-	case azkeys.SignatureAlgorithmPS384:
-		signature, err = signRSA(&rsa.PSSOptions{Hash: crypto.SHA384, SaltLength: rsa.PSSSaltLengthEqualsHash})
-	case azkeys.SignatureAlgorithmPS512:
-		signature, err = signRSA(&rsa.PSSOptions{Hash: crypto.SHA512, SaltLength: rsa.PSSSaltLengthEqualsHash})
-	case azkeys.SignatureAlgorithmRS256:
-		signature, err = signRSA(crypto.SHA256)
-	case azkeys.SignatureAlgorithmRS384:
-		signature, err = signRSA(crypto.SHA384)
-	case azkeys.SignatureAlgorithmRS512:
-		signature, err = signRSA(crypto.SHA512)
-	case azkeys.SignatureAlgorithmES256:
-		signature, err = signECDSA()
-	case azkeys.SignatureAlgorithmES384:
-		signature, err = signECDSA()
-	case azkeys.SignatureAlgorithmES512:
-		signature, err = signECDSA()
-	default:
-		return azkeys.SignResponse{}, status.Errorf(codes.InvalidArgument, "unsupported signing algorithm: %s", *parameters.Algorithm)
-	}
-	if err != nil {
-		return azkeys.SignResponse{}, status.Errorf(codes.Internal, "unable to sign digest: %v", err)
-	}
-	return azkeys.SignResponse{KeyOperationResult: azkeys.KeyOperationResult{
-		Result: signature,
-	}}, nil
+	_ = "STUB: not implemented"
+	return *new(azkeys.SignResponse), nil
 }
 
+// This is to produce an IEEE-P1363 encoded signature since that's how the azure signature is encoded
+
 func toRSAKey(publicKey crypto.PublicKey, kmsKeyID string, keyOperations []*azkeys.KeyOperation) *azkeys.JSONWebKey {
-	rsaKey := publicKey.(*rsa.PublicKey)
-	s := big.NewInt(int64(rsaKey.E))
-	e := s.Bytes()
-	key := &azkeys.JSONWebKey{
-		N:      rsaKey.N.Bytes(),
-		E:      e,
-		KID:    new(azkeys.ID(kmsKeyID)),
-		KeyOps: keyOperations,
-		Kty:    new(azkeys.KeyTypeRSA),
-	}
-	return key
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func toECKey(publicKey crypto.PublicKey, keyName string, curveName azkeys.CurveName, keyOperations []*azkeys.KeyOperation) *azkeys.JSONWebKey {
-	ecdsaKey := publicKey.(*ecdsa.PublicKey)
-	encodedPoint, err := ecdsaKey.Bytes()
-	if err != nil {
-		panic(fmt.Sprintf("invalid ECDSA public key: %v", err))
-	}
-	if encodedPoint[0] != 0x04 {
-		panic(fmt.Sprintf(
-			"invalid ECDSA public key: public key byte 0 = %#x != 0x04", encodedPoint[0]))
-	}
-	// ecdsa.PublicKey.Bytes returns an uncompressed point encoded per SEC 1
-	// v2.0 Section 2.3.3: 0x04 || X || Y.
-	// Here, X and Y are encoded as defined in Section 2.3.5 of SEC 1.
-	// JWK EC "x" and "y" are defined by RFC 7518 to use that same Section
-	// 2.3.5 encoding.
-	// Therefore, accessing encodedPoint sub-slices below is correct.
-	// Note that accessing ecdsaKey.X and ecdsaKey.Y would also work, but is
-	// deprecated.
-	coordinateLength := (len(encodedPoint) - 1) / 2
-	key := &azkeys.JSONWebKey{
-		Crv:    new(curveName),
-		KID:    new(azkeys.ID(keyName)),
-		KeyOps: keyOperations,
-		Kty:    new(azkeys.KeyTypeEC),
-		X:      slices.Clone(encodedPoint[1 : 1+coordinateLength]),
-		Y:      slices.Clone(encodedPoint[1+coordinateLength:]),
-	}
-	return key
+	_ = "STUB: not implemented"
+	return nil
 }
 
+// ecdsa.PublicKey.Bytes returns an uncompressed point encoded per SEC 1
+// v2.0 Section 2.3.3: 0x04 || X || Y.
+// Here, X and Y are encoded as defined in Section 2.3.5 of SEC 1.
+// JWK EC "x" and "y" are defined by RFC 7518 to use that same Section
+// 2.3.5 encoding.
+// Therefore, accessing encodedPoint sub-slices below is correct.
+// Note that accessing ecdsaKey.X and ecdsaKey.Y would also work, but is
+// deprecated.
+
 func (fs *fakeStore) FetchKeyEntry(keyName string) (*fakeKeyEntry, error) {
-	fs.mu.RLock()
-	defer fs.mu.RUnlock()
-	return fs.fetchKeyEntry(keyName)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (fs *fakeStore) fetchKeyEntry(keyName string) (*fakeKeyEntry, error) {
-	keyEntry, ok := fs.fakeKeys[keyName]
-	if ok {
-		return keyEntry, nil
-	}
-	return &fakeKeyEntry{}, fmt.Errorf("no such key %q", keyName)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (fs *fakeStore) fetchKeyEntries() []fakeKeyEntry {
-	fs.mu.RLock()
-	defer fs.mu.RUnlock()
+func (fs *fakeStore) fetchKeyEntries() []fakeKeyEntry { _ = "STUB: not implemented"; return nil }
 
-	var keyEntries []fakeKeyEntry
-	for _, v := range fs.fakeKeys {
-		keyEntries = append(keyEntries, *v)
-	}
-	return keyEntries
-}
-
-func getKeyOperations() []*azkeys.KeyOperation {
-	return []*azkeys.KeyOperation{new(azkeys.KeyOperationSign), new(azkeys.KeyOperationVerify)}
-}
+func getKeyOperations() []*azkeys.KeyOperation { _ = "STUB: not implemented"; return nil }

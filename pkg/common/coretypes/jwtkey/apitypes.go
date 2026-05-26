@@ -6,28 +6,11 @@ import (
 )
 
 func ToAPIProto(jwtKey JWTKey) (*apitypes.JWTKey, error) {
-	id, publicKey, expiresAt, tainted, err := toProtoFields(jwtKey)
-	if err != nil {
-		return nil, err
-	}
-
-	return &apitypes.JWTKey{
-		KeyId:     id,
-		PublicKey: publicKey,
-		ExpiresAt: expiresAt,
-		Tainted:   tainted,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func ToAPIFromPluginProto(pb *plugintypes.JWTKey) (*apitypes.JWTKey, error) {
-	if pb == nil {
-		return nil, nil
-	}
-
-	jwtKey, err := fromProtoFields(pb.KeyId, pb.PublicKey, pb.ExpiresAt, pb.Tainted)
-	if err != nil {
-		return nil, err
-	}
-
-	return ToAPIProto(jwtKey)
+	_ = "STUB: not implemented"
+	return nil, nil
 }

@@ -3,10 +3,7 @@
 package namedpipe
 
 import (
-	"fmt"
 	"net"
-	"path/filepath"
-	"strings"
 )
 
 type Addr struct {
@@ -14,27 +11,14 @@ type Addr struct {
 	pipeName   string
 }
 
-func (p *Addr) PipeName() string {
-	return p.pipeName
-}
+func (p *Addr) PipeName() string { _ = "STUB: not implemented"; return "" }
 
-func (p *Addr) Network() string {
-	return "pipe"
-}
+func (p *Addr) Network() string { _ = "STUB: not implemented"; return "" }
 
-func (p *Addr) String() string {
-	return fmt.Sprintf(`\\%s\%s`, p.serverName, filepath.Join("pipe", p.pipeName))
-}
+func (p *Addr) String() string { _ = "STUB: not implemented"; return "" }
 
 // AddrFromName returns a named pipe in the local
 // computer with the specified pipe name
-func AddrFromName(pipeName string) net.Addr {
-	return &Addr{
-		serverName: ".",
-		pipeName:   pipeName,
-	}
-}
+func AddrFromName(pipeName string) net.Addr { _ = "STUB: not implemented"; return *new(net.Addr) }
 
-func GetPipeName(addr string) string {
-	return strings.TrimPrefix(addr, `\\.\pipe`)
-}
+func GetPipeName(addr string) string { _ = "STUB: not implemented"; return "" }

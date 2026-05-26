@@ -2,23 +2,16 @@ package azuremsi
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"net/http"
 	"regexp"
-	"sort"
-	"strings"
 	"sync"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
-	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute/v7"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v9"
 	"github.com/go-jose/go-jose/v4"
 	"github.com/go-jose/go-jose/v4/jwt"
 	"github.com/hashicorp/go-hclog"
-	"github.com/hashicorp/hcl"
 	"github.com/spiffe/go-spiffe/v2/spiffeid"
 	nodeattestorv1 "github.com/spiffe/spire-plugin-sdk/proto/spire/plugin/server/nodeattestor/v1"
 	configv1 "github.com/spiffe/spire-plugin-sdk/proto/spire/service/common/config/v1"
@@ -28,8 +21,6 @@ import (
 	"github.com/spiffe/spire/pkg/common/plugin/azure"
 	"github.com/spiffe/spire/pkg/common/pluginconf"
 	nodeattestorbase "github.com/spiffe/spire/pkg/server/plugin/nodeattestor/base"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 const (
@@ -66,15 +57,11 @@ var (
 	}
 )
 
-func BuiltIn() catalog.BuiltIn {
-	return builtin(New())
-}
+func BuiltIn() catalog.BuiltIn { _ = "STUB: not implemented"; return *new(catalog.BuiltIn) }
 
 func builtin(p *MSIAttestorPlugin) catalog.BuiltIn {
-	return catalog.MakeBuiltIn(pluginName,
-		nodeattestorv1.NodeAttestorPluginServer(p),
-		configv1.ConfigServiceServer(p),
-	)
+	_ = "STUB: not implemented"
+	return *new(catalog.BuiltIn)
 }
 
 type TenantConfig struct {
@@ -101,90 +88,13 @@ type msiAttestorConfig struct {
 }
 
 func (p *MSIAttestorPlugin) buildConfig(coreConfig catalog.CoreConfig, hclText string, status *pluginconf.Status) *msiAttestorConfig {
-	newConfig := new(MSIAttestorConfig)
-
-	if err := hcl.Decode(newConfig, hclText); err != nil {
-		status.ReportErrorf("unable to decode configuration: %v", err)
-		return nil
-	}
-
-	if len(newConfig.Tenants) == 0 {
-		status.ReportError("configuration must have at least one tenant")
-	}
-	for _, tenant := range newConfig.Tenants {
-		if tenant.ResourceID == "" {
-			tenant.ResourceID = azure.DefaultMSIResourceID
-		}
-	}
-
-	tenants := make(map[string]*tenantConfig)
-	for tenantID, tenant := range newConfig.Tenants {
-		var client apiClient
-
-		// Use tenant-specific credentials for resolving selectors
-		switch {
-		case tenant.SubscriptionID != "", tenant.AppID != "", tenant.AppSecret != "":
-			if tenant.SubscriptionID == "" {
-				status.ReportErrorf("misconfigured tenant %q: missing subscription id", tenantID)
-			}
-			if tenant.AppID == "" {
-				status.ReportErrorf("misconfigured tenant %q: missing app id", tenantID)
-			}
-			if tenant.AppSecret == "" {
-				status.ReportErrorf("misconfigured tenant %q: missing app secret", tenantID)
-			}
-
-			cred, err := azidentity.NewClientSecretCredential(tenantID, tenant.AppID, tenant.AppSecret, nil)
-			if err != nil {
-				status.ReportErrorf("unable to get tenant client credential: %v", err)
-			}
-
-			client, err = p.hooks.newClient(tenant.SubscriptionID, cred)
-			if err != nil {
-				status.ReportErrorf("unable to create client for tenant %q: %v", tenantID, err)
-			}
-
-		default:
-			instanceMetadata, err := p.hooks.fetchInstanceMetadata(http.DefaultClient)
-			if err != nil {
-				status.ReportError(err.Error())
-			}
-			cred, err := p.hooks.fetchCredential(tenantID)
-			if err != nil {
-				status.ReportErrorf("unable to fetch client credential: %v", err)
-			}
-			client, err = p.hooks.newClient(instanceMetadata.Compute.SubscriptionID, cred)
-			if err != nil {
-				status.ReportErrorf("unable to create client with default credential: %v", err)
-			}
-		}
-
-		// If credentials are not configured then selectors won't be gathered.
-		if client == nil {
-			status.ReportErrorf("no client credentials available for tenant %q", tenantID)
-		}
-
-		tenants[tenantID] = &tenantConfig{
-			resourceID: tenant.ResourceID,
-			client:     client,
-		}
-	}
-
-	tmpl := azure.DefaultAgentPathTemplate
-	if len(newConfig.AgentPathTemplate) > 0 {
-		var err error
-		tmpl, err = agentpathtemplate.Parse(newConfig.AgentPathTemplate)
-		if err != nil {
-			status.ReportErrorf("failed to parse agent path template: %q", newConfig.AgentPathTemplate)
-		}
-	}
-
-	return &msiAttestorConfig{
-		td:             coreConfig.TrustDomain,
-		tenants:        tenants,
-		idPathTemplate: tmpl,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Use tenant-specific credentials for resolving selectors
+
+// If credentials are not configured then selectors won't be gathered.
 
 type MSIAttestorPlugin struct {
 	nodeattestorbase.Base
@@ -207,306 +117,83 @@ type MSIAttestorPlugin struct {
 
 var _ nodeattestorv1.NodeAttestorServer = (*MSIAttestorPlugin)(nil)
 
-func New() *MSIAttestorPlugin {
-	p := &MSIAttestorPlugin{}
-	p.hooks.now = time.Now
-	p.hooks.keySetProvider = jwtutil.NewCachingKeySetProvider(jwtutil.OIDCIssuer(azureOIDCIssuer), keySetRefreshInterval)
-	p.hooks.newClient = newAzureClient
-	p.hooks.fetchInstanceMetadata = azure.FetchInstanceMetadata
-	p.hooks.fetchCredential = func(tenantID string) (azcore.TokenCredential, error) {
-		return azidentity.NewDefaultAzureCredential(
-			&azidentity.DefaultAzureCredentialOptions{
-				TenantID: tenantID,
-			},
-		)
-	}
+func New() *MSIAttestorPlugin { _ = "STUB: not implemented"; return nil }
 
-	return p
-}
-
-func (p *MSIAttestorPlugin) SetLogger(log hclog.Logger) {
-	p.log = log
-}
+func (p *MSIAttestorPlugin) SetLogger(log hclog.Logger) { _ = "STUB: not implemented"; return }
 
 func (p *MSIAttestorPlugin) Attest(stream nodeattestorv1.NodeAttestor_AttestServer) error {
-	req, err := stream.Recv()
-	if err != nil {
-		return err
-	}
-
-	config, err := p.getConfig()
-	if err != nil {
-		return err
-	}
-
-	payload := req.GetPayload()
-	if payload == nil {
-		return status.Error(codes.InvalidArgument, "missing attestation payload")
-	}
-
-	attestationData := new(azure.MSIAttestationData)
-	if err := json.Unmarshal(payload, attestationData); err != nil {
-		return status.Errorf(codes.InvalidArgument, "failed to unmarshal data payload: %v", err)
-	}
-
-	if attestationData.Token == "" {
-		return status.Errorf(codes.InvalidArgument, "missing token from attestation data")
-	}
-
-	keySet, err := p.hooks.keySetProvider.GetKeySet(stream.Context())
-	if err != nil {
-		return status.Errorf(codes.Internal, "unable to obtain JWKS: %v", err)
-	}
-
-	token, err := jwt.ParseSigned(attestationData.Token, allowedJWTSignatureAlgorithms)
-	if err != nil {
-		return status.Errorf(codes.InvalidArgument, "unable to parse token: %v", err)
-	}
-
-	keyID, ok := getTokenKeyID(token)
-	if !ok {
-		return status.Error(codes.InvalidArgument, "token missing key id")
-	}
-
-	keys := keySet.Key(keyID)
-	if len(keys) == 0 {
-		return status.Errorf(codes.InvalidArgument, "key id %q not found", keyID)
-	}
-
-	claims := new(azure.MSITokenClaims)
-	if err := token.Claims(&keys[0], claims); err != nil {
-		return status.Errorf(codes.InvalidArgument, "unable to verify token: %v", err)
-	}
-
-	switch {
-	case claims.TenantID == "":
-		return status.Error(codes.Internal, "token missing tenant ID claim")
-	case claims.PrincipalID == "":
-		return status.Error(codes.Internal, "token missing subject claim")
-	}
-
-	// Before doing the work to validate the token, ensure that this MSI token
-	// has not already been used to attest an agent.
-	agentID, err := azure.MakeAgentID(config.td, config.idPathTemplate, claims)
-	if err != nil {
-		return status.Errorf(codes.Internal, "unable to make agent ID: %v", err)
-	}
-
-	if err := p.AssessTOFU(stream.Context(), agentID.String(), p.log); err != nil {
-		return err
-	}
-
-	tenant, ok := config.tenants[claims.TenantID]
-	if !ok {
-		return status.Errorf(codes.PermissionDenied, "tenant %q is not authorized", claims.TenantID)
-	}
-
-	if err := claims.ValidateWithLeeway(jwt.Expected{
-		AnyAudience: []string{tenant.resourceID},
-		Time:        p.hooks.now(),
-	}, tokenLeeway); err != nil {
-		return status.Errorf(codes.Internal, "unable to validate token claims: %v", err)
-	}
-
-	var selectorValues []string
-	selectorValues, err = p.resolve(stream.Context(), tenant.client, claims.PrincipalID)
-	if err != nil {
-		return err
-	}
-
-	return stream.Send(&nodeattestorv1.AttestResponse{
-		Response: &nodeattestorv1.AttestResponse_AgentAttributes{
-			AgentAttributes: &nodeattestorv1.AgentAttributes{
-				SpiffeId:       agentID.String(),
-				CanReattest:    false,
-				SelectorValues: selectorValues,
-			},
-		},
-	})
+	_ = "STUB: not implemented"
+	return nil
 }
 
+// Before doing the work to validate the token, ensure that this MSI token
+// has not already been used to attest an agent.
+
 func (p *MSIAttestorPlugin) Configure(_ context.Context, req *configv1.ConfigureRequest) (*configv1.ConfigureResponse, error) {
-	newConfig, _, err := pluginconf.Build(req, p.buildConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	p.config = newConfig
-
-	return &configv1.ConfigureResponse{}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (p *MSIAttestorPlugin) Validate(_ context.Context, req *configv1.ValidateRequest) (*configv1.ValidateResponse, error) {
-	_, notes, err := pluginconf.Build(req, p.buildConfig)
-
-	return &configv1.ValidateResponse{
-		Valid: err == nil,
-		Notes: notes,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (p *MSIAttestorPlugin) getConfig() (*msiAttestorConfig, error) {
-	p.mu.RLock()
-	defer p.mu.RUnlock()
-	if p.config == nil {
-		return nil, status.Error(codes.FailedPrecondition, "not configured")
-	}
-	return p.config, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (p *MSIAttestorPlugin) resolve(ctx context.Context, client apiClient, principalID string) ([]string, error) {
+	_ = "STUB: not implemented"
 	// Retrieve the resource belonging to the principal id.
-	vmResourceID, err := client.GetVirtualMachineResourceID(ctx, principalID)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "unable to get resource for principal %q: %v", principalID, err)
-	}
-
-	// parse out the resource group and vm name from the resource ID
-	vmResourceGroup, vmName, err := parseVirtualMachineID(vmResourceID)
-	if err != nil {
-		return nil, err
-	}
-
-	// build up a unique map of selectors. this is easier than deduping
-	// individual selectors (e.g. the virtual network for each interface)
-	selectorMap := map[string]bool{
-		selectorValue("subscription-id", client.SubscriptionID()): true,
-		selectorValue("vm-name", vmResourceGroup, vmName):         true,
-	}
-	addSelectors := func(values []string) {
-		for _, value := range values {
-			selectorMap[value] = true
-		}
-	}
-
-	// pull the VM information and gather selectors
-	vm, err := client.GetVirtualMachine(ctx, vmResourceGroup, vmName)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "unable to get virtual machine %q: %v", resourceGroupName(vmResourceGroup, vmName), err)
-	}
-	if vm.Properties.NetworkProfile != nil {
-		networkProfileSelectors, err := getNetworkProfileSelectors(ctx, client, vm.Properties.NetworkProfile)
-		if err != nil {
-			return nil, err
-		}
-		addSelectors(networkProfileSelectors)
-	}
-
-	// sort and return selectors
-	selectorValues := make([]string, 0, len(selectorMap))
-	for selectorValue := range selectorMap {
-		selectorValues = append(selectorValues, selectorValue)
-	}
-	sort.Strings(selectorValues)
-
-	return selectorValues, nil
+	return nil, nil
 }
 
+// parse out the resource group and vm name from the resource ID
+
+// build up a unique map of selectors. this is easier than deduping
+// individual selectors (e.g. the virtual network for each interface)
+
+// pull the VM information and gather selectors
+
+// sort and return selectors
+
 func getNetworkProfileSelectors(ctx context.Context, client apiClient, networkProfile *armcompute.NetworkProfile) ([]string, error) {
-	if networkProfile.NetworkInterfaces == nil {
-		return nil, nil
-	}
-
-	var selectors []string
-	for _, interfaceRef := range networkProfile.NetworkInterfaces {
-		if interfaceRef.ID == nil {
-			continue
-		}
-		niResourceGroup, niName, err := parseNetworkInterfaceID(*interfaceRef.ID)
-		if err != nil {
-			return nil, err
-		}
-		networkInterface, err := client.GetNetworkInterface(ctx, niResourceGroup, niName)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "unable to get network interface %q: %v", resourceGroupName(niResourceGroup, niName), err)
-		}
-
-		networkInterfaceSelectors, err := getNetworkInterfaceSelectors(networkInterface)
-		if err != nil {
-			return nil, err
-		}
-
-		selectors = append(selectors, networkInterfaceSelectors...)
-	}
-
-	return selectors, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func getNetworkInterfaceSelectors(networkInterface *armnetwork.Interface) ([]string, error) {
-	var selectors []string
-	if nsg := networkInterface.Properties.NetworkSecurityGroup; nsg != nil && nsg.ID != nil {
-		nsgResourceGroup, nsgName, err := parseNetworkSecurityGroupID(*nsg.ID)
-		if err != nil {
-			return nil, err
-		}
-		selectors = append(selectors, selectorValue("network-security-group", nsgResourceGroup, nsgName))
-	}
-
-	if ipcs := networkInterface.Properties.IPConfigurations; ipcs != nil {
-		for _, ipc := range ipcs {
-			if props := ipc.Properties; props != nil {
-				if subnet := props.Subnet; subnet != nil && subnet.ID != nil {
-					subResourceGroup, subVirtualNetwork, subName, err := parseVirtualNetworkSubnetID(*subnet.ID)
-					if err != nil {
-						return nil, err
-					}
-					selectors = append(selectors, selectorValue("virtual-network", subResourceGroup, subVirtualNetwork))
-					selectors = append(selectors, selectorValue("virtual-network-subnet", subResourceGroup, subVirtualNetwork, subName))
-				}
-			}
-		}
-	}
-
-	return selectors, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func parseVirtualMachineID(id string) (resourceGroup, name string, err error) {
-	m := reVirtualMachineID.FindStringSubmatch(id)
-	if m == nil {
-		return "", "", status.Errorf(codes.Internal, "malformed virtual machine ID %q", id)
-	}
-	return m[1], m[2], nil
+	_ = "STUB: not implemented"
+	return "", "", nil
 }
 
 func parseNetworkSecurityGroupID(id string) (resourceGroup, name string, err error) {
-	m := reNetworkSecurityGroupID.FindStringSubmatch(id)
-	if m == nil {
-		return "", "", status.Errorf(codes.Internal, "malformed network security group ID %q", id)
-	}
-	return m[1], m[2], nil
+	_ = "STUB: not implemented"
+	return "", "", nil
 }
 
 func parseNetworkInterfaceID(id string) (resourceGroup, name string, err error) {
-	m := reNetworkInterfaceID.FindStringSubmatch(id)
-	if m == nil {
-		return "", "", status.Errorf(codes.Internal, "malformed network interface ID %q", id)
-	}
-	return m[1], m[2], nil
+	_ = "STUB: not implemented"
+	return "", "", nil
 }
 
 func parseVirtualNetworkSubnetID(id string) (resourceGroup, networkName, subnetName string, err error) {
-	m := reVirtualNetworkSubnetID.FindStringSubmatch(id)
-	if m == nil {
-		return "", "", "", status.Errorf(codes.Internal, "malformed virtual network subnet ID %q", id)
-	}
-	return m[1], m[2], m[3], nil
+	_ = "STUB: not implemented"
+	return "", "", "", nil
 }
 
-func resourceGroupName(resourceGroup, name string) string {
-	return fmt.Sprintf("%s:%s", resourceGroup, name)
-}
+func resourceGroupName(resourceGroup, name string) string { _ = "STUB: not implemented"; return "" }
 
-func selectorValue(parts ...string) string {
-	return strings.Join(parts, ":")
-}
+func selectorValue(parts ...string) string { _ = "STUB: not implemented"; return "" }
 
 func getTokenKeyID(token *jwt.JSONWebToken) (string, bool) {
-	for _, h := range token.Headers {
-		if h.KeyID != "" {
-			return h.KeyID, true
-		}
-	}
+	_ = "STUB: not implemented"
 	return "", false
 }

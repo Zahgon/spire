@@ -12,11 +12,6 @@ var (
 
 type stringSet map[string]struct{}
 
-func allocStringSet() stringSet {
-	return stringSetPool.Get().(stringSet)
-}
+func allocStringSet() stringSet { _ = "STUB: not implemented"; return *new(stringSet) }
 
-func freeStringSet(set stringSet) {
-	clear(set)
-	stringSetPool.Put(set)
-}
+func freeStringSet(set stringSet) { _ = "STUB: not implemented"; return }

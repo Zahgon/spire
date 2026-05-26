@@ -9,6 +9,4 @@ type Observer interface {
 
 type ObserverFunc func() State
 
-func (fn ObserverFunc) State() State {
-	return fn()
-}
+func (fn ObserverFunc) State() State { _ = "STUB: not implemented"; return *new(State) }

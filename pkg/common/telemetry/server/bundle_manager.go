@@ -9,13 +9,8 @@ import (
 // IncrBundleManagerUpdateFederatedBundleCounter indicate
 // the number of updating federated bundle by bundle manager
 func IncrBundleManagerUpdateFederatedBundleCounter(m telemetry.Metrics, trustDomain string) {
-	m.IncrCounterWithLabels([]string{
-		telemetry.BundleManager,
-		telemetry.Update,
-		telemetry.FederatedBundle,
-	}, 1, []telemetry.Label{
-		{Name: telemetry.TrustDomainID, Value: trustDomain},
-	})
+	_ = "STUB: not implemented"
+	return
 }
 
 // End Counters
@@ -25,12 +20,8 @@ func IncrBundleManagerUpdateFederatedBundleCounter(m telemetry.Metrics, trustDom
 
 // StartBundleManagerFetchFederatedBundleCall return metric for Server's federated bundle fetch.
 func StartBundleManagerFetchFederatedBundleCall(m telemetry.Metrics) *telemetry.CallCounter {
-	return telemetry.StartCall(
-		m,
-		telemetry.BundleManager,
-		telemetry.Fetch,
-		telemetry.FederatedBundle,
-	)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // End Call Counters

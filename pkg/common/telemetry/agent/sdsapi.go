@@ -6,13 +6,12 @@ import "github.com/spiffe/spire/pkg/common/telemetry"
 
 // IncrSDSAPIConnectionCounter indicate SDS
 // API connection (some connection is made, running total count)
-func IncrSDSAPIConnectionCounter(m telemetry.Metrics) {
-	m.IncrCounter([]string{telemetry.SDSAPI, telemetry.Connection}, 1)
-}
+func IncrSDSAPIConnectionCounter(m telemetry.Metrics) { _ = "STUB: not implemented"; return }
 
 // SetSDSAPIConnectionTotalGauge sets the number of active SDS connections
 func SetSDSAPIConnectionTotalGauge(m telemetry.Metrics, connections int32) {
-	m.SetGauge([]string{telemetry.SDSAPI, telemetry.Connections}, float32(connections))
+	_ = "STUB: not implemented"
+	return
 }
 
 // End Counters

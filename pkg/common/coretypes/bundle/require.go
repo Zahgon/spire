@@ -6,13 +6,8 @@ import (
 )
 
 func RequireToCommonFromPluginProto(pb *plugintypes.Bundle) *common.Bundle {
-	out, err := ToCommonFromPluginProto(pb)
-	panicOnError(err)
-	return out
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func panicOnError(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
+func panicOnError(err error) { _ = "STUB: not implemented"; return }

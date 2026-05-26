@@ -105,177 +105,47 @@ type aliasEntry struct {
 // Build queries the data source for all registration entries and Agent selectors and builds an in-memory
 // representation of the data that can be used for efficient lookups.
 func Build(ctx context.Context, trustDomain string, entryIter EntryIterator, agentIter AgentIterator) (*FullEntryCache, error) {
-	type aliasInfo struct {
-		aliasEntry
-		selectors selectorSet
-	}
-	bysel := make(map[Selector][]aliasInfo)
-
-	entries := make(map[string][]*types.Entry)
-	for entryIter.Next(ctx) {
-		entry := entryIter.Entry()
-		if entry.ParentId.TrustDomain != trustDomain {
-			continue
-		}
-		if entry.SpiffeId.TrustDomain != trustDomain {
-			continue
-		}
-
-		parentID := entry.ParentId.Path
-		if entry.ParentId.Path == "/spire/server" {
-			alias := aliasInfo{
-				aliasEntry: aliasEntry{
-					id:    entry.SpiffeId.Path,
-					entry: entry,
-				},
-				selectors: selectorSetFromProto(entry.Selectors),
-			}
-			for selector := range alias.selectors {
-				bysel[selector] = append(bysel[selector], alias)
-			}
-			continue
-		}
-		entries[parentID] = append(entries[parentID], entry)
-	}
-	if err := entryIter.Err(); err != nil {
-		return nil, err
-	}
-
-	aliasSeen := allocStringSet()
-	defer freeStringSet(aliasSeen)
-
-	aliases := make(map[string][]aliasEntry)
-	for agentIter.Next(ctx) {
-		agent := agentIter.Agent()
-
-		if agent.ID.TrustDomain().String() != trustDomain {
-			continue
-		}
-
-		agentID := agent.ID.Path()
-		agentSelectors := selectorSetFromProto(agent.Selectors)
-		// track which aliases we've evaluated so far to make sure we don't
-		// add one twice.
-		clearStringSet(aliasSeen)
-		for s := range agentSelectors {
-			for _, alias := range bysel[s] {
-				if _, ok := aliasSeen[alias.entry.Id]; ok {
-					continue
-				}
-				aliasSeen[alias.entry.Id] = struct{}{}
-				if isSubset(alias.selectors, agentSelectors) {
-					aliases[agentID] = append(aliases[agentID], alias.aliasEntry)
-				}
-			}
-		}
-	}
-	if err := agentIter.Err(); err != nil {
-		return nil, err
-	}
-
-	return &FullEntryCache{
-		aliases: aliases,
-		entries: entries,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
+// track which aliases we've evaluated so far to make sure we don't
+// add one twice.
+
 func (c *FullEntryCache) LookupAuthorizedEntries(agentID spiffeid.ID, requestedEntries map[string]struct{}) map[string]api.ReadOnlyEntry {
-	seen := allocSeenSet()
-	defer freeSeenSet(seen)
-
-	foundEntries := make(map[string]api.ReadOnlyEntry)
-	c.crawl(agentID.Path(), seen, func(entry *types.Entry) bool {
-		if _, ok := requestedEntries[entry.Id]; ok {
-			foundEntries[entry.Id] = api.NewReadOnlyEntry(entry)
-		}
-
-		return len(foundEntries) != len(requestedEntries)
-	})
-
-	return foundEntries
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // GetAuthorizedEntries gets all authorized registration entries for a given Agent SPIFFE ID.
 func (c *FullEntryCache) GetAuthorizedEntries(agentID spiffeid.ID) []api.ReadOnlyEntry {
-	seen := allocSeenSet()
-	defer freeSeenSet(seen)
-
-	foundEntries := []api.ReadOnlyEntry{}
-	c.crawl(agentID.Path(), seen, func(entry *types.Entry) bool {
-		foundEntries = append(foundEntries, api.NewReadOnlyEntry(entry))
-		return true
-	})
-
-	return foundEntries
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Crawl the list of registration entries calling the visit function on all of them.
 // visit(entry) returns a boolean indicating if we should continue iterating (if true)
 // or if we should terminate the crawl (if false).
 func (c *FullEntryCache) crawl(parentID string, seen map[string]struct{}, visit func(*types.Entry) bool) {
-	if _, ok := seen[parentID]; ok {
-		return
-	}
-	seen[parentID] = struct{}{}
-
-	for _, entry := range c.entries[parentID] {
-		if !visit(entry) {
-			return
-		}
-		c.crawl(entry.SpiffeId.Path, seen, visit)
-	}
-
-	for _, alias := range c.aliases[parentID] {
-		c.crawl(alias.id, seen, visit)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 func selectorSetFromProto(selectors []*types.Selector) selectorSet {
-	set := make(selectorSet, len(selectors))
-	for _, selector := range selectors {
-		set[Selector{Type: selector.Type, Value: selector.Value}] = struct{}{}
-	}
-	return set
+	_ = "STUB: not implemented"
+	return *new(selectorSet)
 }
 
-func allocSeenSet() seenSet {
-	return seenSetPool.Get().(seenSet)
-}
+func allocSeenSet() seenSet { _ = "STUB: not implemented"; return *new(seenSet) }
 
-func freeSeenSet(set seenSet) {
-	clearSeenSet(set)
-	seenSetPool.Put(set)
-}
+func freeSeenSet(set seenSet) { _ = "STUB: not implemented"; return }
 
-func clearSeenSet(set seenSet) {
-	for k := range set {
-		delete(set, k)
-	}
-}
+func clearSeenSet(set seenSet) { _ = "STUB: not implemented"; return }
 
-func allocStringSet() stringSet {
-	return stringSetPool.Get().(stringSet)
-}
+func allocStringSet() stringSet { _ = "STUB: not implemented"; return *new(stringSet) }
 
-func freeStringSet(set stringSet) {
-	clearStringSet(set)
-	stringSetPool.Put(set)
-}
+func freeStringSet(set stringSet) { _ = "STUB: not implemented"; return }
 
-func clearStringSet(set stringSet) {
-	for k := range set {
-		delete(set, k)
-	}
-}
+func clearStringSet(set stringSet) { _ = "STUB: not implemented"; return }
 
-func isSubset(sub, whole selectorSet) bool {
-	if len(sub) > len(whole) {
-		return false
-	}
-	for s := range sub {
-		if _, ok := whole[s]; !ok {
-			return false
-		}
-	}
-	return true
-}
+func isSubset(sub, whole selectorSet) bool { _ = "STUB: not implemented"; return false }

@@ -3,7 +3,6 @@ package x509util
 import (
 	"context"
 	"crypto"
-	"crypto/rand"
 	"crypto/x509"
 )
 
@@ -22,16 +21,16 @@ type MemoryKeypair struct {
 }
 
 func NewMemoryKeypair(cert *x509.Certificate, key crypto.PrivateKey) *MemoryKeypair {
-	return &MemoryKeypair{
-		cert: cert,
-		key:  key,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (m *MemoryKeypair) GetCertificate(_ context.Context) (*x509.Certificate, error) {
-	return m.cert, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (m *MemoryKeypair) CreateCertificate(_ context.Context, template *x509.Certificate, publicKey any) ([]byte, error) {
-	return x509.CreateCertificate(rand.Reader, template, m.cert, publicKey, m.key)
+	_ = "STUB: not implemented"
+	return nil, nil
 }

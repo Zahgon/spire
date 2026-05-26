@@ -13,33 +13,11 @@ type ListenerFactoryOS struct {
 }
 
 func (lf *ListenerFactory) ListenPipe(pipe string, pipeConfig *winio.PipeConfig) (*Listener, error) {
-	if lf.NewPipeListener == nil {
-		lf.NewPipeListener = winio.ListenPipe
-	}
-	if lf.NewTracker == nil {
-		lf.NewTracker = NewTracker
-	}
-	if lf.Log == nil {
-		lf.Log = newNoopLogger()
-	}
-	return lf.listenPipe(pipe, pipeConfig)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (lf *ListenerFactory) listenPipe(pipe string, pipeConfig *winio.PipeConfig) (*Listener, error) {
-	l, err := lf.NewPipeListener(pipe, pipeConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	tracker, err := lf.NewTracker(lf.Log)
-	if err != nil {
-		l.Close()
-		return nil, err
-	}
-
-	return &Listener{
-		l:       l,
-		Tracker: tracker,
-		log:     lf.Log,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

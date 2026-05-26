@@ -2,15 +2,11 @@ package health
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
 	"net/http"
 	"sync"
 	"time"
 
-	"github.com/andres-erbsen/clock"
 	"github.com/sirupsen/logrus"
-	"github.com/spiffe/spire/pkg/common/telemetry"
 )
 
 const (
@@ -60,31 +56,11 @@ type ServableChecker interface {
 }
 
 func NewChecker(config Config, log logrus.FieldLogger) ServableChecker {
-	l := log.WithField(telemetry.SubsystemName, "health")
-
-	c := &checker{
-		config: config,
-		log:    l,
-
-		cache: newCache(l, clock.New()),
-	}
-
-	// Start HTTP server if ListenerEnabled is true
-	if config.ListenerEnabled {
-		handler := http.NewServeMux()
-
-		handler.HandleFunc(config.getReadyPath(), c.readyHandler)
-		handler.HandleFunc(config.getLivePath(), c.liveHandler)
-
-		c.server = &http.Server{
-			Addr:              config.getAddress(),
-			Handler:           handler,
-			ReadHeaderTimeout: time.Second * 10,
-		}
-	}
-
-	return c
+	_ = "STUB: not implemented"
+	return *new(ServableChecker)
 }
+
+// Start HTTP server if ListenerEnabled is true
 
 type checker struct {
 	config Config
@@ -98,111 +74,32 @@ type checker struct {
 }
 
 func (c *checker) AddCheck(name string, checkable Checkable) error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	return c.cache.addCheck(name, checkable)
-}
-
-func (c *checker) ListenAndServe(ctx context.Context) error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	if err := c.cache.start(ctx); err != nil {
-		return err
-	}
-
-	var wg sync.WaitGroup
-	if c.config.ListenerEnabled {
-		wg.Go(func() {
-			c.log.WithField("address", c.server.Addr).Info("Serving health checks")
-			if err := c.server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
-				c.log.WithError(err).Warn("Error serving health checks")
-			}
-		})
-	}
-
-	wg.Go(func() {
-		<-ctx.Done()
-		if c.server != nil {
-			_ = c.server.Close()
-		}
-	})
-
-	wg.Wait()
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
-// StartedState returns the global startup state.
-func (c *checker) StartedState() bool {
-	startup, _, _, _, _ := c.checkStates()
+func (c *checker) ListenAndServe(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
-	return startup
-}
+// StartedState returns the global startup state.
+func (c *checker) StartedState() bool { _ = "STUB: not implemented"; return false }
 
 // LiveState returns the global live state and details.
-func (c *checker) LiveState() (bool, any) {
-	_, live, _, details, _ := c.checkStates()
-
-	return live, details
-}
+func (c *checker) LiveState() (bool, any) { _ = "STUB: not implemented"; return false, *new(any) }
 
 // ReadyState returns the global ready state and details.
-func (c *checker) ReadyState() (bool, any) {
-	_, _, ready, _, details := c.checkStates()
-
-	return ready, details
-}
+func (c *checker) ReadyState() (bool, any) { _ = "STUB: not implemented"; return false, *new(any) }
 
 func (c *checker) checkStates() (bool, bool, bool, any, any) {
-	isStarted, isLive, isReady := true, true, true
-
-	liveDetails := make(map[string]any)
-	readyDetails := make(map[string]any)
-	for subsystemName, subsystemState := range c.cache.getStatuses() {
-		state := subsystemState.details
-		if state.Started != nil {
-			isStarted = *state.Started
-		}
-
-		if !state.Live {
-			isLive = false
-		}
-
-		if !state.Ready {
-			isReady = false
-		}
-
-		liveDetails[subsystemName] = state.LiveDetails
-		readyDetails[subsystemName] = state.ReadyDetails
-	}
-
-	return isStarted, isLive, isReady, liveDetails, readyDetails
+	_ = "STUB: not implemented"
+	return false, false, false, *new(any), *new(any)
 }
 
 func (c *checker) liveHandler(w http.ResponseWriter, _ *http.Request) {
-	live, details := c.LiveState()
-
-	statusCode := http.StatusOK
-	if !live {
-		statusCode = http.StatusInternalServerError
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	_ = json.NewEncoder(w).Encode(details)
+	_ = "STUB: not implemented"
+	return
 }
 
 func (c *checker) readyHandler(w http.ResponseWriter, _ *http.Request) {
-	ready, details := c.ReadyState()
-
-	statusCode := http.StatusOK
-	if !ready {
-		statusCode = http.StatusInternalServerError
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	_ = json.NewEncoder(w).Encode(details)
+	_ = "STUB: not implemented"
+	return
 }

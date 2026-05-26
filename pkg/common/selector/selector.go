@@ -3,9 +3,6 @@
 package selector
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/spiffe/spire/proto/spire/common"
 )
 
@@ -18,28 +15,14 @@ type Selector struct {
 	Value string
 }
 
-func New(c *common.Selector) *Selector {
-	s := &Selector{
-		Type:  c.Type,
-		Value: c.Value,
-	}
-	return s
-}
+func New(c *common.Selector) *Selector { _ = "STUB: not implemented"; return nil }
 
-func (s *Selector) Raw() *common.Selector {
-	c := &common.Selector{
-		Type:  s.Type,
-		Value: s.Value,
-	}
-	return c
-}
+func (s *Selector) Raw() *common.Selector { _ = "STUB: not implemented"; return nil }
 
 func Validate(s *common.Selector) error {
+	_ = "STUB: not implemented"
 	// Validate that the Type does not contain a colon (:) to prevent accidental misconfigurations
 	// e.g. type="unix:user" value="root" is the invalid selector
 	// and type="unix" value"user:root" is the valid selector
-	if strings.Contains(s.Type, Delimiter) {
-		return fmt.Errorf("selector type must not contain a colon; invalid selector type: %q", s.Type)
-	}
 	return nil
 }

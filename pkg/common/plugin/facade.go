@@ -1,19 +1,16 @@
 package plugin
 
 import (
-	"strings"
-
 	"github.com/sirupsen/logrus"
 	"github.com/spiffe/spire/pkg/common/catalog"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // PrefixMessage prefixes the given message with plugin information. The prefix
 // is only applied if it is not already applied.
 func PrefixMessage(pluginInfo catalog.PluginInfo, message string) string {
-	message, _ = prefixMessage(pluginInfo, message)
-	return message
+	_ = "STUB: not implemented"
+	return ""
 }
 
 // Facade is embedded by plugin interface facade implementations as a
@@ -28,104 +25,69 @@ type Facade struct {
 // FixedFacade is a helper that creates a facade from fixed information, i.e.
 // not the product of a loaded plugin.
 func FixedFacade(pluginName, pluginType string, log logrus.FieldLogger) Facade {
-	return Facade{
-		PluginInfo: pluginInfo{
-			pluginName: pluginName,
-			pluginType: pluginType,
-		},
-		Log: log,
-	}
+	_ = "STUB: not implemented"
+	return *new(Facade)
 }
 
 // InitInfo partially satisfies the catalog.Facade interface
-func (f *Facade) InitInfo(pluginInfo catalog.PluginInfo) {
-	f.PluginInfo = pluginInfo
-}
+func (f *Facade) InitInfo(pluginInfo catalog.PluginInfo) { _ = "STUB: not implemented"; return }
 
 // InitLog partially satisfies the catalog.Facade interface
 func (f *Facade) InitLog(log logrus.FieldLogger) {
-	f.Log = log
+	_ = "STUB: not implemented"
+
+	// WrapErr wraps a given error such that it will be prefixed with the plugin
+	// name. This method should be used by facade implementations to wrap errors
+	// that come out of plugin implementations.
+	return
 }
 
-// WrapErr wraps a given error such that it will be prefixed with the plugin
-// name. This method should be used by facade implementations to wrap errors
-// that come out of plugin implementations.
-func (f *Facade) WrapErr(err error) error {
-	if err == nil {
-		return nil
-	}
+func (f *Facade) WrapErr(err error) error { _ = "STUB: not implemented"; return nil }
 
-	// Embellish the gRPC status with the prefix, if necessary.
-	if st, ok := status.FromError(err); ok {
-		// Care must be taken to preserve any status details. Therefore, the
-		// proto is embellished directly and a new status created from that
-		// proto.
-		pb := st.Proto()
-		if message, ok := prefixMessage(f, pb.Message); ok {
-			pb.Message = message
-			return status.FromProto(pb).Err()
-		}
-		return err
-	}
+// Embellish the gRPC status with the prefix, if necessary.
 
-	// Embellish the normal error with the prefix, if necessary. This is a
-	// defensive measure since plugins go over gRPC.
-	if message, ok := prefixMessage(f, err.Error()); ok {
-		return &facadeError{wrapped: err, message: message}
-	}
+// Care must be taken to preserve any status details. Therefore, the
+// proto is embellished directly and a new status created from that
+// proto.
 
-	return err
-}
+// Embellish the normal error with the prefix, if necessary. This is a
+// defensive measure since plugins go over gRPC.
 
 // Error creates a gRPC status with the given code and message. The message
 // will be prefixed with the plugin name.
 func (f *Facade) Error(code codes.Code, message string) error {
-	return status.Error(code, messagePrefix(f)+message)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Errorf creates a gRPC status with the given code and
 // formatted message. The message will be prefixed with the plugin name.
 func (f *Facade) Errorf(code codes.Code, format string, args ...any) error {
-	return status.Errorf(code, messagePrefix(f)+format, args...)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func prefixMessage(pluginInfo catalog.PluginInfo, message string) (string, bool) {
-	prefix := messagePrefix(pluginInfo)
-
-	if strings.HasPrefix(message, prefix) {
-		return message, false
-	}
-
-	oldPrefix := pluginInfo.Name() + ": "
-	return prefix + strings.TrimPrefix(message, oldPrefix), true
+	_ = "STUB: not implemented"
+	return "", false
 }
 
-func messagePrefix(pluginInfo catalog.PluginInfo) string {
-	return strings.ToLower(pluginInfo.Type()) + "(" + pluginInfo.Name() + "): "
-}
+func messagePrefix(pluginInfo catalog.PluginInfo) string { _ = "STUB: not implemented"; return "" }
 
 type facadeError struct {
 	wrapped error
 	message string
 }
 
-func (e *facadeError) Error() string {
-	return e.message
-}
+func (e *facadeError) Error() string { _ = "STUB: not implemented"; return "" }
 
-func (e *facadeError) Unwrap() error {
-	return e.wrapped
-}
+func (e *facadeError) Unwrap() error { _ = "STUB: not implemented"; return nil }
 
 type pluginInfo struct {
 	pluginName string
 	pluginType string
 }
 
-func (info pluginInfo) Name() string {
-	return info.pluginName
-}
+func (info pluginInfo) Name() string { _ = "STUB: not implemented"; return "" }
 
-func (info pluginInfo) Type() string {
-	return info.pluginType
-}
+func (info pluginInfo) Type() string { _ = "STUB: not implemented"; return "" }

@@ -2,13 +2,10 @@ package client
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"sync"
 
 	"github.com/spiffe/go-spiffe/v2/bundle/spiffebundle"
 	"github.com/spiffe/go-spiffe/v2/spiffeid"
-	"github.com/spiffe/spire/pkg/common/bundleutil"
 	"github.com/spiffe/spire/pkg/server/datastore"
 )
 
@@ -50,100 +47,32 @@ type bundleUpdater struct {
 }
 
 func NewBundleUpdater(config BundleUpdaterConfig) BundleUpdater {
-	if config.newClientHook == nil {
-		config.newClientHook = NewClient
-	}
-	return &bundleUpdater{
-		td:                config.TrustDomain,
-		ds:                config.DataStore,
-		newClientHook:     config.newClientHook,
-		trustDomainConfig: config.TrustDomainConfig,
-	}
+	_ = "STUB: not implemented"
+	return *new(BundleUpdater)
 }
 
 func (u *bundleUpdater) UpdateBundle(ctx context.Context) (*spiffebundle.Bundle, *spiffebundle.Bundle, error) {
-	trustDomainConfig := u.GetTrustDomainConfig()
-
-	client, err := u.newClient(ctx, trustDomainConfig)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	localFederatedBundleOrNil, err := fetchBundleIfExists(ctx, u.ds, u.td)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to fetch local federated bundle: %w", err)
-	}
-
-	fetchedFederatedBundle, err := client.FetchBundle(ctx)
-	if err != nil {
-		return localFederatedBundleOrNil, nil, fmt.Errorf("failed to fetch federated bundle from endpoint: %w", err)
-	}
-
-	if localFederatedBundleOrNil != nil && fetchedFederatedBundle.Equal(localFederatedBundleOrNil) {
-		return localFederatedBundleOrNil, nil, nil
-	}
-
-	bundle, err := bundleutil.SPIFFEBundleToProto(fetchedFederatedBundle)
-	if err != nil {
-		return nil, nil, err
-	}
-	_, err = u.ds.SetBundle(ctx, bundle)
-	if err != nil {
-		return localFederatedBundleOrNil, nil, fmt.Errorf("failed to store fetched federated bundle: %w", err)
-	}
-
-	return localFederatedBundleOrNil, fetchedFederatedBundle, nil
+	_ = "STUB: not implemented"
+	return nil, nil, nil
 }
 
 func (u *bundleUpdater) GetTrustDomainConfig() TrustDomainConfig {
-	u.trustDomainConfigMtx.Lock()
-	trustDomainConfig := u.trustDomainConfig
-	u.trustDomainConfigMtx.Unlock()
-	return trustDomainConfig
+	_ = "STUB: not implemented"
+	return *new(TrustDomainConfig)
 }
 
 func (u *bundleUpdater) SetTrustDomainConfig(trustDomainConfig TrustDomainConfig) bool {
-	u.trustDomainConfigMtx.Lock()
-	defer u.trustDomainConfigMtx.Unlock()
-	if u.trustDomainConfig != trustDomainConfig {
-		u.trustDomainConfig = trustDomainConfig
-		return true
-	}
+	_ = "STUB: not implemented"
 	return false
 }
 
 func (u *bundleUpdater) newClient(ctx context.Context, trustDomainConfig TrustDomainConfig) (Client, error) {
-	clientConfig := ClientConfig{
-		TrustDomain: u.td,
-		EndpointURL: trustDomainConfig.EndpointURL,
-	}
-
-	if spiffeAuth, ok := trustDomainConfig.EndpointProfile.(HTTPSSPIFFEProfile); ok {
-		trustDomain := spiffeAuth.EndpointSPIFFEID.TrustDomain()
-		localEndpointBundle, err := fetchBundleIfExists(ctx, u.ds, trustDomain)
-		if err != nil {
-			return nil, fmt.Errorf("failed to fetch local copy of bundle for %q: %w", trustDomain, err)
-		}
-
-		if localEndpointBundle == nil {
-			return nil, errors.New("can't perform SPIFFE Authentication: local copy of bundle not found")
-		}
-		clientConfig.SPIFFEAuth = &SPIFFEAuthConfig{
-			EndpointSpiffeID: spiffeAuth.EndpointSPIFFEID,
-			RootCAs:          localEndpointBundle.X509Authorities(),
-		}
-	}
-	return u.newClientHook(clientConfig)
+	_ = "STUB: not implemented"
+	return *new(Client), nil
 }
 
 func fetchBundleIfExists(ctx context.Context, ds datastore.DataStore, trustDomain spiffeid.TrustDomain) (*spiffebundle.Bundle, error) {
+	_ = "STUB: not implemented"
 	// Load the current bundle and extract the root CA certificates
-	bundle, err := ds.FetchBundle(ctx, trustDomain.IDString())
-	if err != nil {
-		return nil, err
-	}
-	if bundle == nil {
-		return nil, nil
-	}
-	return bundleutil.SPIFFEBundleFromProto(bundle)
+	return nil, nil
 }

@@ -8,6 +8,6 @@ import "github.com/spiffe/spire/pkg/common/telemetry"
 // StartStoreSVIDUpdates return metric for agent's processing and
 // StoreSVIDUpdates calls
 func StartStoreSVIDUpdates(m telemetry.Metrics) *telemetry.CallCounter {
-	cc := telemetry.StartCall(m, telemetry.Store, telemetry.StoreSVIDUpdates)
-	return cc
+	_ = "STUB: not implemented"
+	return nil
 }

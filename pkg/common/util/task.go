@@ -2,8 +2,6 @@ package util
 
 import (
 	"context"
-	"fmt"
-	"runtime/debug"
 	"sync"
 )
 
@@ -14,36 +12,16 @@ type TaskRunner struct {
 }
 
 func NewTaskRunner(ctx context.Context, cancel context.CancelCauseFunc) *TaskRunner {
-	return &TaskRunner{
-		ctx:    ctx,
-		cancel: cancel,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (t *TaskRunner) StartTasks(tasks ...func(context.Context) error) {
-	runTask := func(task func(context.Context) error) (err error) {
-		defer func() {
-			if r := recover(); r != nil {
-				err = fmt.Errorf("panic: %v\n%s", r, string(debug.Stack()))
-			}
-		}()
-		return task(t.ctx)
-	}
-
-	for _, task := range tasks {
-		t.wg.Go(func() {
-			err := runTask(task)
-			if err != nil {
-				t.cancel(err)
-			}
-		})
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
-func (t *TaskRunner) Wait() error {
-	t.wg.Wait()
-	return context.Cause(t.ctx)
-}
+func (t *TaskRunner) Wait() error { _ = "STUB: not implemented"; return nil }
 
 // RunTasks executes all the provided functions concurrently and waits for
 // them all to complete. If a function returns an error, all other functions
@@ -54,8 +32,6 @@ func (t *TaskRunner) Wait() error {
 // RunTasks MUST support cancellation via the provided context for RunTasks to
 // work properly.
 func RunTasks(ctx context.Context, tasks ...func(context.Context) error) error {
-	nctx, cancel := context.WithCancelCause(ctx)
-	t := NewTaskRunner(nctx, cancel)
-	t.StartTasks(tasks...)
-	return t.Wait()
+	_ = "STUB: not implemented"
+	return nil
 }

@@ -4,7 +4,6 @@ package sqlstore
 
 import (
 	"context"
-	"errors"
 
 	"github.com/jinzhu/gorm"
 	"github.com/sirupsen/logrus"
@@ -15,9 +14,8 @@ type sqliteDB struct {
 }
 
 func (s sqliteDB) connect(ctx context.Context, cfg *configuration, isReadOnly bool) (db *gorm.DB, version string, supportsCTE bool, err error) {
-	return nil, "", false, errors.New("sqlite3 is not a supported dialect when CGO is not enabled")
+	_ = "STUB: not implemented"
+	return nil, "", false, nil
 }
 
-func (s sqliteDB) isConstraintViolation(err error) bool {
-	return false
-}
+func (s sqliteDB) isConstraintViolation(err error) bool { _ = "STUB: not implemented"; return false }

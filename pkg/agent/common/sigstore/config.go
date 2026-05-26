@@ -16,12 +16,7 @@ type Config struct {
 	Logger hclog.Logger
 }
 
-func NewConfig() *Config {
-	return &Config{
-		AllowedIdentities: make(map[string][]string),
-		SkippedImages:     make(map[string]struct{}),
-	}
-}
+func NewConfig() *Config { _ = "STUB: not implemented"; return nil }
 
 type HCLConfig struct {
 	// AllowedIdentities is a list of identities (issuer and subjects) that must match for the signature to be valid.
@@ -53,46 +48,6 @@ type RegistryCredential struct {
 }
 
 func NewConfigFromHCL(hclConfig *HCLConfig, log hclog.Logger) *Config {
-	config := NewConfig()
-	config.Logger = log
-
-	if hclConfig.AllowedIdentities != nil {
-		config.AllowedIdentities = hclConfig.AllowedIdentities
-	}
-
-	if hclConfig.SkippedImages != nil {
-		config.SkippedImages = make(map[string]struct{})
-		for _, image := range hclConfig.SkippedImages {
-			config.SkippedImages[image] = struct{}{}
-		}
-	}
-
-	if hclConfig.RekorURL != nil {
-		config.RekorURL = *hclConfig.RekorURL
-	}
-
-	if hclConfig.IgnoreSCT != nil {
-		config.IgnoreSCT = *hclConfig.IgnoreSCT
-	}
-
-	if hclConfig.IgnoreTlog != nil {
-		config.IgnoreTlog = *hclConfig.IgnoreTlog
-	}
-
-	if hclConfig.IgnoreAttestations != nil {
-		config.IgnoreAttestations = *hclConfig.IgnoreAttestations
-	}
-
-	if hclConfig.RegistryCredentials != nil {
-		m := make(map[string]*RegistryCredential)
-		for k, v := range hclConfig.RegistryCredentials {
-			m[k] = &RegistryCredential{
-				Username: v.Username,
-				Password: v.Password,
-			}
-		}
-		config.RegistryCredentials = m
-	}
-
-	return config
+	_ = "STUB: not implemented"
+	return nil
 }

@@ -3,38 +3,33 @@ package catalog
 import (
 	"github.com/spiffe/spire/pkg/common/catalog"
 	"github.com/spiffe/spire/pkg/server/plugin/bundlepublisher"
-	"github.com/spiffe/spire/pkg/server/plugin/bundlepublisher/awsrolesanywhere"
-	"github.com/spiffe/spire/pkg/server/plugin/bundlepublisher/awss3"
-	"github.com/spiffe/spire/pkg/server/plugin/bundlepublisher/gcpcloudstorage"
-	"github.com/spiffe/spire/pkg/server/plugin/bundlepublisher/k8sconfigmap"
 )
 
 type bundlePublisherRepository struct {
 	bundlepublisher.Repository
 }
 
-func (repo *bundlePublisherRepository) Binder() any {
-	return repo.AddBundlePublisher
-}
+func (repo *bundlePublisherRepository) Binder() any { _ = "STUB: not implemented"; return *new(any) }
 
 func (repo *bundlePublisherRepository) Constraints() catalog.Constraints {
-	return catalog.ZeroOrMore()
+	_ = "STUB: not implemented"
+	return *new(catalog.Constraints)
 }
 
 func (repo *bundlePublisherRepository) Versions() []catalog.Version {
-	return []catalog.Version{bundlePublisherV1{}}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (repo *bundlePublisherRepository) BuiltIns() []catalog.BuiltIn {
-	return []catalog.BuiltIn{
-		awss3.BuiltIn(),
-		gcpcloudstorage.BuiltIn(),
-		awsrolesanywhere.BuiltIn(),
-		k8sconfigmap.BuiltIn(),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 type bundlePublisherV1 struct{}
 
-func (bundlePublisherV1) New() catalog.Facade { return new(bundlepublisher.V1) }
-func (bundlePublisherV1) Deprecated() bool    { return false }
+func (bundlePublisherV1) New() catalog.Facade {
+	_ = "STUB: not implemented"
+	return *new(catalog.Facade)
+}
+func (bundlePublisherV1) Deprecated() bool { _ = "STUB: not implemented"; return false }

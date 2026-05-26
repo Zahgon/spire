@@ -9,24 +9,24 @@ import (
 
 // StartGenerateKeyCall returns a CallCounter for GenerateKeyPair in the Server KeyManager interface
 func StartGenerateKeyCall(m telemetry.Metrics) *telemetry.CallCounter {
-	cc := telemetry.StartCall(m, telemetry.ServerKeyManager, telemetry.GenerateKey)
-	return cc
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartGetPublicKeyCall returns a CallCounter for GetPublicKey in the Server KeyManager interface
 func StartGetPublicKeyCall(m telemetry.Metrics) *telemetry.CallCounter {
-	cc := telemetry.StartCall(m, telemetry.ServerKeyManager, telemetry.GetPublicKey)
-	return cc
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartGetPublicKeysCall returns a CallCounter for GetPublicKeys in the Server KeyManager interface
 func StartGetPublicKeysCall(m telemetry.Metrics) *telemetry.CallCounter {
-	cc := telemetry.StartCall(m, telemetry.ServerKeyManager, telemetry.GetPublicKeys)
-	return cc
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartSignDataCall returns a CallCounter for SignData in the Server KeyManager interface
 func StartSignDataCall(m telemetry.Metrics) *telemetry.CallCounter {
-	cc := telemetry.StartCall(m, telemetry.ServerKeyManager, telemetry.SignData)
-	return cc
+	_ = "STUB: not implemented"
+	return nil
 }

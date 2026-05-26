@@ -21,75 +21,22 @@ type Listener struct {
 	Tracker PeerTracker
 }
 
-func newNoopLogger() *logrus.Logger {
-	logger := logrus.New()
-	logger.Out = io.Discard
-	return logger
-}
+func newNoopLogger() *logrus.Logger { _ = "STUB: not implemented"; return nil }
 
 func (l *Listener) Accept() (net.Conn, error) {
-	for {
-		var caller CallerInfo
-		var err error
-
-		conn, err := l.l.Accept()
-		if err != nil {
-			return conn, err
-		}
-
-		// Support future Listener types
-		switch conn.RemoteAddr().Network() {
-		case "unix":
-			caller, err = CallerFromUDSConn(conn)
-		case "pipe":
-			caller, err = CallerFromNamedPipeConn(conn)
-		default:
-			err = ErrUnsupportedTransport
-		}
-
-		if err != nil {
-			l.log.WithError(err).Warn("Connection failed during accept")
-			conn.Close()
-			continue
-		}
-
-		watcher, err := l.Tracker.NewWatcher(caller)
-		if err != nil {
-			l.log.WithError(err).Warn("Connection failed during accept")
-			conn.Close()
-			continue
-		}
-
-		wrappedConn := &Conn{
-			Conn: conn,
-			Info: AuthInfo{
-				Caller:  caller,
-				Watcher: closeOnIsAliveErr{Watcher: watcher, conn: conn},
-			},
-		}
-
-		return wrappedConn, nil
-	}
+	_ = "STUB: not implemented"
+	return *new(net.Conn), nil
 }
 
-func (l *Listener) Close() error {
-	l.Tracker.Close()
-	return l.l.Close()
-}
+// Support future Listener types
 
-func (l *Listener) Addr() net.Addr {
-	return l.l.Addr()
-}
+func (l *Listener) Close() error { _ = "STUB: not implemented"; return nil }
+
+func (l *Listener) Addr() net.Addr { _ = "STUB: not implemented"; return *new(net.Addr) }
 
 type closeOnIsAliveErr struct {
 	Watcher
 	conn io.Closer
 }
 
-func (w closeOnIsAliveErr) IsAlive() error {
-	err := w.Watcher.IsAlive()
-	if err != nil {
-		_ = w.conn.Close()
-	}
-	return err
-}
+func (w closeOnIsAliveErr) IsAlive() error { _ = "STUB: not implemented"; return nil }

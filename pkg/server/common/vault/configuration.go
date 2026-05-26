@@ -1,10 +1,5 @@
 package vault
 
-import (
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-)
-
 type BaseConfiguration struct {
 	// A URL of Vault server. (e.g., https://vault.example.com:8443/)
 	VaultAddr string `hcl:"vault_addr" json:"vault_addr"`
@@ -72,81 +67,16 @@ type K8sAuthConfig struct {
 }
 
 func GenClientParams(method AuthMethod, baseConfig *BaseConfiguration, lookupEnv func(string) (string, bool)) (*ClientParams, error) {
-	envOrDefault := func(envKey, fallback string) string {
-		if value, ok := lookupEnv(envKey); ok {
-			return value
-		}
-		return fallback
-	}
-
-	cp := &ClientParams{
-		VaultAddr:     envOrDefault(EnvVaultAddr, baseConfig.VaultAddr),
-		CACertPath:    envOrDefault(EnvVaultCACert, baseConfig.CACertPath),
-		TLSSkipVerify: baseConfig.InsecureSkipVerify,
-		Namespace:     envOrDefault(EnvVaultNamespace, baseConfig.Namespace),
-	}
-
-	switch method {
-	case TOKEN:
-		cp.Token = envOrDefault(EnvVaultToken, baseConfig.TokenAuth.Token)
-	case CERT:
-		cp.CertAuthMountPoint = baseConfig.CertAuth.CertAuthMountPoint
-		cp.CertAuthRoleName = baseConfig.CertAuth.CertAuthRoleName
-		cp.ClientCertPath = envOrDefault(EnvVaultClientCert, baseConfig.CertAuth.ClientCertPath)
-		cp.ClientKeyPath = envOrDefault(EnvVaultClientKey, baseConfig.CertAuth.ClientKeyPath)
-	case APPROLE:
-		cp.AppRoleAuthMountPoint = baseConfig.AppRoleAuth.AppRoleMountPoint
-		cp.AppRoleID = envOrDefault(EnvVaultAppRoleID, baseConfig.AppRoleAuth.RoleID)
-		cp.AppRoleSecretID = envOrDefault(EnvVaultAppRoleSecretID, baseConfig.AppRoleAuth.SecretID)
-	case K8S:
-		if baseConfig.K8sAuth.K8sAuthRoleName == "" {
-			return nil, status.Error(codes.InvalidArgument, "k8s_auth_role_name is required")
-		}
-		if baseConfig.K8sAuth.TokenPath == "" {
-			return nil, status.Error(codes.InvalidArgument, "token_path is required")
-		}
-		cp.K8sAuthMountPoint = baseConfig.K8sAuth.K8sAuthMountPoint
-		cp.K8sAuthRoleName = baseConfig.K8sAuth.K8sAuthRoleName
-		cp.K8sAuthTokenPath = baseConfig.K8sAuth.TokenPath
-	}
-
-	return cp, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func ParseAuthMethod(config *BaseConfiguration) (AuthMethod, error) {
-	var authMethod AuthMethod
-	if config.TokenAuth != nil {
-		authMethod = TOKEN
-	}
-	if config.CertAuth != nil {
-		if err := checkForAuthMethodConfigured(authMethod); err != nil {
-			return 0, err
-		}
-		authMethod = CERT
-	}
-	if config.AppRoleAuth != nil {
-		if err := checkForAuthMethodConfigured(authMethod); err != nil {
-			return 0, err
-		}
-		authMethod = APPROLE
-	}
-	if config.K8sAuth != nil {
-		if err := checkForAuthMethodConfigured(authMethod); err != nil {
-			return 0, err
-		}
-		authMethod = K8S
-	}
-
-	if authMethod != 0 {
-		return authMethod, nil
-	}
-
-	return 0, status.Error(codes.InvalidArgument, "must be configured one of these authentication method 'Token, Client Certificate, AppRole or Kubernetes")
+	_ = "STUB: not implemented"
+	return *new(AuthMethod), nil
 }
 
 func checkForAuthMethodConfigured(authMethod AuthMethod) error {
-	if authMethod != 0 {
-		return status.Error(codes.InvalidArgument, "only one authentication method can be configured")
-	}
+	_ = "STUB: not implemented"
 	return nil
 }

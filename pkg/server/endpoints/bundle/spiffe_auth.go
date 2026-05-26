@@ -7,30 +7,17 @@ import (
 )
 
 func SPIFFEAuth(getter func() ([]*x509.Certificate, crypto.PrivateKey, error)) ServerAuth {
-	return &spiffeAuth{
-		getter: getter,
-	}
+	_ = "STUB: not implemented"
+	return *new(ServerAuth)
 }
 
 type spiffeAuth struct {
 	getter func() ([]*x509.Certificate, crypto.PrivateKey, error)
 }
 
-func (s *spiffeAuth) GetTLSConfig() *tls.Config {
-	return &tls.Config{
-		GetCertificate: s.getCertificate,
-		MinVersion:     tls.VersionTLS12,
-	}
-}
+func (s *spiffeAuth) GetTLSConfig() *tls.Config { _ = "STUB: not implemented"; return nil }
 
 func (s *spiffeAuth) getCertificate(_ *tls.ClientHelloInfo) (*tls.Certificate, error) {
-	chain, privateKey, err := s.getter()
-	if err != nil {
-		return nil, err
-	}
-
-	return &tls.Certificate{
-		Certificate: chainDER(chain),
-		PrivateKey:  privateKey,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

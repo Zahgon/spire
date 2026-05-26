@@ -2,7 +2,6 @@ package manager
 
 import (
 	"crypto/x509"
-	"sync"
 	"time"
 
 	"github.com/andres-erbsen/clock"
@@ -14,7 +13,6 @@ import (
 	"github.com/spiffe/spire/pkg/agent/plugin/keymanager"
 	"github.com/spiffe/spire/pkg/agent/plugin/nodeattestor"
 	"github.com/spiffe/spire/pkg/agent/storage"
-	"github.com/spiffe/spire/pkg/agent/svid"
 	"github.com/spiffe/spire/pkg/agent/trustbundlesources"
 	"github.com/spiffe/spire/pkg/agent/workloadkey"
 	"github.com/spiffe/spire/pkg/common/rotationutil"
@@ -55,57 +53,6 @@ type Config struct {
 }
 
 // New creates a cache manager based on c's configuration
-func New(c *Config) Manager {
-	return newManager(c)
-}
+func New(c *Config) Manager { _ = "STUB: not implemented"; return *new(Manager) }
 
-func newManager(c *Config) *manager {
-	if c.SyncInterval == 0 {
-		c.SyncInterval = 5 * time.Second
-	}
-
-	if c.RotationInterval == 0 {
-		c.RotationInterval = svid.DefaultRotatorInterval
-	}
-
-	if c.Clk == nil {
-		c.Clk = clock.New()
-	}
-
-	cache := managerCache.NewLRUCache(c.Log.WithField(telemetry.SubsystemName, telemetry.CacheManager), c.TrustDomain, c.Bundle,
-		c.Metrics, c.X509SVIDCacheMaxSize, c.JWTSVIDCacheMaxSize, c.Clk)
-
-	rotCfg := &svid.RotatorConfig{
-		SVIDKeyManager:   keymanager.ForSVID(c.Catalog.GetKeyManager()),
-		Log:              c.Log,
-		Metrics:          c.Metrics,
-		SVID:             c.SVID,
-		SVIDKey:          c.SVIDKey,
-		BundleStream:     cache.SubscribeToBundleChanges(),
-		ServerAddr:       c.ServerAddr,
-		TrustDomain:      c.TrustDomain,
-		Interval:         c.RotationInterval,
-		Clk:              c.Clk,
-		NodeAttestor:     c.NodeAttestor,
-		Reattestable:     c.Reattestable,
-		RotationStrategy: c.RotationStrategy,
-		TLSPolicy:        c.TLSPolicy,
-	}
-	svidRotator, client := svid.NewRotator(rotCfg)
-
-	m := &manager{
-		cache:          cache,
-		c:              c,
-		mtx:            new(sync.RWMutex),
-		svid:           svidRotator,
-		storage:        c.Storage,
-		client:         client,
-		clk:            c.Clk,
-		svidStoreCache: c.SVIDStoreCache,
-
-		processedTaintedX509Authorities: make(map[string]struct{}),
-		processedTaintedJWTAuthorities:  make(map[string]struct{}),
-	}
-
-	return m
-}
+func newManager(c *Config) *manager { _ = "STUB: not implemented"; return nil }

@@ -1,15 +1,8 @@
 package main
 
 import (
-	"errors"
-	"fmt"
 	"net"
-	"net/url"
-	"os"
 	"time"
-
-	"github.com/hashicorp/hcl"
-	"github.com/spiffe/spire/pkg/common/config"
 )
 
 const (
@@ -215,169 +208,18 @@ type experimentalWorkloadAPIConfig struct {
 }
 
 func LoadConfig(path string, expandEnv bool) (*Config, error) {
-	hclBytes, err := os.ReadFile(path)
-	if err != nil {
-		return nil, fmt.Errorf("unable to load configuration: %w", err)
-	}
-	hclString := string(hclBytes)
-	if expandEnv {
-		hclString = config.ExpandEnv(hclString)
-	}
-	return ParseConfig(hclString)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func ParseConfig(hclConfig string) (_ *Config, err error) {
-	c := new(Config)
-	if err := hcl.Decode(c, hclConfig); err != nil {
-		return nil, fmt.Errorf("unable to decode configuration: %w", err)
-	}
-
-	if c.LogLevel == "" {
-		c.LogLevel = defaultLogLevel
-	}
-
-	if len(c.Domains) == 0 {
-		return nil, errors.New("at least one domain must be configured")
-	}
-	c.Domains = dedupeList(c.Domains)
-
-	if c.ACME != nil {
-		c.ACME.CacheDir = defaultCacheDir
-		if c.ACME.RawCacheDir != nil {
-			c.ACME.CacheDir = *c.ACME.RawCacheDir
-		}
-		switch {
-		case c.InsecureAddr != "":
-			return nil, errors.New("insecure_addr and the acme section are mutually exclusive")
-		case !c.ACME.ToSAccepted:
-			return nil, errors.New("tos_accepted must be set to true in the acme configuration section")
-		case c.ACME.Email == "":
-			return nil, errors.New("email must be configured in the acme configuration section")
-		}
-	}
-
-	if c.ServingCertFile != nil {
-		if c.ServingCertFile.CertFilePath == "" {
-			return nil, errors.New("cert_file_path must be configured in the serving_cert_file configuration section")
-		}
-		if c.ServingCertFile.KeyFilePath == "" {
-			return nil, errors.New("key_file_path must be configured in the serving_cert_file configuration section")
-		}
-
-		if c.ServingCertFile.RawAddr == "" {
-			c.ServingCertFile.RawAddr = defaultAddr
-		}
-
-		addr, err := net.ResolveTCPAddr("tcp", c.ServingCertFile.RawAddr)
-		if err != nil {
-			return nil, fmt.Errorf("invalid addr in the serving_cert_file configuration section: %w", err)
-		}
-		c.ServingCertFile.Addr = addr
-
-		c.ServingCertFile.FileSyncInterval, err = parseDurationField(c.ServingCertFile.RawFileSyncInterval, defaultFileSyncInterval)
-		if err != nil {
-			return nil, fmt.Errorf("invalid file_sync_interval in the serving_cert_file configuration section: %w", err)
-		}
-	}
-
-	var methodCount int
-
-	if c.ServerAPI != nil {
-		c.ServerAPI.PollInterval, err = parseDurationField(c.ServerAPI.RawPollInterval, defaultPollInterval)
-		if err != nil {
-			return nil, fmt.Errorf("invalid poll_interval in the server_api configuration section: %w", err)
-		}
-		methodCount++
-	}
-
-	if c.WorkloadAPI != nil {
-		if c.WorkloadAPI.TrustDomain == "" {
-			return nil, errors.New("trust_domain must be configured in the workload_api configuration section")
-		}
-		c.WorkloadAPI.PollInterval, err = parseDurationField(c.WorkloadAPI.RawPollInterval, defaultPollInterval)
-		if err != nil {
-			return nil, fmt.Errorf("invalid poll_interval in the workload_api configuration section: %w", err)
-		}
-		methodCount++
-	}
-
-	if c.File != nil {
-		c.File.PollInterval, err = parseDurationField(c.File.RawPollInterval, defaultPollInterval)
-		if err != nil {
-			return nil, fmt.Errorf("invalid poll_interval in the file configuration section: %w", err)
-		}
-		methodCount++
-	}
-
-	if c.HealthChecks != nil {
-		if c.HealthChecks.BindPort <= 0 {
-			c.HealthChecks.BindPort = defaultHealthChecksBindPort
-		}
-		if c.HealthChecks.ReadyPath == "" {
-			c.HealthChecks.ReadyPath = defaultHealthChecksReadyPath
-		}
-		if c.HealthChecks.LivePath == "" {
-			c.HealthChecks.LivePath = defaultHealthChecksLivePath
-		}
-	}
-
-	if err := c.validateOS(); err != nil {
-		return nil, err
-	}
-
-	switch methodCount {
-	case 0:
-		return nil, errors.New("exactly one of the server_api, workload_api, or file sections must be configured")
-	case 1:
-	default:
-		return nil, errors.New("the server_api, workload_api, and file sections are mutually exclusive")
-	}
-	if c.JWTIssuer != "" {
-		jwtIssuer, err := url.Parse(c.JWTIssuer)
-		switch {
-		case err != nil:
-			return nil, fmt.Errorf("the jwt_issuer url could not be parsed: %w", err)
-		case jwtIssuer.Scheme == "":
-			return nil, errors.New("the jwt_issuer url must contain a scheme")
-		case jwtIssuer.Host == "":
-			return nil, errors.New("the jwt_issuer url must contain a host")
-		}
-	}
-	if c.JWKSURI != "" {
-		jwksURI, err := url.Parse(c.JWKSURI)
-		if err != nil || jwksURI.Scheme == "" || jwksURI.Host == "" {
-			return nil, fmt.Errorf("the jwks_uri setting could not be parsed: %w", err)
-		}
-	}
-	if c.JWKSURI == "" && c.JWTIssuer != "" {
-		fmt.Printf("Warning: The jwt_issuer configuration will also affect the jwks_uri behavior when jwks_url is not set. This behaviour will be changed in 1.13.0.")
-	}
-	return c, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func dedupeList(items []string) []string {
-	keys := make(map[string]bool)
-	var list []string
-
-	for _, s := range items {
-		if _, ok := keys[s]; !ok {
-			keys[s] = true
-			list = append(list, s)
-		}
-	}
-
-	return list
-}
+func dedupeList(items []string) []string { _ = "STUB: not implemented"; return nil }
 
 func parseDurationField(rawValue string, defaultValue time.Duration) (duration time.Duration, err error) {
-	if rawValue != "" {
-		duration, err = time.ParseDuration(rawValue)
-		if err != nil {
-			return 0, err
-		}
-	}
-	if duration <= 0 {
-		duration = defaultValue
-	}
-	return duration, nil
+	_ = "STUB: not implemented"
+	return *new(time.Duration), nil
 }

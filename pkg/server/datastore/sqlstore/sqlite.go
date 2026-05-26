@@ -4,13 +4,8 @@ package sqlstore
 
 import (
 	"context"
-	"errors"
-	"net/url"
-	"path/filepath"
-	"runtime"
 
 	"github.com/jinzhu/gorm"
-	"github.com/mattn/go-sqlite3"
 	"github.com/sirupsen/logrus"
 
 	// gorm sqlite dialect init registration
@@ -22,44 +17,15 @@ type sqliteDB struct {
 }
 
 func (s sqliteDB) connect(ctx context.Context, cfg *configuration, isReadOnly bool) (db *gorm.DB, version string, supportsCTE bool, err error) {
-	if isReadOnly {
-		s.log.Warn("Read-only connection is not applicable for sqlite3. Falling back to primary connection")
-	}
-
-	db, err = openSQLite3(cfg.ConnectionString)
-	if err != nil {
-		return nil, "", false, err
-	}
-
-	version, err = queryVersion(ctx, db, "SELECT sqlite_version()")
-	if err != nil {
-		return nil, "", false, err
-	}
-
-	// The embedded version of SQLite3 unconditionally supports CTE.
-	return db, version, true, nil
+	_ = "STUB: not implemented"
+	return nil, "", false, nil
 }
 
-func (s sqliteDB) isConstraintViolation(err error) bool {
-	if err == nil {
-		return false
-	}
-	var e sqlite3.Error
-	ok := errors.As(err, &e)
-	return ok && e.Code == sqlite3.ErrConstraint
-}
+// The embedded version of SQLite3 unconditionally supports CTE.
 
-func openSQLite3(connString string) (*gorm.DB, error) {
-	embellished, err := embellishSQLite3ConnString(connString)
-	if err != nil {
-		return nil, err
-	}
-	db, err := gorm.Open("sqlite3", embellished)
-	if err != nil {
-		return nil, newWrappedSQLError(err)
-	}
-	return db, nil
-}
+func (s sqliteDB) isConstraintViolation(err error) bool { _ = "STUB: not implemented"; return false }
+
+func openSQLite3(connString string) (*gorm.DB, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // embellishSQLite3ConnString adds query values supported by
 // github.com/mattn/go-sqlite3 to enable journal mode and foreign key support.
@@ -67,34 +33,16 @@ func openSQLite3(connString string) (*gorm.DB, error) {
 // enabled for *each* connection opened by db/sql. If the connection string is
 // not already a file: URI, it is converted first.
 func embellishSQLite3ConnString(connectionString string) (string, error) {
+	_ = "STUB: not implemented"
 	// On Windows, when parsing an absolute path like "c:\tmp\lite",
 	// "c" is parsed as the URL scheme
-	if runtime.GOOS == "windows" && filepath.IsAbs(connectionString) {
-		connectionString = "/" + connectionString
-	}
-
-	u, err := url.Parse(connectionString)
-	if err != nil {
-		return "", newWrappedSQLError(err)
-	}
-
-	switch {
-	case u.Scheme == "":
-		// connection string is a path. move the path section into the
-		// opaque section so it renders property for sqlite3, for example:
-		// data.db = file:data.db
-		// ./data.db = file:./data.db
-		// /data.db = file:/data.db
-		u.Scheme = "file"
-		u.Opaque, u.Path = u.Path, ""
-	case u.Scheme != "file":
-		// only no scheme (i.e. file path) or file scheme is supported
-		return "", newSQLError("unsupported scheme %q", u.Scheme)
-	}
-
-	q := u.Query()
-	q.Set("_foreign_keys", "ON")
-	q.Set("_journal_mode", "WAL")
-	u.RawQuery = q.Encode()
-	return u.String(), nil
+	return "", nil
 }
+
+// connection string is a path. move the path section into the
+// opaque section so it renders property for sqlite3, for example:
+// data.db = file:data.db
+// ./data.db = file:./data.db
+// /data.db = file:/data.db
+
+// only no scheme (i.e. file path) or file scheme is supported

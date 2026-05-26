@@ -10,14 +10,23 @@ type Blackhole struct{}
 
 var _ Metrics = Blackhole{}
 
-func (Blackhole) SetGauge([]string, float32)                             {}
-func (Blackhole) SetGaugeWithLabels([]string, float32, []Label)          {}
-func (Blackhole) SetPrecisionGauge([]string, float64)                    {}
-func (Blackhole) SetPrecisionGaugeWithLabels([]string, float64, []Label) {}
-func (Blackhole) EmitKey([]string, float32)                              {}
-func (Blackhole) IncrCounter([]string, float32)                          {}
-func (Blackhole) IncrCounterWithLabels([]string, float32, []Label)       {}
-func (Blackhole) AddSample([]string, float32)                            {}
-func (Blackhole) AddSampleWithLabels([]string, float32, []Label)         {}
-func (Blackhole) MeasureSince([]string, time.Time)                       {}
-func (Blackhole) MeasureSinceWithLabels([]string, time.Time, []Label)    {}
+func (Blackhole) SetGauge([]string, float32)                    { _ = "STUB: not implemented"; return }
+func (Blackhole) SetGaugeWithLabels([]string, float32, []Label) { _ = "STUB: not implemented"; return }
+func (Blackhole) SetPrecisionGauge([]string, float64)           { _ = "STUB: not implemented"; return }
+func (Blackhole) SetPrecisionGaugeWithLabels([]string, float64, []Label) {
+	_ = "STUB: not implemented"
+	return
+}
+func (Blackhole) EmitKey([]string, float32)     { _ = "STUB: not implemented"; return }
+func (Blackhole) IncrCounter([]string, float32) { _ = "STUB: not implemented"; return }
+func (Blackhole) IncrCounterWithLabels([]string, float32, []Label) {
+	_ = "STUB: not implemented"
+	return
+}
+func (Blackhole) AddSample([]string, float32)                    { _ = "STUB: not implemented"; return }
+func (Blackhole) AddSampleWithLabels([]string, float32, []Label) { _ = "STUB: not implemented"; return }
+func (Blackhole) MeasureSince([]string, time.Time)               { _ = "STUB: not implemented"; return }
+func (Blackhole) MeasureSinceWithLabels([]string, time.Time, []Label) {
+	_ = "STUB: not implemented"
+	return
+}

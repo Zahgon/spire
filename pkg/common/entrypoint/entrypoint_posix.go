@@ -4,7 +4,6 @@ package entrypoint
 
 import (
 	"context"
-	"os"
 )
 
 type EntryPoint struct {
@@ -12,11 +11,8 @@ type EntryPoint struct {
 }
 
 func NewEntryPoint(runFn func(ctx context.Context, args []string) int) *EntryPoint {
-	return &EntryPoint{
-		runCmdFn: runFn,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (e *EntryPoint) Main() int {
-	return e.runCmdFn(context.Background(), os.Args[1:])
-}
+func (e *EntryPoint) Main() int { _ = "STUB: not implemented"; return 0 }

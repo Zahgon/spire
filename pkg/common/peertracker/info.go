@@ -22,6 +22,4 @@ type AuthInfo struct {
 
 // AuthType returns the authentication type and allows us to
 // conform to the gRPC AuthInfo interface
-func (AuthInfo) AuthType() string {
-	return authType
-}
+func (AuthInfo) AuthType() string { _ = "STUB: not implemented"; return "" }

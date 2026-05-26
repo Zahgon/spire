@@ -2,16 +2,9 @@ package gcpiit
 
 import (
 	"context"
-	"fmt"
-	"slices"
-	"strings"
 	"sync"
-	"time"
-
-	"github.com/hashicorp/hcl"
 
 	"github.com/go-jose/go-jose/v4"
-	"github.com/go-jose/go-jose/v4/jwt"
 	hclog "github.com/hashicorp/go-hclog"
 	"github.com/spiffe/go-spiffe/v2/spiffeid"
 	nodeattestorv1 "github.com/spiffe/spire-plugin-sdk/proto/spire/plugin/server/nodeattestor/v1"
@@ -22,9 +15,6 @@ import (
 	"github.com/spiffe/spire/pkg/common/pluginconf"
 	nodeattestorbase "github.com/spiffe/spire/pkg/server/plugin/nodeattestor/base"
 	"google.golang.org/api/compute/v1"
-	"google.golang.org/api/option"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 const (
@@ -38,15 +28,11 @@ const (
 // https://cloud.google.com/compute/docs/instances/verifying-instance-identity#verify_signature
 var allowedJWTSignatureAlgorithms = []jose.SignatureAlgorithm{jose.RS256}
 
-func BuiltIn() catalog.BuiltIn {
-	return builtin(New())
-}
+func BuiltIn() catalog.BuiltIn { _ = "STUB: not implemented"; return *new(catalog.BuiltIn) }
 
 func builtin(p *IITAttestorPlugin) catalog.BuiltIn {
-	return catalog.MakeBuiltIn(pluginName,
-		nodeattestorv1.NodeAttestorPluginServer(p),
-		configv1.ConfigServiceServer(p),
-	)
+	_ = "STUB: not implemented"
+	return *new(catalog.BuiltIn)
 }
 
 type jwksRetriever interface {
@@ -87,177 +73,45 @@ type IITAttestorConfig struct {
 }
 
 func buildConfig(coreConfig catalog.CoreConfig, hclText string, status *pluginconf.Status) *IITAttestorConfig {
-	newConfig := new(IITAttestorConfig)
-	if err := hcl.Decode(newConfig, hclText); err != nil {
-		status.ReportErrorf("unable to decode configuration: %v", err)
-		return nil
-	}
-
-	if len(newConfig.ProjectIDAllowList) == 0 {
-		status.ReportError("projectid_allow_list is required")
-	}
-
-	tmpl := gcp.DefaultAgentPathTemplate
-	if len(newConfig.AgentPathTemplate) > 0 {
-		var err error
-		tmpl, err = agentpathtemplate.Parse(newConfig.AgentPathTemplate)
-		if err != nil {
-			status.ReportErrorf("failed to parse agent path template: %q", newConfig.AgentPathTemplate)
-		}
-	}
-
-	if len(newConfig.AllowedLabelKeys) > 0 {
-		newConfig.allowedLabelKeys = make(map[string]bool, len(newConfig.AllowedLabelKeys))
-		for _, key := range newConfig.AllowedLabelKeys {
-			newConfig.allowedLabelKeys[key] = true
-		}
-	}
-
-	if len(newConfig.AllowedMetadataKeys) > 0 {
-		newConfig.allowedMetadataKeys = make(map[string]bool, len(newConfig.AllowedMetadataKeys))
-		for _, key := range newConfig.AllowedMetadataKeys {
-			newConfig.allowedMetadataKeys[key] = true
-		}
-	}
-
-	if newConfig.MaxMetadataValueSize == 0 {
-		newConfig.MaxMetadataValueSize = defaultMaxMetadataValueSize
-	}
-
-	newConfig.idPathTemplate = tmpl
-	newConfig.trustDomain = coreConfig.TrustDomain
-
-	return newConfig
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // New creates a new IITAttestorPlugin.
-func New() *IITAttestorPlugin {
-	return &IITAttestorPlugin{
-		jwksRetriever: newGooglePublicKeyRetriever(googleCertURL),
-		client:        googleComputeEngineClient{},
-	}
-}
+func New() *IITAttestorPlugin { _ = "STUB: not implemented"; return nil }
 
 // SetLogger sets up plugin logging
 func (p *IITAttestorPlugin) SetLogger(log hclog.Logger) {
-	p.log = log
+	_ = "STUB: not implemented"
+
+	// Attest implements the server side logic for the gcp iit node attestation plugin.
+	return
 }
 
-// Attest implements the server side logic for the gcp iit node attestation plugin.
 func (p *IITAttestorPlugin) Attest(stream nodeattestorv1.NodeAttestor_AttestServer) error {
-	jwks, err := p.jwksRetriever.retrieveJWKS(stream.Context())
-	if err != nil {
-		return err
-	}
-
-	identityMetadata, err := validateAttestationAndExtractIdentityMetadata(stream, jwks)
-	if err != nil {
-		return err
-	}
-
-	c, err := p.getConfig()
-	if err != nil {
-		return err
-	}
-
-	computeEngineMetadata := identityMetadata.Google.ComputeEngine
-
-	if !slices.Contains(c.ProjectIDAllowList, computeEngineMetadata.ProjectID) {
-		return status.Errorf(codes.PermissionDenied, "identity token project ID %q is not in the allow list", computeEngineMetadata.ProjectID)
-	}
-
-	id, err := gcp.MakeAgentID(c.trustDomain, c.idPathTemplate, identityMetadata)
-	if err != nil {
-		return status.Errorf(codes.Internal, "failed to create agent ID: %v", err)
-	}
-
-	if err := p.AssessTOFU(stream.Context(), id.String(), p.log); err != nil {
-		return err
-	}
-
-	var instance *compute.Instance
-	if c.UseInstanceMetadata {
-		instance, err = p.client.fetchInstanceMetadata(stream.Context(), computeEngineMetadata, c.ServiceAccountFile)
-		if err != nil {
-			return status.Errorf(codes.Internal, "failed to fetch instance metadata: %v", err)
-		}
-	}
-
-	selectorValues := []string{
-		makeSelectorValue("project-id", computeEngineMetadata.ProjectID),
-		makeSelectorValue("zone", computeEngineMetadata.Zone),
-		makeSelectorValue("instance-name", computeEngineMetadata.InstanceName),
-		makeSelectorValue("sa", identityMetadata.Email),
-	}
-	if instance != nil {
-		instanceSelectors, err := getInstanceSelectorValues(c, instance)
-		if err != nil {
-			return err
-		}
-		selectorValues = append(selectorValues, instanceSelectors...)
-	}
-
-	return stream.Send(&nodeattestorv1.AttestResponse{
-		Response: &nodeattestorv1.AttestResponse_AgentAttributes{
-			AgentAttributes: &nodeattestorv1.AgentAttributes{
-				SpiffeId:       id.String(),
-				SelectorValues: selectorValues,
-				CanReattest:    false,
-			},
-		},
-	})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Configure configures the IITAttestorPlugin.
 func (p *IITAttestorPlugin) Configure(_ context.Context, req *configv1.ConfigureRequest) (*configv1.ConfigureResponse, error) {
-	newConfig, _, err := pluginconf.Build(req, buildConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	p.mtx.Lock()
-	defer p.mtx.Unlock()
-	p.config = newConfig
-
-	return &configv1.ConfigureResponse{}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (p *IITAttestorPlugin) Validate(_ context.Context, req *configv1.ValidateRequest) (*configv1.ValidateResponse, error) {
-	_, notes, err := pluginconf.Build(req, buildConfig)
-
-	return &configv1.ValidateResponse{
-		Valid: err == nil,
-		Notes: notes,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (p *IITAttestorPlugin) getConfig() (*IITAttestorConfig, error) {
-	p.mtx.Lock()
-	defer p.mtx.Unlock()
-
-	if p.config == nil {
-		return nil, status.Error(codes.FailedPrecondition, "not configured")
-	}
-	return p.config, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func getInstanceSelectorValues(config *IITAttestorConfig, instance *compute.Instance) ([]string, error) {
-	metadata, err := getInstanceMetadata(instance, config.allowedMetadataKeys, config.MaxMetadataValueSize)
-	if err != nil {
-		return nil, err
-	}
-
-	var selectorValues []string
-	for _, tag := range getInstanceTags(instance) {
-		selectorValues = append(selectorValues, makeSelectorValue("tag", tag))
-	}
-	for _, label := range getInstanceLabels(instance, config.allowedLabelKeys) {
-		selectorValues = append(selectorValues, makeSelectorValue("label", label.key, label.value))
-	}
-	for _, md := range metadata {
-		selectorValues = append(selectorValues, makeSelectorValue("metadata", md.key, md.value))
-	}
-	return selectorValues, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 type keyValue struct {
@@ -266,103 +120,32 @@ type keyValue struct {
 }
 
 func validateAttestationAndExtractIdentityMetadata(stream nodeattestorv1.NodeAttestor_AttestServer, jwks *jose.JSONWebKeySet) (gcp.IdentityToken, error) {
-	req, err := stream.Recv()
-	if err != nil {
-		return gcp.IdentityToken{}, err
-	}
-
-	payload := req.GetPayload()
-	if payload == nil {
-		return gcp.IdentityToken{}, status.Errorf(codes.InvalidArgument, "missing attestation payload")
-	}
-
-	token, err := jwt.ParseSigned(string(payload), allowedJWTSignatureAlgorithms)
-	if err != nil {
-		return gcp.IdentityToken{}, status.Errorf(codes.InvalidArgument, "unable to parse the identity token: %v", err)
-	}
-
-	identityToken := gcp.IdentityToken{}
-	if err := token.Claims(jwks, &identityToken); err != nil {
-		return gcp.IdentityToken{}, status.Errorf(codes.InvalidArgument, "failed to validate the identity token signature: %v", err)
-	}
-
-	if err := identityToken.Validate(jwt.Expected{
-		AnyAudience: []string{tokenAudience},
-		Time:        time.Now(),
-	}); err != nil {
-		return gcp.IdentityToken{}, status.Errorf(codes.PermissionDenied, "failed to validate the identity token claims: %v", err)
-	}
-
-	return identityToken, nil
+	_ = "STUB: not implemented"
+	return *new(gcp.IdentityToken), nil
 }
 
-func getInstanceTags(instance *compute.Instance) []string {
-	if instance.Tags != nil {
-		return instance.Tags.Items
-	}
+func getInstanceTags(instance *compute.Instance) []string { _ = "STUB: not implemented"; return nil }
+
+func getInstanceLabels(instance *compute.Instance, allowedKeys map[string]bool) []keyValue {
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func getInstanceLabels(instance *compute.Instance, allowedKeys map[string]bool) []keyValue {
-	var labels []keyValue
-	for k, v := range instance.Labels {
-		if !allowedKeys[k] {
-			continue
-		}
-		labels = append(labels, keyValue{
-			key:   k,
-			value: v,
-		})
-	}
-	return labels
-}
-
 func getInstanceMetadata(instance *compute.Instance, allowedKeys map[string]bool, maxValueSize int) ([]keyValue, error) {
-	if instance.Metadata == nil {
-		return nil, nil
-	}
-	var md []keyValue
-	for _, item := range instance.Metadata.Items {
-		if !allowedKeys[item.Key] {
-			continue
-		}
-
-		var value string
-		if item.Value != nil {
-			value = *item.Value
-			if len(value) > maxValueSize {
-				return nil, status.Errorf(codes.Internal, "metadata %q exceeded value limit (%d > %d)", item.Key, len(value), maxValueSize)
-			}
-		}
-		md = append(md, keyValue{
-			key:   item.Key,
-			value: value,
-		})
-	}
-	return md, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func makeSelectorValue(key string, value ...string) string {
-	return fmt.Sprintf("%s:%s", key, strings.Join(value, ":"))
-}
+func makeSelectorValue(key string, value ...string) string { _ = "STUB: not implemented"; return "" }
 
 type googleComputeEngineClient struct{}
 
 func (c googleComputeEngineClient) fetchInstanceMetadata(ctx context.Context, instanceMetadata gcp.ComputeEngine, serviceAccountFile string) (*compute.Instance, error) {
-	service, err := c.getService(ctx, serviceAccountFile)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create compute service client: %w", err)
-	}
-	instance, err := service.Instances.Get(instanceMetadata.ProjectID, instanceMetadata.Zone, instanceMetadata.InstanceName).Do()
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch instance metadata: %w", err)
-	}
-	return instance, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c googleComputeEngineClient) getService(ctx context.Context, serviceAccountFile string) (*compute.Service, error) {
-	if serviceAccountFile != "" {
-		return compute.NewService(ctx, option.WithAuthCredentialsFile(option.ServiceAccount, serviceAccountFile))
-	}
-	return compute.NewService(ctx)
+	_ = "STUB: not implemented"
+	return nil, nil
 }

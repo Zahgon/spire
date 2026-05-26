@@ -10,9 +10,7 @@ import (
 	"github.com/spiffe/spire/pkg/server/plugin/upstreamauthority"
 )
 
-func New() *Catalog {
-	return new(Catalog)
-}
+func New() *Catalog { _ = "STUB: not implemented"; return nil }
 
 type Catalog struct {
 	bundlePublisherRepository

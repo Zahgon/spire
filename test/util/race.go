@@ -1,9 +1,6 @@
 package util
 
 import (
-	"fmt"
-	"os"
-	"strconv"
 	"testing"
 )
 
@@ -18,28 +15,11 @@ func init() {
 }
 
 func RaceTest(t *testing.T, fn func(*testing.T)) {
+	_ = "STUB: not implemented"
 	// wrap in a top level group to ensure all subtests
 	// complete before this method returns. All subtests
 	// will be run in parallel
-	t.Run("group", func(t *testing.T) {
-		for i := range raceTestNumThreads {
-			t.Run(fmt.Sprintf("thread %v", i), func(t *testing.T) {
-				t.Parallel()
-				for range raceTestNumLoops {
-					fn(t)
-				}
-			})
-		}
-	})
+	return
 }
 
-func getEnvInt(name string, fallback int) int {
-	if env := os.Getenv(name); env != "" {
-		val, err := strconv.Atoi(env)
-		if err != nil {
-			panic(fmt.Sprintf("%v invalid value: %v", name, err))
-		}
-		return val
-	}
-	return fallback
-}
+func getEnvInt(name string, fallback int) int { _ = "STUB: not implemented"; return 0 }

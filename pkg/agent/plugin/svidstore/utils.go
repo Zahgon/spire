@@ -1,13 +1,7 @@
 package svidstore
 
 import (
-	"crypto/x509"
-	"fmt"
-	"strings"
-
 	svidstorev1 "github.com/spiffe/spire-plugin-sdk/proto/spire/plugin/agent/svidstore/v1"
-	"github.com/spiffe/spire/pkg/common/pemutil"
-	"github.com/spiffe/spire/pkg/common/x509util"
 )
 
 type Data struct {
@@ -26,73 +20,17 @@ type Data struct {
 }
 
 func SecretFromProto(req *svidstorev1.PutX509SVIDRequest) (*Data, error) {
-	x509SVID, err := rawCertToPem(req.Svid.CertChain)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse CertChain: %w", err)
-	}
-
-	x509Bundles, err := rawCertToPem(req.Svid.Bundle)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse Bundle: %w", err)
-	}
-
-	federatedBundles := make(map[string]string, len(req.FederatedBundles))
-	for td, fBundle := range req.FederatedBundles {
-		bundle, err := rawCertToPem([][]byte{fBundle})
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse FederatedBundle %q: %w", td, err)
-		}
-		federatedBundles[td] = bundle
-	}
-
-	x509SVIDKey, err := rawKeyToPem(req.Svid.PrivateKey)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse key: %w", err)
-	}
-
-	return &Data{
-		SPIFFEID:         req.Svid.SpiffeID,
-		X509SVID:         x509SVID,
-		X509SVIDKey:      x509SVIDKey,
-		Bundle:           x509Bundles,
-		FederatedBundles: federatedBundles,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // ParseMetadata parses metadata from a slice of strings
 // into a map that can be consumed by SVIDStore plugins
 func ParseMetadata(metaData []string) (map[string]string, error) {
-	data := make(map[string]string)
-	for _, s := range metaData {
-		value := strings.SplitN(s, ":", 2)
-		if len(value) < 2 {
-			return nil, fmt.Errorf("metadata does not contain a colon: %q", s)
-		}
-		data[value[0]] = value[1]
-	}
-
-	return data, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func rawKeyToPem(rawKey []byte) (string, error) {
-	key, err := x509.ParsePKCS8PrivateKey(rawKey)
-	if err != nil {
-		return "", err
-	}
+func rawKeyToPem(rawKey []byte) (string, error) { _ = "STUB: not implemented"; return "", nil }
 
-	keyPem, err := pemutil.EncodePKCS8PrivateKey(key)
-	if err != nil {
-		return "", err
-	}
-
-	return string(keyPem), nil
-}
-
-func rawCertToPem(rawCerts [][]byte) (string, error) {
-	certs, err := x509util.RawCertsToCertificates(rawCerts)
-	if err != nil {
-		return "", err
-	}
-
-	return string(pemutil.EncodeCertificates(certs)), nil
-}
+func rawCertToPem(rawCerts [][]byte) (string, error) { _ = "STUB: not implemented"; return "", nil }

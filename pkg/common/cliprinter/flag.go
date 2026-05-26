@@ -1,7 +1,6 @@
 package cliprinter
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 
@@ -20,7 +19,8 @@ var flagDescription = fmt.Sprintf(
 // AppendFlag adds the -format flag to the provided flagset, and populates
 // the referenced Printer interface with a properly configured printer.
 func AppendFlag(p *Printer, fs *flag.FlagSet, env *commoncli.Env) *FormatterFlag {
-	return AppendFlagWithCustomPretty(p, fs, env, nil)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // AppendFlagWithCustomPretty is the same as AppendFlag, however it also allows
@@ -29,20 +29,9 @@ func AppendFlag(p *Printer, fs *flag.FlagSet, env *commoncli.Env) *FormatterFlag
 // intended use is to allow for the adoption of cliprinter while still retaining
 // backwards compatibility with the legacy/bespoke pretty print output.
 func AppendFlagWithCustomPretty(p *Printer, fs *flag.FlagSet, env *commoncli.Env, cp CustomPrettyFunc) *FormatterFlag {
+	_ = "STUB: not implemented"
 	// Set the default
-	np := newPrinter(defaultFormatType, env)
-	np.setCustomPrettyPrinter(cp)
-	*p = np
-
-	f := &FormatterFlag{
-		p:            p,
-		f:            defaultFormatType,
-		env:          env,
-		customPretty: cp,
-	}
-
-	fs.Var(f, defaultFlagName, flagDescription)
-	return f
+	return nil
 }
 
 type FormatterFlag struct {
@@ -56,32 +45,6 @@ type FormatterFlag struct {
 	isSet bool
 }
 
-func (f *FormatterFlag) String() string {
-	if f == nil || f.f == 0 {
-		return formatTypeToStr(defaultFormatType)
-	}
+func (f *FormatterFlag) String() string { _ = "STUB: not implemented"; return "" }
 
-	return formatTypeToStr(f.f)
-}
-
-func (f *FormatterFlag) Set(formatStr string) error {
-	if f.isSet && formatTypeToStr(f.f) != formatStr {
-		return fmt.Errorf("the output format has already been set to %q", formatTypeToStr(f.f))
-	}
-	if f.p == nil {
-		return errors.New("internal error: formatter flag not correctly invoked; please report this bug")
-	}
-
-	format, err := strToFormatType(formatStr)
-	if err != nil {
-		return fmt.Errorf("bad formatter flag: %w", err)
-	}
-
-	np := newPrinter(format, f.env)
-	np.setCustomPrettyPrinter(f.customPretty)
-
-	*f.p = np
-	f.f = format
-	f.isSet = true
-	return nil
-}
+func (f *FormatterFlag) Set(formatStr string) error { _ = "STUB: not implemented"; return nil }

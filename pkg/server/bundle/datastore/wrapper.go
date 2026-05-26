@@ -11,10 +11,8 @@ import (
 // WithBundleUpdateCallback wraps a datastore interface and provides updates to
 // bundle publishers in operations that modify the local bundle.
 func WithBundleUpdateCallback(ds datastore.DataStore, bundleUpdated func()) datastore.DataStore {
-	return datastoreWrapper{
-		DataStore:     ds,
-		bundleUpdated: bundleUpdated,
-	}
+	_ = "STUB: not implemented"
+	return *new(datastore.DataStore)
 }
 
 type datastoreWrapper struct {
@@ -23,33 +21,21 @@ type datastoreWrapper struct {
 }
 
 func (w datastoreWrapper) AppendBundle(ctx context.Context, bundle *common.Bundle) (*common.Bundle, error) {
-	b, err := w.DataStore.AppendBundle(ctx, bundle)
-	if err == nil {
-		w.bundleUpdated()
-	}
-	return b, err
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (w datastoreWrapper) PruneBundle(ctx context.Context, trustDomainID string, expiresBefore time.Time) (bool, error) {
-	changed, err := w.DataStore.PruneBundle(ctx, trustDomainID, expiresBefore)
-	if err == nil && changed {
-		w.bundleUpdated()
-	}
-	return changed, err
+	_ = "STUB: not implemented"
+	return false, nil
 }
 
 func (w datastoreWrapper) RevokeX509CA(ctx context.Context, trustDomainID string, subjectKeyIDToRevoke string) error {
-	err := w.DataStore.RevokeX509CA(ctx, trustDomainID, subjectKeyIDToRevoke)
-	if err == nil {
-		w.bundleUpdated()
-	}
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (w datastoreWrapper) RevokeJWTKey(ctx context.Context, trustDomainID string, authorityID string) (*common.PublicKey, error) {
-	pubKey, err := w.DataStore.RevokeJWTKey(ctx, trustDomainID, authorityID)
-	if err == nil {
-		w.bundleUpdated()
-	}
-	return pubKey, err
+	_ = "STUB: not implemented"
+	return nil, nil
 }

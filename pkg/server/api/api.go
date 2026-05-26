@@ -2,13 +2,10 @@ package api
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"time"
 
 	"github.com/spiffe/go-spiffe/v2/spiffeid"
 	"github.com/spiffe/spire-api-sdk/proto/spire/api/types"
-	"github.com/spiffe/spire/pkg/common/nodeutil"
 	"github.com/spiffe/spire/proto/spire/common"
 )
 
@@ -35,23 +32,6 @@ type AttestedNodeCache interface {
 // AttestedNodeToProto converts an agent from the given *common.AttestedNode with
 // the provided selectors to *types.Agent
 func AttestedNodeToProto(node *common.AttestedNode, selectors []*types.Selector) (*types.Agent, error) {
-	if node == nil {
-		return nil, errors.New("missing node")
-	}
-
-	spiffeID, err := spiffeid.FromString(node.SpiffeId)
-	if err != nil {
-		return nil, fmt.Errorf("node has malformed SPIFFE ID: %w", err)
-	}
-
-	return &types.Agent{
-		Id:                   ProtoFromID(spiffeID),
-		AttestationType:      node.AttestationDataType,
-		X509SvidSerialNumber: node.CertSerialNumber,
-		X509SvidExpiresAt:    node.CertNotAfter,
-		Selectors:            selectors,
-		Banned:               nodeutil.IsAgentBanned(node),
-		CanReattest:          node.CanReattest,
-		AgentVersion:         node.AgentVersion,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

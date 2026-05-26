@@ -1,8 +1,6 @@
 package selector
 
 import (
-	"bytes"
-
 	"github.com/spiffe/spire/proto/spire/common"
 )
 
@@ -20,96 +18,25 @@ type Set interface {
 
 type set map[Selector]*Selector
 
-func NewSet(selectors ...*Selector) Set {
-	set := set{}
-	for _, cs := range selectors {
-		set.Add(cs)
-	}
-	return &set
-}
+func NewSet(selectors ...*Selector) Set { _ = "STUB: not implemented"; return *new(Set) }
 
-func NewSetFromRaw(c []*common.Selector) Set {
-	set := set{}
-	for _, cs := range c {
-		s := &Selector{
-			Type:  cs.Type,
-			Value: cs.Value,
-		}
-		set.Add(s)
-	}
+func NewSetFromRaw(c []*common.Selector) Set { _ = "STUB: not implemented"; return *new(Set) }
 
-	return &set
-}
-
-func (s *set) Raw() []*common.Selector {
-	c := []*common.Selector{}
-	for _, selector := range *s {
-		cs := &common.Selector{
-			Type:  selector.Type,
-			Value: selector.Value,
-		}
-		c = append(c, cs)
-	}
-
-	return c
-}
+func (s *set) Raw() []*common.Selector { _ = "STUB: not implemented"; return nil }
 
 // Array returns an array with the elements of the set in any order.
-func (s *set) Array() []*Selector {
-	c := []*Selector{}
-	for _, selector := range *s {
-		c = append(c, selector)
-	}
-	return c
-}
+func (s *set) Array() []*Selector { _ = "STUB: not implemented"; return nil }
 
-func (s *set) Equal(otherSet Set) bool {
-	return EqualSet(s, otherSet.(*set))
-}
+func (s *set) Equal(otherSet Set) bool { _ = "STUB: not implemented"; return false }
 
-func (s *set) Includes(selector *Selector) bool {
-	return Includes(s, selector)
-}
+func (s *set) Includes(selector *Selector) bool { _ = "STUB: not implemented"; return false }
 
-func (s *set) IncludesSet(s2 Set) bool {
-	return IncludesSet(s, s2.(*set))
-}
+func (s *set) IncludesSet(s2 Set) bool { _ = "STUB: not implemented"; return false }
 
-func (s *set) Add(selector *Selector) {
-	(*s)[*selector] = selector
-}
+func (s *set) Add(selector *Selector) { _ = "STUB: not implemented"; return }
 
-func (s *set) Remove(selector *Selector) *Selector {
-	key := *selector
-	if removed, ok := (*s)[key]; ok {
-		delete(*s, key)
-		return removed
-	}
-	return nil
-}
+func (s *set) Remove(selector *Selector) *Selector { _ = "STUB: not implemented"; return nil }
 
-func (s *set) Size() int {
-	return len(*s)
-}
+func (s *set) Size() int { _ = "STUB: not implemented"; return 0 }
 
-func (s *set) String() string {
-	var b bytes.Buffer
-
-	b.WriteString("[")
-
-	if len(*s) > 0 {
-		i := 0
-		for _, selector := range *s {
-			if i > 0 {
-				b.WriteString(" ")
-			}
-			b.WriteString(selector.Type)
-			b.WriteString(":")
-			b.WriteString(selector.Value)
-			i++
-		}
-	}
-
-	b.WriteString("]")
-	return b.String()
-}
+func (s *set) String() string { _ = "STUB: not implemented"; return "" }

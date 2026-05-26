@@ -6,12 +6,9 @@ import (
 	"io"
 	"net"
 	"os/exec"
-	"path/filepath"
 	"testing"
 
 	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/require"
-	"golang.org/x/sys/unix"
 )
 
 const (
@@ -26,38 +23,19 @@ type fakePeer struct {
 	t             *testing.T
 }
 
-func (f *fakePeer) killGrandchild() {
-	if f.grandchildPID == 0 {
-		f.t.Fatal("no known grandchild")
-	}
+func (f *fakePeer) killGrandchild() { _ = "STUB: not implemented"; return }
 
-	err := unix.Kill(f.grandchildPID, unix.SIGKILL)
-	if err != nil {
-		f.t.Fatalf("unable to kill grandchild: %v", err)
-	}
-
-	f.grandchildPID = 0
-}
-
-func addr(t *testing.T) net.Addr {
-	return &net.UnixAddr{
-		Net:  "unix",
-		Name: filepath.Join(t.TempDir(), "test.sock"),
-	}
-}
+func addr(t *testing.T) net.Addr { _ = "STUB: not implemented"; return *new(net.Addr) }
 
 func listener(t *testing.T, log *logrus.Logger, addr net.Addr) *Listener {
-	listener, err := (&ListenerFactory{Log: log}).ListenUnix(addr.Network(), addr.(*net.UnixAddr))
-	require.NoError(t, err)
-
-	return listener
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func childExecCommand(childPath string, addr net.Addr) *exec.Cmd {
+	_ = "STUB: not implemented"
 	// #nosec G204 test code
-	return exec.Command(childPath, "-socketPath", addr.(*net.UnixAddr).Name)
+	return nil
 }
 
-func dial(addr net.Addr) (net.Conn, error) {
-	return net.Dial(addr.Network(), addr.String())
-}
+func dial(addr net.Addr) (net.Conn, error) { _ = "STUB: not implemented"; return *new(net.Conn), nil }

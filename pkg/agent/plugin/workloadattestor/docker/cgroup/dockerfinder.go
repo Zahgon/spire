@@ -1,10 +1,7 @@
 package cgroup
 
 import (
-	"errors"
-	"fmt"
 	"regexp"
-	"strings"
 )
 
 const (
@@ -29,31 +26,8 @@ type ContainerIDFinder interface {
 }
 
 func newContainerIDFinder(pattern string) (ContainerIDFinder, error) {
-	idTokenCount := 0
-	elems := strings.Split(pattern, "/")
-	for i, e := range elems {
-		switch e {
-		case wildcardToken:
-			elems[i] = regexpWildcard
-		case containerIDToken:
-			idTokenCount++
-			elems[i] = regexpContainerID
-		default:
-			elems[i] = regexp.QuoteMeta(e)
-		}
-	}
-	if idTokenCount != 1 {
-		return nil, fmt.Errorf("pattern %q must contain the container id token %q exactly once", pattern, containerIDToken)
-	}
-
-	pattern = "^" + strings.Join(elems, "/") + "$"
-	re, err := regexp.Compile(pattern)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create container id fetcher: %w", err)
-	}
-	return &containerIDFinder{
-		re: re,
-	}, nil
+	_ = "STUB: not implemented"
+	return *new(ContainerIDFinder), nil
 }
 
 // NewContainerIDFinder returns a new ContainerIDFinder.
@@ -74,24 +48,8 @@ func newContainerIDFinder(pattern string) (ContainerIDFinder, error) {
 // Note: The pattern provided is *not* a regular expression. It is a simplified matching
 // language that enforces a forward slash-delimited schema.
 func NewContainerIDFinder(patterns []string) (ContainerIDFinder, error) {
-	if len(patterns) < 1 {
-		return nil, errors.New("dockerfinder: at least 1 pattern must be supplied")
-	}
-
-	if ambiguousPatterns := findAmbiguousPatterns(patterns); len(ambiguousPatterns) != 0 {
-		return nil, fmt.Errorf("dockerfinder: patterns must not be ambiguous: %q", ambiguousPatterns)
-	}
-	var finders []ContainerIDFinder
-	for _, pattern := range patterns {
-		finder, err := newContainerIDFinder(pattern)
-		if err != nil {
-			return nil, err
-		}
-		finders = append(finders, finder)
-	}
-	return &containerIDFinders{
-		finders: finders,
-	}, nil
+	_ = "STUB: not implemented"
+	return *new(ContainerIDFinder), nil
 }
 
 type containerIDFinder struct {
@@ -99,11 +57,8 @@ type containerIDFinder struct {
 }
 
 func (f *containerIDFinder) FindContainerID(cgroup string) (string, bool) {
-	matches := f.re.FindStringSubmatch(cgroup)
-	if len(matches) == 0 {
-		return "", false
-	}
-	return matches[submatchIndex], true
+	_ = "STUB: not implemented"
+	return "", false
 }
 
 type containerIDFinders struct {
@@ -111,12 +66,7 @@ type containerIDFinders struct {
 }
 
 func (f *containerIDFinders) FindContainerID(cgroup string) (string, bool) {
-	for _, finder := range f.finders {
-		id, ok := finder.FindContainerID(cgroup)
-		if ok {
-			return id, ok
-		}
-	}
+	_ = "STUB: not implemented"
 	return "", false
 }
 
@@ -137,52 +87,9 @@ func (f *containerIDFinders) FindContainerID(cgroup string) (string, bool) {
 // any other, otherwise, the two components at an index are directly compared.
 // From this and the fact the regex wildcards cannot match "/" follows that a single
 // non-equivalent path component means the two patterns cannot match the same inputs.
-func findAmbiguousPatterns(patterns []string) []string {
-	p := patterns[0]
-	rest := patterns[1:]
-	foundPatterns := make(map[string]struct{})
+func findAmbiguousPatterns(patterns []string) []string { _ = "STUB: not implemented"; return nil }
 
-	// generate all combinations except for equivalent
-	// index combinations which will always match.
-	for len(rest) > 0 {
-		for _, p2 := range rest {
-			if equivalentPatterns(p, p2) {
-				foundPatterns[p] = struct{}{}
-				foundPatterns[p2] = struct{}{}
-			}
-		}
+// generate all combinations except for equivalent
+// index combinations which will always match.
 
-		p = rest[0]
-		rest = rest[1:]
-	}
-
-	out := make([]string, 0, len(foundPatterns))
-	for foundPattern := range foundPatterns {
-		out = append(out, foundPattern)
-	}
-
-	return out
-}
-
-func equivalentPatterns(a, b string) bool {
-	if a == b {
-		return true
-	}
-
-	aComponents := strings.Split(a, "/")
-	bComponents := strings.Split(b, "/")
-	if len(aComponents) != len(bComponents) {
-		return false
-	}
-
-	for i, comp := range aComponents {
-		switch {
-		case comp == bComponents[i]:
-		case comp == wildcardToken || bComponents[i] == wildcardToken:
-		case comp == containerIDToken || bComponents[i] == containerIDToken:
-		default:
-			return false
-		}
-	}
-	return true
-}
+func equivalentPatterns(a, b string) bool { _ = "STUB: not implemented"; return false }

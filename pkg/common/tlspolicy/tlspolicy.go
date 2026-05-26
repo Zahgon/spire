@@ -20,27 +20,13 @@ type Policy struct {
 // LogPolicy logs an informational message reporting the configured policy,
 // aiding administrators to determine what policy options have been
 // successfully enabled.
-func LogPolicy(policy Policy, logger hclog.Logger) {
-	if policy.RequirePQKEM {
-		logger.Debug("Experimental option 'require_pq_kem' is enabled; all TLS connections will require use of a post-quantum safe KEM")
-	}
-}
+func LogPolicy(policy Policy, logger hclog.Logger) { _ = "STUB: not implemented"; return }
 
 // ApplyPolicy applies the policy options in policy to a given tls.Config,
 // which is assumed to have already been obtained from the go-spiffe tlsconfig
 // package.
-func ApplyPolicy(config *tls.Config, policy Policy) error {
-	if policy.RequirePQKEM {
-		// List only known PQ-safe KEMs as valid curves.
-		config.CurvePreferences = []tls.CurveID{
-			tls.X25519MLKEM768,
-		}
+func ApplyPolicy(config *tls.Config, policy Policy) error { _ = "STUB: not implemented"; return nil }
 
-		// Require TLS 1.3, as all PQ-safe KEMs require it anyway.
-		if config.MinVersion < tls.VersionTLS13 {
-			config.MinVersion = tls.VersionTLS13
-		}
-	}
+// List only known PQ-safe KEMs as valid curves.
 
-	return nil
-}
+// Require TLS 1.3, as all PQ-safe KEMs require it anyway.

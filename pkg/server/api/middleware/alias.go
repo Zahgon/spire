@@ -11,38 +11,38 @@ type Middleware = middleware.Middleware
 type PreprocessFunc = middleware.PreprocessFunc
 type PostprocessFunc = middleware.PostprocessFunc
 
-func Preprocess(fn PreprocessFunc) Middleware {
-	return middleware.Preprocess(fn)
-}
+func Preprocess(fn PreprocessFunc) Middleware { _ = "STUB: not implemented"; return *new(Middleware) }
 
-func Postprocess(fn PostprocessFunc) Middleware {
-	return middleware.Postprocess(fn)
-}
+func Postprocess(fn PostprocessFunc) Middleware { _ = "STUB: not implemented"; return *new(Middleware) }
 
 func Funcs(preprocess PreprocessFunc, postprocess PostprocessFunc) Middleware {
-	return middleware.Funcs(preprocess, postprocess)
+	_ = "STUB: not implemented"
+	return *new(Middleware)
 }
 
-func Chain(ms ...Middleware) Middleware {
-	return middleware.Chain(ms...)
-}
+func Chain(ms ...Middleware) Middleware { _ = "STUB: not implemented"; return *new(Middleware) }
 
 func WithLogger(log logrus.FieldLogger) Middleware {
-	return middleware.WithLogger(log)
+	_ = "STUB: not implemented"
+	return *new(Middleware)
 }
 
 func WithMetrics(metrics telemetry.Metrics) Middleware {
-	return middleware.WithMetrics(metrics)
+	_ = "STUB: not implemented"
+	return *new(Middleware)
 }
 
 func Interceptors(m Middleware) (grpc.UnaryServerInterceptor, grpc.StreamServerInterceptor) {
-	return middleware.Interceptors(m)
+	_ = "STUB: not implemented"
+	return *new(grpc.UnaryServerInterceptor), *new(grpc.StreamServerInterceptor)
 }
 
 func UnaryInterceptor(m Middleware) grpc.UnaryServerInterceptor {
-	return middleware.UnaryInterceptor(m)
+	_ = "STUB: not implemented"
+	return *new(grpc.UnaryServerInterceptor)
 }
 
 func StreamInterceptor(m Middleware) grpc.StreamServerInterceptor {
-	return middleware.StreamInterceptor(m)
+	_ = "STUB: not implemented"
+	return *new(grpc.StreamServerInterceptor)
 }

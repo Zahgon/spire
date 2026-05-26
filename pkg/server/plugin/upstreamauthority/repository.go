@@ -5,17 +5,15 @@ type Repository struct {
 }
 
 func (repo *Repository) GetUpstreamAuthority() (UpstreamAuthority, bool) {
-	return repo.UpstreamAuthority, repo.UpstreamAuthority != nil
+	_ = "STUB: not implemented"
+	return *new(UpstreamAuthority), false
 }
 
 func (repo *Repository) SetUpstreamAuthority(upstreamAuthority UpstreamAuthority) {
-	repo.UpstreamAuthority = upstreamAuthority
+	_ = "STUB: not implemented"
+	return
 }
 
-func (repo *Repository) ClearUpstreamAuthority() {
-	repo.UpstreamAuthority = nil
-}
+func (repo *Repository) ClearUpstreamAuthority() { _ = "STUB: not implemented"; return }
 
-func (repo *Repository) Clear() {
-	repo.UpstreamAuthority = nil
-}
+func (repo *Repository) Clear() { _ = "STUB: not implemented"; return }

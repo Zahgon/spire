@@ -2,15 +2,9 @@ package authpolicy
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"os"
 
-	"github.com/open-policy-agent/opa/v1/ast"
 	"github.com/open-policy-agent/opa/v1/rego"
 	"github.com/open-policy-agent/opa/v1/storage"
-	"github.com/open-policy-agent/opa/v1/storage/inmem"
-	"github.com/open-policy-agent/opa/v1/util"
 	"github.com/sirupsen/logrus"
 )
 
@@ -64,120 +58,30 @@ type Result struct {
 // NewEngineFromConfigOrDefault returns a new policy engine. Or if no
 // config is provided, provides the default policy
 func NewEngineFromConfigOrDefault(ctx context.Context, logger logrus.FieldLogger, cfg *OpaEngineConfig) (*Engine, error) {
-	if cfg == nil {
-		return DefaultAuthPolicy(ctx)
-	}
-	return newEngine(ctx, cfg)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // newEngine returns a new policy engine. Or nil if no
 // config is provided.
 func newEngine(ctx context.Context, cfg *OpaEngineConfig) (*Engine, error) {
-	switch {
-	case cfg == nil:
-		return nil, errors.New("policy engine configuration is nil")
-	case cfg.LocalOpaProvider == nil:
-		return nil, errors.New("policy engine configuration must define a provider")
-	}
-
-	module, err := os.ReadFile(cfg.LocalOpaProvider.RegoPath)
-	if err != nil {
-		return nil, err
-	}
-
-	var store storage.Store
-	// If permissions file is defined use it, else provide empty store
-	if cfg.LocalOpaProvider.PolicyDataPath != "" {
-		storefile, err := os.Open(cfg.LocalOpaProvider.PolicyDataPath)
-		if err != nil {
-			return nil, err
-		}
-		defer storefile.Close()
-
-		d := util.NewJSONDecoder(storefile)
-		var data map[string]any
-		if err := d.Decode(&data); err != nil {
-			return nil, fmt.Errorf("error decoding JSON databindings: %w", err)
-		}
-		store = inmem.NewFromObject(data)
-	} else {
-		store = inmem.NewFromObject(map[string]any{})
-	}
-
-	return NewEngineFromRego(ctx, string(module), store)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// If permissions file is defined use it, else provide empty store
 
 // NewEngineFromRego is a helper to create the Engine object
 func NewEngineFromRego(ctx context.Context, regoPolicy string, dataStore storage.Store) (*Engine, error) {
-	rg := rego.New(
-		rego.Query("data.spire.result"),
-		rego.Package("spire"),
-		rego.Module("spire.rego", regoPolicy),
-		rego.Store(dataStore),
-		rego.SetRegoVersion(ast.RegoV1),
-	)
-	query, err := rg.PrepareForEval(ctx, rego.WithPartialEval())
-	if err != nil {
-		return nil, err
-	}
-
-	e := &Engine{
-		query: query,
-	}
-
-	// Test policy with some simple calls to ensure that the
-	// policy can be evaluated properly.
-	if err := e.validatePolicy(ctx); err != nil {
-		return nil, fmt.Errorf("authpolicy engine failed to validate on sample test inputs: %w", err)
-	}
-
-	return e, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Test policy with some simple calls to ensure that the
+// policy can be evaluated properly.
 
 // Eval determines whether access should be allowed on a resource.
 func (e *Engine) Eval(ctx context.Context, input Input) (result Result, err error) {
-	rs, err := e.query.Eval(ctx, rego.EvalInput(input))
-	if err != nil {
-		return Result{}, err
-	}
-
-	if len(rs) == 0 || len(rs[0].Expressions) == 0 {
-		return Result{}, errors.New("policy: no matching policies found")
-	}
-
-	exp := rs[0].Expressions[0]
-	resultMap, ok := exp.Value.(map[string]any)
-	if !ok {
-		return Result{}, errors.New("unexpected type in evaluating policy result expression")
-	}
-
-	getBoolValue := func(name string) (bool, error) {
-		value, ok := resultMap[name].(bool)
-		if !ok {
-			return false, fmt.Errorf("policy: result did not contain %q bool value", name)
-		}
-		return value, nil
-	}
-
-	if result.Allow, err = getBoolValue(allowKey); err != nil {
-		return Result{}, err
-	}
-
-	if result.AllowIfAdmin, err = getBoolValue(allowIfAdminKey); err != nil {
-		return Result{}, err
-	}
-
-	if result.AllowIfLocal, err = getBoolValue(allowIfLocalKey); err != nil {
-		return Result{}, err
-	}
-
-	if result.AllowIfDownstream, err = getBoolValue(allowIfDownstreamKey); err != nil {
-		return Result{}, err
-	}
-
-	if result.AllowIfAgent, err = getBoolValue(allowIfAgentKey); err != nil {
-		return Result{}, err
-	}
-
-	return result, nil
+	_ = "STUB: not implemented"
+	return *new(Result), nil
 }

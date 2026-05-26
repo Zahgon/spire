@@ -3,12 +3,9 @@ package telemetry
 import (
 	"context"
 	"io"
-	"strings"
-	"sync"
 	"time"
 
 	"github.com/uber-go/tally/v4"
-	"github.com/uber-go/tally/v4/m3"
 )
 
 var (
@@ -50,142 +47,99 @@ type m3Sink struct {
 }
 
 func newM3Sink(serviceName, address, env string) (*m3Sink, error) {
-	m3Config := m3.Configuration{
-		Env:      env,
-		HostPort: address,
-		Service:  serviceName,
-	}
-
-	r, err := m3Config.NewReporter()
-	if err != nil {
-		return nil, err
-	}
-
-	scopeOpts := tally.ScopeOptions{
-		CachedReporter: r,
-	}
-
-	reportEvery := time.Second
-	scope, closer := tally.NewRootScope(scopeOpts, reportEvery)
-	sink := &m3Sink{
-		closer: closer,
-		scope:  scope,
-	}
-
-	return sink, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func newM3TestSink(scope tally.Scope) *m3Sink {
-	return &m3Sink{
-		scope: scope,
-	}
-}
+func newM3TestSink(scope tally.Scope) *m3Sink { _ = "STUB: not implemented"; return nil }
 
-func (m *m3Sink) SetGauge(key []string, val float32) {
-	m.setGauge(key, float64(val), m.scope)
-}
+func (m *m3Sink) SetGauge(key []string, val float32) { _ = "STUB: not implemented"; return }
 
-func (m *m3Sink) SetPrecisionGauge(key []string, val float64) {
-	m.setGauge(key, val, m.scope)
-}
+func (m *m3Sink) SetPrecisionGauge(key []string, val float64) { _ = "STUB: not implemented"; return }
 
 func (m *m3Sink) SetGaugeWithLabels(key []string, val float32, labels []Label) {
-	subscope := m.subscopeWithLabels(labels)
-	m.setGauge(key, float64(val), subscope)
+	_ = "STUB: not implemented"
+	return
 }
 
 func (m *m3Sink) SetPrecisionGaugeWithLabels(key []string, val float64, labels []Label) {
-	subscope := m.subscopeWithLabels(labels)
-	m.setGauge(key, val, subscope)
+	_ = "STUB: not implemented"
+	return
 }
 
 // Not implemented for m3
-func (m *m3Sink) EmitKey([]string, float32) {}
+func (m *m3Sink) EmitKey([]string, float32) {
+	_ = "STUB: not implemented"
 
-// Counters should accumulate values
-func (m *m3Sink) IncrCounter(key []string, val float32) {
-	m.incrCounter(key, val, m.scope)
+	// Counters should accumulate values
+	return
 }
 
+func (m *m3Sink) IncrCounter(key []string, val float32) { _ = "STUB: not implemented"; return }
+
 func (m *m3Sink) IncrCounterWithLabels(key []string, val float32, labels []Label) {
-	subscope := m.subscopeWithLabels(labels)
-	m.incrCounter(key, val, subscope)
+	_ = "STUB: not implemented"
+	return
 }
 
 // Samples are for timing information, where quantiles are used
-func (m *m3Sink) AddSample(key []string, val float32) {
-	m.addSample(key, val, m.scope)
-}
+func (m *m3Sink) AddSample(key []string, val float32) { _ = "STUB: not implemented"; return }
 
 func (m *m3Sink) AddSampleWithLabels(key []string, val float32, labels []Label) {
-	subscope := m.subscopeWithLabels(labels)
-	m.addSample(key, val, subscope)
+	_ = "STUB: not implemented"
+	return
 }
 
 func (m *m3Sink) subscopeWithLabels(labels []Label) tally.Scope {
-	tags := labelsToTags(labels)
-	return m.scope.Tagged(tags)
+	_ = "STUB: not implemented"
+	return *new(tally.Scope)
 }
 
 // Flattens the key for formatting, removes spaces
 func (m *m3Sink) flattenKey(parts []string) string {
+	_ = "STUB: not implemented"
 	// Ignore service name and type of metric as part of metric name,
 	// i.e. prefer "foo_bar" to "service_counter_foo_bar"
-	return strings.Join(parts[2:], "_")
+	return ""
 }
 
-func (m *m3Sink) Shutdown() {
-}
+func (m *m3Sink) Shutdown() { _ = "STUB: not implemented"; return }
 
-func labelsToTags(labels []Label) map[string]string {
-	tags := make(map[string]string, len(labels))
-	for _, l := range labels {
-		tags[l.Name] = l.Value
-	}
-
-	return tags
-}
+func labelsToTags(labels []Label) map[string]string { _ = "STUB: not implemented"; return nil }
 
 func (m *m3Sink) setGauge(key []string, val float64, scope tally.Scope) {
-	gauge := m.getGauge(key, scope)
-	gauge.Update(val)
+	_ = "STUB: not implemented"
+	return
 }
 
 func (m *m3Sink) getGauge(key []string, scope tally.Scope) tally.Gauge {
-	flattenedKey := m.flattenKey(key)
-	return scope.Gauge(flattenedKey)
+	_ = "STUB: not implemented"
+	return *new(tally.Gauge)
 }
 
 func (m *m3Sink) incrCounter(key []string, val float32, scope tally.Scope) {
-	counter := m.getCounter(key, scope)
-	val64 := int64(val)
-	counter.Inc(val64)
+	_ = "STUB: not implemented"
+	return
 }
 
 func (m *m3Sink) getCounter(key []string, scope tally.Scope) tally.Counter {
-	flattenedKey := m.flattenKey(key)
-	return scope.Counter(flattenedKey)
+	_ = "STUB: not implemented"
+	return *new(tally.Counter)
 }
 
 func (m *m3Sink) addSample(key []string, val float32, scope tally.Scope) {
-	flattenedKey := m.flattenKey(key)
-	if key[1] == "timer" {
-		m.addDurationSample(flattenedKey, val, scope)
-	} else {
-		m.addValueSample(flattenedKey, val, scope)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 func (m *m3Sink) addDurationSample(flattenedKey string, val float32, scope tally.Scope) {
-	histogram := scope.Histogram(flattenedKey, durationBuckets)
-	dur := time.Duration(int64(val)) * timerGranularity
-	histogram.RecordDuration(dur)
+	_ = "STUB: not implemented"
+	return
 }
 
 func (m *m3Sink) addValueSample(flattenedKey string, val float32, scope tally.Scope) {
-	histogram := scope.Histogram(flattenedKey, exponentialValueBuckets)
-	val64 := float64(val)
-	histogram.RecordValue(val64)
+	_ = "STUB: not implemented"
+	return
 }
 
 var _ Sink = (*m3Sink)(nil)
@@ -195,49 +149,14 @@ type m3Runner struct {
 }
 
 func newM3Runner(c *MetricsConfig) (sinkRunner, error) {
-	runner := &m3Runner{}
-	for _, conf := range c.FileConfig.M3 {
-		sink, err := newM3Sink(c.ServiceName, conf.Address, conf.Env)
-		if err != nil {
-			return runner, err
-		}
-
-		runner.loadedSinks = append(runner.loadedSinks, sink)
-	}
-
-	return runner, nil
+	_ = "STUB: not implemented"
+	return *new(sinkRunner), nil
 }
 
-func (r *m3Runner) isConfigured() bool {
-	return len(r.loadedSinks) > 0
-}
+func (r *m3Runner) isConfigured() bool { _ = "STUB: not implemented"; return false }
 
-func (r *m3Runner) sinks() []Sink {
-	s := make([]Sink, len(r.loadedSinks))
-	for i, v := range r.loadedSinks {
-		s[i] = v
-	}
+func (r *m3Runner) sinks() []Sink { _ = "STUB: not implemented"; return nil }
 
-	return s
-}
+func (r *m3Runner) run(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
-func (r *m3Runner) run(ctx context.Context) error {
-	if !r.isConfigured() {
-		return nil
-	}
-
-	var wg sync.WaitGroup
-	wg.Go(func() {
-		<-ctx.Done()
-		for _, s := range r.loadedSinks {
-			s.closer.Close()
-		}
-	})
-
-	wg.Wait()
-	return ctx.Err()
-}
-
-func (r *m3Runner) requiresTypePrefix() bool {
-	return true
-}
+func (r *m3Runner) requiresTypePrefix() bool { _ = "STUB: not implemented"; return false }

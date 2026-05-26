@@ -9,11 +9,8 @@ import (
 )
 
 func WithMetrics(km keymanager.KeyManager, metrics telemetry.Metrics) keymanager.KeyManager {
-	return keyManagerWrapper{
-		PluginInfo: km,
-		km:         km,
-		m:          metrics,
-	}
+	_ = "STUB: not implemented"
+	return *new(keymanager.KeyManager)
 }
 
 type keyManagerWrapper struct {
@@ -23,16 +20,16 @@ type keyManagerWrapper struct {
 }
 
 func (w keyManagerWrapper) GenerateKey(ctx context.Context, keyID string, keyType keymanager.KeyType) (_ keymanager.Key, err error) {
-	defer StartGenerateKeyCall(w.m).Done(&err)
-	return w.km.GenerateKey(ctx, keyID, keyType)
+	_ = "STUB: not implemented"
+	return *new(keymanager.Key), nil
 }
 
 func (w keyManagerWrapper) GetKey(ctx context.Context, keyID string) (_ keymanager.Key, err error) {
-	defer StartGetKeyCall(w.m).Done(&err)
-	return w.km.GetKey(ctx, keyID)
+	_ = "STUB: not implemented"
+	return *new(keymanager.Key), nil
 }
 
 func (w keyManagerWrapper) GetKeys(ctx context.Context) (_ []keymanager.Key, err error) {
-	defer StartGetKeysCall(w.m).Done(&err)
-	return w.km.GetKeys(ctx)
+	_ = "STUB: not implemented"
+	return nil, nil
 }

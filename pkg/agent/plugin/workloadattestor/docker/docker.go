@@ -2,24 +2,18 @@ package docker
 
 import (
 	"context"
-	"fmt"
-	"strings"
 	"sync"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
 	dockerclient "github.com/docker/docker/client"
 	"github.com/hashicorp/go-hclog"
-	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/token"
 	workloadattestorv1 "github.com/spiffe/spire-plugin-sdk/proto/spire/plugin/agent/workloadattestor/v1"
 	configv1 "github.com/spiffe/spire-plugin-sdk/proto/spire/service/common/config/v1"
 	"github.com/spiffe/spire/pkg/agent/common/sigstore"
 	"github.com/spiffe/spire/pkg/common/catalog"
 	"github.com/spiffe/spire/pkg/common/pluginconf"
-	"github.com/spiffe/spire/pkg/common/telemetry"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 const (
@@ -30,16 +24,9 @@ const (
 	subselectorImageConfigDigest = "image_config_digest"
 )
 
-func BuiltIn() catalog.BuiltIn {
-	return builtin(New())
-}
+func BuiltIn() catalog.BuiltIn { _ = "STUB: not implemented"; return *new(catalog.BuiltIn) }
 
-func builtin(p *Plugin) catalog.BuiltIn {
-	return catalog.MakeBuiltIn(pluginName,
-		workloadattestorv1.WorkloadAttestorPluginServer(p),
-		configv1.ConfigServiceServer(p),
-	)
-}
+func builtin(p *Plugin) catalog.BuiltIn { _ = "STUB: not implemented"; return *new(catalog.BuiltIn) }
 
 // Docker is a subset of the docker client functionality, useful for mocking.
 type Docker interface {
@@ -66,18 +53,11 @@ type Plugin struct {
 	podmanClientFactory func(socketPath string) (podmanDocker, error)
 }
 
-func New() *Plugin {
-	return &Plugin{
-		retryer:             newRetryer(),
-		podmanClientFactory: defaultPodmanClientFactory,
-	}
-}
+func New() *Plugin { _ = "STUB: not implemented"; return nil }
 
 func defaultPodmanClientFactory(socketPath string) (podmanDocker, error) {
-	return dockerclient.NewClientWithOpts(
-		dockerclient.WithHost(socketPath),
-		dockerclient.WithAPIVersionNegotiation(),
-	)
+	_ = "STUB: not implemented"
+	return *new(podmanDocker), nil
 }
 
 type dockerPluginConfig struct {
@@ -97,173 +77,36 @@ type dockerPluginConfig struct {
 }
 
 func (p *Plugin) buildConfig(coreConfig catalog.CoreConfig, hclText string, status *pluginconf.Status) *dockerPluginConfig {
-	var err error
-	newConfig := &dockerPluginConfig{}
-	if err = hcl.Decode(newConfig, hclText); err != nil {
-		status.ReportErrorf("unable to decode configuration: %v", err)
-		return nil
-	}
-
-	pluginconf.ReportUnusedKeys(status, newConfig.UnusedKeyPositions)
-
-	newConfig.containerHelper = p.createHelper(newConfig, status)
-
-	dockerHost := getDockerHost(newConfig)
-	if dockerHost != "" {
-		newConfig.dockerOpts = append(newConfig.dockerOpts, dockerclient.WithHost(dockerHost))
-	}
-	if newConfig.DockerVersion == "" {
-		newConfig.dockerOpts = append(newConfig.dockerOpts, dockerclient.WithAPIVersionNegotiation())
-	} else {
-		newConfig.dockerOpts = append(newConfig.dockerOpts, dockerclient.WithVersion(newConfig.DockerVersion))
-	}
-
-	if newConfig.Sigstore != nil {
-		newConfig.sigstoreConfig = sigstore.NewConfigFromHCL(newConfig.Sigstore, p.log)
-	}
-
-	return newConfig
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (p *Plugin) SetLogger(log hclog.Logger) {
-	p.log = log
-}
+func (p *Plugin) SetLogger(log hclog.Logger) { _ = "STUB: not implemented"; return }
 
 func (p *Plugin) Attest(ctx context.Context, req *workloadattestorv1.AttestRequest) (*workloadattestorv1.AttestResponse, error) {
-	p.mtx.RLock()
-	defer p.mtx.RUnlock()
-
-	containerID, podmanSocket, err := p.c.getContainerIDAndSocket(req.Pid, p.log)
-	switch {
-	case err != nil:
-		return nil, err
-	case containerID == "":
-		// Not a docker workload. Nothing more to do.
-		return &workloadattestorv1.AttestResponse{}, nil
-	}
-
-	client := p.docker
-	if podmanSocket != "" {
-		podmanClient, err := p.podmanClientFactory(podmanSocket)
-		if err != nil {
-			return nil, fmt.Errorf("unable to create Podman client for socket %q: %w", podmanSocket, err)
-		}
-		defer func() {
-			if closeErr := podmanClient.Close(); closeErr != nil {
-				p.log.Warn("Failed to close Podman client", telemetry.Error, closeErr)
-			}
-		}()
-		client = podmanClient
-	}
-
-	var container container.InspectResponse
-	err = p.retryer.Retry(ctx, func() error {
-		container, err = client.ContainerInspect(ctx, containerID)
-		return err
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	selectors := getSelectorValuesFromConfig(container.Config)
-
-	var imageJSON image.InspectResponse
-	var inspectErr error
-	imageName := container.Config.Image
-	if imageName != "" || p.sigstoreVerifier != nil {
-		imageJSON, _, inspectErr = client.ImageInspectWithRaw(ctx, imageName)
-	}
-
-	// Add image_config_digest selector
-	if inspectErr == nil && imageJSON.ID != "" {
-		selectors = append(selectors, fmt.Sprintf("%s:%s", subselectorImageConfigDigest, imageJSON.ID))
-	}
-
-	if p.sigstoreVerifier != nil {
-		if inspectErr != nil {
-			return nil, fmt.Errorf("failed to inspect image %q: %w", imageName, inspectErr)
-		}
-
-		if len(imageJSON.RepoDigests) == 0 {
-			return nil, fmt.Errorf("sigstore signature verification failed: no repo digest found for image %s", imageName)
-		}
-
-		var verified bool
-		// RepoDigests is a list of content-addressable digests of locally available
-		// image manifests that the image is referenced from. Multiple manifests can
-		// refer to the same image.
-		var allErrors []string
-		for _, digest := range imageJSON.RepoDigests {
-			sigstoreSelectors, err := p.sigstoreVerifier.Verify(ctx, digest)
-			if err != nil {
-				p.log.Warn("Error verifying sigstore image signature", telemetry.ImageID, digest, telemetry.Error, err)
-				allErrors = append(allErrors, fmt.Sprintf("%s %s: %v", telemetry.ImageID, digest, err))
-				continue
-			}
-			selectors = append(selectors, sigstoreSelectors...)
-			verified = true
-			break
-		}
-
-		if !verified {
-			return nil, fmt.Errorf("sigstore signature verification failed for image %s: %v", imageName, fmt.Sprintf("errors: %s", strings.Join(allErrors, "; ")))
-		}
-	}
-
-	return &workloadattestorv1.AttestResponse{
-		SelectorValues: selectors,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
+// Not a docker workload. Nothing more to do.
+
+// Add image_config_digest selector
+
+// RepoDigests is a list of content-addressable digests of locally available
+// image manifests that the image is referenced from. Multiple manifests can
+// refer to the same image.
+
 func getSelectorValuesFromConfig(cfg *container.Config) []string {
-	var selectorValues []string
-	for label, value := range cfg.Labels {
-		selectorValues = append(selectorValues, fmt.Sprintf("%s:%s:%s", subselectorLabel, label, value))
-	}
-	for _, e := range cfg.Env {
-		selectorValues = append(selectorValues, fmt.Sprintf("%s:%s", subselectorEnv, e))
-	}
-	if cfg.Image != "" {
-		selectorValues = append(selectorValues, fmt.Sprintf("%s:%s", subselectorImageID, cfg.Image))
-	}
-	return selectorValues
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (p *Plugin) Configure(ctx context.Context, req *configv1.ConfigureRequest) (*configv1.ConfigureResponse, error) {
-	newConfig, _, err := pluginconf.Build(req, p.buildConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	docker, err := dockerclient.NewClientWithOpts(newConfig.dockerOpts...)
-	if err != nil {
-		return nil, err
-	}
-
-	var sigstoreVerifier sigstore.Verifier
-	if newConfig.sigstoreConfig != nil {
-		verifier := sigstore.NewVerifier(newConfig.sigstoreConfig)
-		err = verifier.Init(ctx)
-		if err != nil {
-			return nil, status.Errorf(codes.InvalidArgument, "error initializing sigstore verifier: %v", err)
-		}
-		sigstoreVerifier = verifier
-	}
-
-	p.mtx.Lock()
-	defer p.mtx.Unlock()
-	p.docker = docker
-	p.c = newConfig.containerHelper
-	p.sigstoreVerifier = sigstoreVerifier
-
-	return &configv1.ConfigureResponse{}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (p *Plugin) Validate(_ context.Context, req *configv1.ValidateRequest) (*configv1.ValidateResponse, error) {
-	_, notes, err := pluginconf.Build(req, p.buildConfig)
-
-	return &configv1.ValidateResponse{
-		Valid: err == nil,
-		Notes: notes,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

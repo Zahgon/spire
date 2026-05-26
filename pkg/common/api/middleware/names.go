@@ -4,10 +4,8 @@ import (
 	"context"
 	"strings"
 	"sync"
-	"unicode"
 
 	"github.com/spiffe/spire/pkg/common/api"
-	"github.com/spiffe/spire/pkg/common/api/rpccontext"
 )
 
 const (
@@ -60,20 +58,8 @@ var (
 // full method is parsed and the names cached and returned along with an
 // embellished context.
 func withNames(ctx context.Context, fullMethod string) (context.Context, api.Names) {
-	names, ok := rpccontext.Names(ctx)
-	if ok {
-		return ctx, names
-	}
-
-	cached, ok := namesCache.Load(fullMethod)
-	if ok {
-		names = cached.(api.Names)
-	} else {
-		names = makeNames(fullMethod)
-		namesCache.Store(fullMethod, names)
-	}
-
-	return rpccontext.WithNames(ctx, names), names
+	_ = "STUB: not implemented"
+	return *new(context.Context), *new(api.Names)
 }
 
 // makeNames parses a gRPC full method name into individual parts.  It expects
@@ -81,53 +67,21 @@ func withNames(ctx context.Context, fullMethod string) (context.Context, api.Nam
 // names. It will not panic if given bad input, but will not provide meaningful
 // names.
 func makeNames(fullMethod string) (names api.Names) {
+	_ = "STUB: not implemented"
 	// Strip the leading slash. It should always be present in practice.
-	if len(fullMethod) > 0 && fullMethod[0] == '/' {
-		fullMethod = fullMethod[1:]
-	}
-
-	// Parse the slash separated service and method name. The separating slash
-	// should always be present in practice.
-	if before, after, ok := strings.Cut(fullMethod, "/"); ok {
-		names.RawService = before
-		names.Method = after
-	}
-
-	names.Service = serviceReplacer.Replace(names.RawService)
-	names.MetricKey = append(names.MetricKey, strings.Split(names.Service, ".")...)
-	names.MetricKey = append(names.MetricKey, methodMetricKeyReplacer.Replace(names.Method))
-	for i := range names.MetricKey {
-		names.MetricKey[i] = metricKey(names.MetricKey[i])
-	}
-	return names
+	return *new(api.Names)
 }
+
+// Parse the slash separated service and method name. The separating slash
+// should always be present in practice.
 
 // metricKey converts an RPC service or method name into one appropriate for
 // metrics use. It converts PascalCase into snake_case, also converting any
 // non-alphanumeric rune into an underscore.
-func metricKey(s string) string {
-	in := []rune(s)
-	var out []rune
+func metricKey(s string) string { _ = "STUB: not implemented"; return "" }
 
-	for i, r := range in {
-		if !unicode.In(r, unicode.Letter, unicode.Number) {
-			out = append(out, '_')
-			continue
-		}
-		lr := unicode.ToLower(r)
-		// Add an underscore if the current rune:
-		// - is uppercase
-		// - not the first rune
-		// - is followed or preceded by a lowercase rune
-		// - was not preceded by an underscore in the output
-		if r != lr &&
-			i > 0 &&
-			(i+1) < len(in) &&
-			(unicode.IsLower(in[i+1]) || unicode.IsLower(in[i-1])) &&
-			out[len(out)-1] != '_' {
-			out = append(out, '_')
-		}
-		out = append(out, lr)
-	}
-	return string(out)
-}
+// Add an underscore if the current rune:
+// - is uppercase
+// - not the first rune
+// - is followed or preceded by a lowercase rune
+// - was not preceded by an underscore in the output

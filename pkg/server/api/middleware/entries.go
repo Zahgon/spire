@@ -5,9 +5,6 @@ import (
 
 	"github.com/spiffe/go-spiffe/v2/spiffeid"
 	"github.com/spiffe/spire-api-sdk/proto/spire/api/types"
-	"github.com/spiffe/spire/pkg/server/api/rpccontext"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type EntryFetcher interface {
@@ -20,7 +17,8 @@ type EntryFetcherFunc func(ctx context.Context, id spiffeid.ID) ([]*types.Entry,
 
 // FetchEntries fetches the downstream entries matching the given SPIFFE ID.
 func (fn EntryFetcherFunc) FetchEntries(ctx context.Context, id spiffeid.ID) ([]*types.Entry, error) {
-	return fn(ctx, id)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 type callerEntriesKey struct{}
@@ -30,20 +28,6 @@ type callerEntriesKey struct{}
 // without re-fetching. This reduces entry fetching in the face of multiple
 // authorizers.
 func WithCallerEntries(ctx context.Context, entryFetcher EntryFetcher) (context.Context, []*types.Entry, error) {
-	if entries, ok := ctx.Value(callerEntriesKey{}).([]*types.Entry); ok {
-		return ctx, entries, nil
-	}
-
-	var entries []*types.Entry
-	id, ok := rpccontext.CallerID(ctx)
-	if !ok {
-		return ctx, nil, nil
-	}
-
-	entries, err := entryFetcher.FetchEntries(ctx, id)
-	if err != nil {
-		rpccontext.Logger(ctx).WithError(err).Error("Failed to fetch caller entries")
-		return nil, nil, status.Errorf(codes.Internal, "failed to fetch caller entries: %v", err)
-	}
-	return context.WithValue(ctx, callerEntriesKey{}, entries), entries, nil
+	_ = "STUB: not implemented"
+	return *new(context.Context), nil, nil
 }

@@ -6,71 +6,31 @@ import (
 )
 
 func FromCommonProto(pb *common.PublicKey) (WITKey, error) {
-	return fromProtoFields(pb.Kid, pb.PkixBytes, pb.NotAfter, pb.TaintedKey)
+	_ = "STUB: not implemented"
+	return *new(WITKey), nil
 }
 
 func FromCommonProtos(pbs []*common.PublicKey) ([]WITKey, error) {
-	if pbs == nil {
-		return nil, nil
-	}
-	witKeys := make([]WITKey, 0, len(pbs))
-	for _, pb := range pbs {
-		witKey, err := FromCommonProto(pb)
-		if err != nil {
-			return nil, err
-		}
-		witKeys = append(witKeys, witKey)
-	}
-	return witKeys, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func ToCommonProto(witKey WITKey) (*common.PublicKey, error) {
-	id, publicKey, expiresAt, tainted, err := toProtoFields(witKey)
-	if err != nil {
-		return nil, err
-	}
-	return &common.PublicKey{
-		Kid:        id,
-		PkixBytes:  publicKey,
-		NotAfter:   expiresAt,
-		TaintedKey: tainted,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func ToCommonProtos(witKeys []WITKey) ([]*common.PublicKey, error) {
-	if witKeys == nil {
-		return nil, nil
-	}
-	pbs := make([]*common.PublicKey, 0, len(witKeys))
-	for _, witKey := range witKeys {
-		pb, err := ToCommonProto(witKey)
-		if err != nil {
-			return nil, err
-		}
-		pbs = append(pbs, pb)
-	}
-	return pbs, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func ToCommonFromPluginProto(pb *plugintypes.WITKey) (*common.PublicKey, error) {
-	witKey, err := FromPluginProto(pb)
-	if err != nil {
-		return nil, err
-	}
-	return ToCommonProto(witKey)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func ToCommonFromPluginProtos(pbs []*plugintypes.WITKey) ([]*common.PublicKey, error) {
-	if pbs == nil {
-		return nil, nil
-	}
-	witKeys := make([]*common.PublicKey, 0, len(pbs))
-	for _, pb := range pbs {
-		witKey, err := ToCommonFromPluginProto(pb)
-		if err != nil {
-			return nil, err
-		}
-		witKeys = append(witKeys, witKey)
-	}
-	return witKeys, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

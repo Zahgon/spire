@@ -9,10 +9,11 @@ import (
 type namesKey struct{}
 
 func WithNames(ctx context.Context, names api.Names) context.Context {
-	return context.WithValue(ctx, namesKey{}, names)
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }
 
 func Names(ctx context.Context) (api.Names, bool) {
-	value, ok := ctx.Value(namesKey{}).(api.Names)
-	return value, ok
+	_ = "STUB: not implemented"
+	return *new(api.Names), false
 }

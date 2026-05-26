@@ -17,14 +17,16 @@ const (
 // synchronization manager fetching latest entries information
 // from server
 func StartManagerFetchEntriesUpdatesCall(m telemetry.Metrics) *telemetry.CallCounter {
-	return telemetry.StartCall(m, telemetry.Manager, telemetry.Sync, telemetry.FetchEntriesUpdates)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartManagerFetchSVIDsUpdatesCall returns metric for when agent's
 // synchronization manager fetching latest SVIDs information
 // from server
 func StartManagerFetchSVIDsUpdatesCall(m telemetry.Metrics) *telemetry.CallCounter {
-	return telemetry.StartCall(m, telemetry.Manager, telemetry.Sync, telemetry.FetchSVIDsUpdates)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // End Call Counters
@@ -34,49 +36,31 @@ func StartManagerFetchSVIDsUpdatesCall(m telemetry.Metrics) *telemetry.CallCount
 // AddCacheManagerExpiredSVIDsSample count of expiring SVIDs according to
 // agent cache manager
 func AddCacheManagerExpiredSVIDsSample(m telemetry.Metrics, cacheType string, count float32) {
-	key := []string{telemetry.CacheManager, telemetry.ExpiringSVIDs}
-	if cacheType != "" {
-		key = append(key, cacheType)
-	}
-	m.AddSample(key, count)
+	_ = "STUB: not implemented"
+	return
 }
 
 // AddCacheManagerOutdatedSVIDsSample count of SVIDs with outdated attributes
 // according to agent cache manager
 func AddCacheManagerOutdatedSVIDsSample(m telemetry.Metrics, cacheType string, count float32) {
-	key := []string{telemetry.CacheManager, telemetry.OutdatedSVIDs}
-	if cacheType != "" {
-		key = append(key, cacheType)
-	}
-	m.AddSample(key, count)
+	_ = "STUB: not implemented"
+	return
 }
 
 // AddCacheManagerTaintedX509SVIDsSample count of tainted X509-SVIDs according to
 // agent cache manager
 func AddCacheManagerTaintedX509SVIDsSample(m telemetry.Metrics, cacheType string, count float32) {
-	key := []string{telemetry.CacheManager, telemetry.TaintedX509SVIDs}
-	if cacheType != "" {
-		key = append(key, cacheType)
-	}
-	m.AddSample(key, count)
+	_ = "STUB: not implemented"
+	return
 }
 
 // AddCacheManagerTaintedJWTSVIDsSample count of tainted JWT-SVIDs according to
 // agent cache manager
 func AddCacheManagerTaintedJWTSVIDsSample(m telemetry.Metrics, cacheType string, count float32) {
-	key := []string{telemetry.CacheManager, telemetry.TaintedJWTSVIDs}
-	if cacheType != "" {
-		key = append(key, cacheType)
-	}
-	m.AddSample(key, count)
+	_ = "STUB: not implemented"
+	return
 }
 
 // End Add Samples
 
-func SetSyncStats(m telemetry.Metrics, stats client.SyncStats) {
-	m.SetGauge([]string{telemetry.SyncBundlesTotal}, float32(stats.Bundles.Total))
-	m.SetGauge([]string{telemetry.SyncEntriesTotal}, float32(stats.Entries.Total))
-	m.SetGauge([]string{telemetry.SyncEntriesMissing}, float32(stats.Entries.Missing))
-	m.SetGauge([]string{telemetry.SyncEntriesStale}, float32(stats.Entries.Stale))
-	m.SetGauge([]string{telemetry.SyncEntriesDropped}, float32(stats.Entries.Dropped))
-}
+func SetSyncStats(m telemetry.Metrics, stats client.SyncStats) { _ = "STUB: not implemented"; return }

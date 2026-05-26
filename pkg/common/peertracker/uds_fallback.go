@@ -3,5 +3,6 @@
 package peertracker
 
 func getCallerInfoFromFileDescriptor(uintptr) (CallerInfo, error) {
-	return CallerInfo{}, ErrUnsupportedPlatform
+	_ = "STUB: not implemented"
+	return *new(CallerInfo), nil
 }

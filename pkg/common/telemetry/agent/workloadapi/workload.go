@@ -10,16 +10,15 @@ import (
 // StartAttestationCall return metric
 // for agent's Workload API Attestor for overall attestation
 func StartAttestationCall(m telemetry.Metrics) *telemetry.CallCounter {
-	cc := telemetry.StartCall(m, telemetry.WorkloadAPI, telemetry.WorkloadAttestation)
-	return cc
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StartAttestorCall return metric
 // for agent's Workload API Attestor for a specific attestor
 func StartAttestorCall(m telemetry.Metrics, aType string) *telemetry.CallCounter {
-	cc := telemetry.StartCall(m, telemetry.WorkloadAPI, telemetry.WorkloadAttestor)
-	cc.AddLabel(telemetry.Attestor, aType)
-	return cc
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // End Call Counters
@@ -28,13 +27,12 @@ func StartAttestorCall(m telemetry.Metrics, aType string) *telemetry.CallCounter
 
 // IncrConnectionCounter indicate Workload
 // API connection (some connection is made, running total count)
-func IncrConnectionCounter(m telemetry.Metrics) {
-	m.IncrCounter([]string{telemetry.WorkloadAPI, telemetry.Connection}, 1)
-}
+func IncrConnectionCounter(m telemetry.Metrics) { _ = "STUB: not implemented"; return }
 
 // SetConnectionTotalGauge sets the number of active Workload API connections
 func SetConnectionTotalGauge(m telemetry.Metrics, connections int32) {
-	m.SetGauge([]string{telemetry.WorkloadAPI, telemetry.Connections}, float32(connections))
+	_ = "STUB: not implemented"
+	return
 }
 
 // End Counters
@@ -44,7 +42,8 @@ func SetConnectionTotalGauge(m telemetry.Metrics, connections int32) {
 // AddDiscoveredSelectorsSample count of discovered selectors
 // during an agent Workload Attest call
 func AddDiscoveredSelectorsSample(m telemetry.Metrics, count float32) {
-	m.AddSample([]string{telemetry.WorkloadAPI, telemetry.DiscoveredSelectors}, count)
+	_ = "STUB: not implemented"
+	return
 }
 
 // End Add Samples

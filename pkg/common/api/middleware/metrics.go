@@ -3,7 +3,6 @@ package middleware
 import (
 	"context"
 
-	"github.com/spiffe/spire/pkg/common/api/rpccontext"
 	"github.com/spiffe/spire/pkg/common/telemetry"
 )
 
@@ -13,9 +12,8 @@ import (
 // rpccontext.AddMetricsLabel function. If unset, it also provides name
 // metadata on to the handler context.
 func WithMetrics(metrics telemetry.Metrics) Middleware {
-	return metricsMiddleware{
-		metrics: metrics,
-	}
+	_ = "STUB: not implemented"
+	return *new(Middleware)
 }
 
 type metricsMiddleware struct {
@@ -23,16 +21,11 @@ type metricsMiddleware struct {
 }
 
 func (m metricsMiddleware) Preprocess(ctx context.Context, fullMethod string, _ any) (context.Context, error) {
-	ctx, names := withNames(ctx, fullMethod)
-	counter := telemetry.StartCall(m.metrics, "rpc", names.MetricKey...)
-	return rpccontext.WithCallCounter(ctx, counter), nil
+	_ = "STUB: not implemented"
+	return *new(context.Context), nil
 }
 
 func (m metricsMiddleware) Postprocess(ctx context.Context, _ string, _ bool, rpcErr error) {
-	counter, ok := rpccontext.CallCounter(ctx).(*telemetry.CallCounter)
-	if !ok {
-		LogMisconfiguration(ctx, "Metrics misconfigured; this is a bug")
-		return
-	}
-	counter.Done(&rpcErr)
+	_ = "STUB: not implemented"
+	return
 }

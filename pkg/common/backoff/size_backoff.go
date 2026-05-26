@@ -26,29 +26,17 @@ type sizeLimitedBackOff struct {
 
 var _ SizeLimitedBackOff = (*sizeLimitedBackOff)(nil)
 
-func (r *sizeLimitedBackOff) NextBackOff() int {
-	return r.currentSize
-}
+func (r *sizeLimitedBackOff) NextBackOff() int { _ = "STUB: not implemented"; return 0 }
 
-func (r *sizeLimitedBackOff) Success() {
-	r.currentSize = min(r.currentSize*2, r.maxSize)
-}
+func (r *sizeLimitedBackOff) Success() { _ = "STUB: not implemented"; return }
 
-func (r *sizeLimitedBackOff) Failure() {
-	r.currentSize = max(r.currentSize/2, 1)
-}
+func (r *sizeLimitedBackOff) Failure() { _ = "STUB: not implemented"; return }
 
-func (r *sizeLimitedBackOff) Reset() {
-	r.currentSize = r.maxSize
-}
+func (r *sizeLimitedBackOff) Reset() { _ = "STUB: not implemented"; return }
 
 // NewSizeLimitedBackOff returns a new SizeLimitedBackOff with provided maxRequestSize and lowest request size of 1.
 // On Failure the size gets reduced by half and on Success size gets doubled
 func NewSizeLimitedBackOff(maxRequestSize int) SizeLimitedBackOff {
-	b := &sizeLimitedBackOff{
-		maxSize: maxRequestSize,
-	}
-	b.Reset()
-
-	return b
+	_ = "STUB: not implemented"
+	return *new(SizeLimitedBackOff)
 }

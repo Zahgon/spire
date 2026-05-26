@@ -39,9 +39,7 @@ type AttestedNode struct {
 }
 
 // TableName gets table name of AttestedNode
-func (AttestedNode) TableName() string {
-	return "attested_node_entries"
-}
+func (AttestedNode) TableName() string { _ = "STUB: not implemented"; return "" }
 
 // AttestedNodeEvent holds the SPIFFE ID of nodes that had an event
 type AttestedNodeEvent struct {
@@ -51,9 +49,7 @@ type AttestedNodeEvent struct {
 }
 
 // TableName gets table name for AttestedNodeEvent
-func (AttestedNodeEvent) TableName() string {
-	return "attested_node_entries_events"
-}
+func (AttestedNodeEvent) TableName() string { _ = "STUB: not implemented"; return "" }
 
 // NodeSelector holds a node selector by spiffe ID
 type NodeSelector struct {
@@ -65,9 +61,7 @@ type NodeSelector struct {
 }
 
 // TableName gets table name of NodeSelector
-func (NodeSelector) TableName() string {
-	return "node_resolver_map_entries"
-}
+func (NodeSelector) TableName() string { _ = "STUB: not implemented"; return "" }
 
 // RegisteredEntry holds a registered entity entry
 type RegisteredEntry struct {
@@ -115,9 +109,7 @@ type RegisteredEntryEvent struct {
 }
 
 // TableName gets table name for RegisteredEntryEvent
-func (RegisteredEntryEvent) TableName() string {
-	return "registered_entries_events"
-}
+func (RegisteredEntryEvent) TableName() string { _ = "STUB: not implemented"; return "" }
 
 // JoinToken holds a join token
 type JoinToken struct {
@@ -145,12 +137,14 @@ type DNSName struct {
 
 // TableName gets table name for DNS entries
 func (DNSName) TableName() string {
-	return "dns_names"
+	_ = "STUB: not implemented"
+
+	// FederatedTrustDomain holds federated trust domains.
+	// It has the information needed to get updated bundles of the
+	// federated trust domain from a SPIFFE bundle endpoint server.
+	return ""
 }
 
-// FederatedTrustDomain holds federated trust domains.
-// It has the information needed to get updated bundles of the
-// federated trust domain from a SPIFFE bundle endpoint server.
 type FederatedTrustDomain struct {
 	Model
 
@@ -175,9 +169,7 @@ type FederatedTrustDomain struct {
 }
 
 // TableName gets table name of FederatedTrustDomain
-func (FederatedTrustDomain) TableName() string {
-	return "federated_trust_domains"
-}
+func (FederatedTrustDomain) TableName() string { _ = "STUB: not implemented"; return "" }
 
 // CAJournal holds information about prepared, active, and old X509 and JWT
 // authorities of servers sharing this database. This information helps to

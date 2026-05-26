@@ -1,9 +1,6 @@
 package protoutil
 
 import (
-	"reflect"
-	"strings"
-
 	"github.com/spiffe/spire-api-sdk/proto/spire/api/types"
 	"github.com/spiffe/spire/proto/spire/common"
 	"google.golang.org/protobuf/proto"
@@ -20,16 +17,8 @@ var (
 )
 
 func MakeAllTrueMask(m proto.Message) proto.Message {
-	v := reflect.ValueOf(proto.Clone(m)).Elem()
-	t := v.Type()
-	for i := range v.NumField() {
-		ft := t.Field(i)
-		fv := v.Field(i)
-		// Skip the protobuf internal fields or those that aren't bools
-		if strings.HasPrefix(ft.Name, "XXX_") || ft.Type.Kind() != reflect.Bool {
-			continue
-		}
-		fv.SetBool(true)
-	}
-	return v.Addr().Interface().(proto.Message)
+	_ = "STUB: not implemented"
+	return *new(proto.Message)
 }
+
+// Skip the protobuf internal fields or those that aren't bools

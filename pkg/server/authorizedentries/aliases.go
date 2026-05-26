@@ -18,32 +18,6 @@ type aliasRecord struct {
 	AllSelectors selectorSet
 }
 
-func aliasRecordByEntryID(a, b aliasRecord) bool {
-	switch {
-	case a.EntryID < b.EntryID:
-		return true
-	case a.EntryID > b.EntryID:
-		return false
-	case a.Selector.Type < b.Selector.Type:
-		return true
-	case a.Selector.Type > b.Selector.Type:
-		return false
-	default:
-		return a.Selector.Value < b.Selector.Value
-	}
-}
+func aliasRecordByEntryID(a, b aliasRecord) bool { _ = "STUB: not implemented"; return false }
 
-func aliasRecordBySelector(a, b aliasRecord) bool {
-	switch {
-	case a.Selector.Type < b.Selector.Type:
-		return true
-	case a.Selector.Type > b.Selector.Type:
-		return false
-	case a.Selector.Value < b.Selector.Value:
-		return true
-	case a.Selector.Value > b.Selector.Value:
-		return false
-	default:
-		return a.EntryID < b.EntryID
-	}
-}
+func aliasRecordBySelector(a, b aliasRecord) bool { _ = "STUB: not implemented"; return false }

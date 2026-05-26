@@ -33,57 +33,65 @@ type kmsClient struct {
 }
 
 func (c *kmsClient) AsymmetricSign(ctx context.Context, req *kmspb.AsymmetricSignRequest, opts ...gax.CallOption) (*kmspb.AsymmetricSignResponse, error) {
-	return c.client.AsymmetricSign(ctx, req, opts...)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (c *kmsClient) Close() error {
-	return c.client.Close()
-}
+func (c *kmsClient) Close() error { _ = "STUB: not implemented"; return nil }
 
 func (c *kmsClient) CreateCryptoKey(ctx context.Context, req *kmspb.CreateCryptoKeyRequest, opts ...gax.CallOption) (*kmspb.CryptoKey, error) {
-	return c.client.CreateCryptoKey(ctx, req, opts...)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *kmsClient) CreateCryptoKeyVersion(ctx context.Context, req *kmspb.CreateCryptoKeyVersionRequest, opts ...gax.CallOption) (*kmspb.CryptoKeyVersion, error) {
-	return c.client.CreateCryptoKeyVersion(ctx, req, opts...)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *kmsClient) DestroyCryptoKeyVersion(ctx context.Context, req *kmspb.DestroyCryptoKeyVersionRequest, opts ...gax.CallOption) (*kmspb.CryptoKeyVersion, error) {
-	return c.client.DestroyCryptoKeyVersion(ctx, req, opts...)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *kmsClient) GetCryptoKeyVersion(ctx context.Context, req *kmspb.GetCryptoKeyVersionRequest, opts ...gax.CallOption) (*kmspb.CryptoKeyVersion, error) {
-	return c.client.GetCryptoKeyVersion(ctx, req, opts...)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *kmsClient) GetPublicKey(ctx context.Context, req *kmspb.GetPublicKeyRequest, opts ...gax.CallOption) (*kmspb.PublicKey, error) {
-	return c.client.GetPublicKey(ctx, req, opts...)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *kmsClient) GetTokeninfo() (*oauth2.Tokeninfo, error) {
-	return c.oauth2Service.Tokeninfo().Do()
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *kmsClient) ListCryptoKeys(ctx context.Context, req *kmspb.ListCryptoKeysRequest, opts ...gax.CallOption) cryptoKeyIterator {
-	return c.client.ListCryptoKeys(ctx, req, opts...)
+	_ = "STUB: not implemented"
+	return *new(cryptoKeyIterator)
 }
 
 func (c *kmsClient) ListCryptoKeyVersions(ctx context.Context, req *kmspb.ListCryptoKeyVersionsRequest, opts ...gax.CallOption) cryptoKeyVersionIterator {
-	return c.client.ListCryptoKeyVersions(ctx, req, opts...)
+	_ = "STUB: not implemented"
+	return *new(cryptoKeyVersionIterator)
 }
 
 func (c *kmsClient) ResourceIAM(resourcePath string) iamHandler {
-	return &iamHandle{
-		h: c.client.ResourceIAM(resourcePath),
-	}
+	_ = "STUB: not implemented"
+	return *new(iamHandler)
 }
 
 func (c *kmsClient) SetIamPolicy(ctx context.Context, req *iampb.SetIamPolicyRequest, opts ...gax.CallOption) (*iampb.Policy, error) {
-	return c.client.SetIamPolicy(ctx, req, opts...)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *kmsClient) UpdateCryptoKey(ctx context.Context, req *kmspb.UpdateCryptoKeyRequest, opts ...gax.CallOption) (*kmspb.CryptoKey, error) {
-	return c.client.UpdateCryptoKey(ctx, req, opts...)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 type cryptoKeyIterator interface {
@@ -107,23 +115,9 @@ type iamHandle struct {
 	h *iam.Handle
 }
 
-func (i *iamHandle) V3() iamHandler3 {
-	return i.h.V3()
-}
+func (i *iamHandle) V3() iamHandler3 { _ = "STUB: not implemented"; return *new(iamHandler3) }
 
 func newKMSClient(ctx context.Context, opts ...option.ClientOption) (cloudKeyManagementService, error) {
-	client, err := kms.NewKeyManagementClient(ctx, opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	oauth2Service, err := oauth2.NewService(ctx, opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	return &kmsClient{
-		client:        client,
-		oauth2Service: oauth2Service,
-	}, nil
+	_ = "STUB: not implemented"
+	return *new(cloudKeyManagementService), nil
 }

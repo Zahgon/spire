@@ -3,10 +3,8 @@
 package process
 
 import (
-	"syscall"
 	"unsafe"
 
-	"github.com/spiffe/spire/pkg/common/util"
 	"golang.org/x/sys/windows"
 )
 
@@ -71,114 +69,63 @@ type API interface {
 type api struct{}
 
 func (a *api) IsProcessInJob(procHandle windows.Handle, jobHandle windows.Handle, result *bool) error {
-	if procIsProcessInJobErr != nil {
-		return procIsProcessInJobErr
-	}
-	r1, _, e1 := syscall.SyscallN(procIsProcessInJob.Addr(), uintptr(procHandle), uintptr(jobHandle), uintptr(unsafe.Pointer(result)))
-	if r1 == 0 {
-		if e1 != 0 {
-			return e1
-		}
-		return syscall.EINVAL
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // GetObjectType gets the object type of the given handle
 func (a *api) GetObjectType(handle windows.Handle) (string, error) {
-	buffer := make([]byte, 1024*10)
-	length := uint32(0)
-
-	status := ntQueryObject(handle, ObjectTypeInformationClass,
-		&buffer[0], util.MustCast[uint32](len(buffer)), &length)
-	if status != windows.STATUS_SUCCESS {
-		return "", status
-	}
-
-	return (*ObjectTypeInformation)(unsafe.Pointer(&buffer[0])).TypeName.String(), nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
 
 // GetObjectName gets the object name of the given handle
 func (a *api) GetObjectName(handle windows.Handle) (string, error) {
-	buffer := make([]byte, 1024*2)
-	var length uint32
-
-	status := ntQueryObject(handle, ObjectNameInformationClass,
-		&buffer[0], util.MustCast[uint32](len(buffer)), &length)
-	if status != windows.STATUS_SUCCESS {
-		return "", status
-	}
-
-	return (*UnicodeString)(unsafe.Pointer(&buffer[0])).String(), nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
 
 func (a *api) QuerySystemExtendedHandleInformation() ([]SystemHandleInformationExItem, error) {
-	buffer := make([]byte, 1024)
-	var retLen uint32
-	var status windows.NTStatus
-
-	for {
-		status = ntQuerySystemInformation(
-			windows.SystemExtendedHandleInformation,
-			unsafe.Pointer(&buffer[0]),
-			util.MustCast[uint32](len(buffer)),
-			&retLen,
-		)
-
-		if status == windows.STATUS_BUFFER_OVERFLOW ||
-			status == windows.STATUS_BUFFER_TOO_SMALL ||
-			status == windows.STATUS_INFO_LENGTH_MISMATCH {
-			if int(retLen) <= cap(buffer) {
-				buffer = unsafe.Slice(&buffer[0], int(retLen))
-			} else {
-				buffer = make([]byte, int(retLen))
-			}
-			continue
-		}
-		// if no error
-		break
-	}
-
-	if status>>30 != 3 {
-		buffer = (buffer)[:int(retLen)]
-
-		handlesList := (*SystemExtendedHandleInformation)(unsafe.Pointer(&buffer[0]))
-		handles := unsafe.Slice(&handlesList.Handles[0], int(handlesList.NumberOfHandles))
-
-		return handles, nil //nolint:nilerr
-	}
-
-	return nil, status
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// if no error
+
+//nolint:nilerr
 
 func (a *api) OpenProcess(desiredAccess uint32, inheritHandle bool, pID uint32) (windows.Handle, error) {
-	return windows.OpenProcess(desiredAccess, inheritHandle, pID)
+	_ = "STUB: not implemented"
+	return *new(windows.Handle), nil
 }
 
-func (a *api) CloseHandle(h windows.Handle) error {
-	return windows.CloseHandle(h)
-}
+func (a *api) CloseHandle(h windows.Handle) error { _ = "STUB: not implemented"; return nil }
 
 // CurrentProcess returns the handle for the current process.
 // It is a pseudo handle that does not need to be closed.
 func (a *api) CurrentProcess() windows.Handle {
-	return windows.CurrentProcess()
+	_ = "STUB: not implemented"
+	return *new(windows.Handle)
 }
 
 func (a *api) DuplicateHandle(hSourceProcessHandle windows.Handle, hSourceHandle windows.Handle, hTargetProcessHandle windows.Handle, lpTargetHandle *windows.Handle, dwDesiredAccess uint32, bInheritHandle bool, dwOptions uint32) error {
-	return windows.DuplicateHandle(hSourceProcessHandle, hSourceHandle, hTargetProcessHandle, lpTargetHandle, dwDesiredAccess, bInheritHandle, dwOptions)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (a *api) CreateToolhelp32Snapshot(flags uint32, pID uint32) (windows.Handle, error) {
-	return windows.CreateToolhelp32Snapshot(flags, pID)
+	_ = "STUB: not implemented"
+	return *new(windows.Handle), nil
 }
 
 func (a *api) Process32First(snapshot windows.Handle, procEntry *windows.ProcessEntry32) error {
-	return windows.Process32First(snapshot, procEntry)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (a *api) Process32Next(snapshot windows.Handle, procEntry *windows.ProcessEntry32) error {
-	return windows.Process32Next(snapshot, procEntry)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // System handle extended information item, returned by NtQuerySystemInformation (https://docs.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntquerysysteminformation)
@@ -217,41 +164,29 @@ type UnicodeString struct {
 }
 
 func (u UnicodeString) String() string {
-	defer func() {
-		// TODO: may we recover?
-		_ = recover()
-	}()
+	_ = "STUB: not implemented"
 
-	data := unsafe.Slice((*uint16)(unsafe.Pointer(u.WString)), int(u.Length*2))
-
-	return windows.UTF16ToString(data)
+	// TODO: may we recover?
+	return ""
 }
 
 func ntQueryObject(handle windows.Handle, objectInformationClass uint32, objectInformation *byte, objectInformationLength uint32, returnLength *uint32) windows.NTStatus {
-	if procNtQueryObjectErr != nil {
-		return windows.STATUS_PROCEDURE_NOT_FOUND
-	}
-	r0, _, _ := syscall.SyscallN(procNtQueryObject.Addr(), uintptr(handle), uintptr(objectInformationClass), uintptr(unsafe.Pointer(objectInformation)), uintptr(objectInformationLength), uintptr(unsafe.Pointer(returnLength)), 0)
-
-	return ntStatusFromSyscall(r0)
+	_ = "STUB: not implemented"
+	return *new(windows.NTStatus)
 }
 
 func ntQuerySystemInformation(sysInfoClass int32, sysInfo unsafe.Pointer, sysInfoLen uint32, retLen *uint32) windows.NTStatus {
-	if procNtQuerySystemInformationErr != nil {
-		return windows.STATUS_PROCEDURE_NOT_FOUND
-	}
-	sysInfoClassUIP, err := util.CheckedCast[uintptr](sysInfoClass)
-	if err != nil {
-		return windows.STATUS_INTEGER_OVERFLOW
-	}
-	r0, _, _ := syscall.SyscallN(procNtQuerySystemInformation.Addr(), sysInfoClassUIP, uintptr(sysInfo), uintptr(sysInfoLen), uintptr(unsafe.Pointer(retLen)), 0, 0)
-	return ntStatusFromSyscall(r0)
+	_ = "STUB: not implemented"
+	return *new(windows.NTStatus)
 }
 
 func ntStatusFromSyscall(r0 uintptr) windows.NTStatus {
+	_ = "STUB: not implemented"
 	// NTSTATUS is a 32-bit Windows ABI value even though syscall.SyscallN
 	// returns it in a uintptr-sized register. Preserve the low 32 bits instead
 	// of treating wider uintptr values as overflow; this keeps statuses with
 	// the high bit set intact even if a platform sign-extends the register.
-	return windows.NTStatus(uint32(r0)) //nolint:gosec // G115: intentional ABI conversion from syscall return value.
+	return *new(windows.NTStatus)
 }
+
+//nolint:gosec // G115: intentional ABI conversion from syscall return value.

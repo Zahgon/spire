@@ -3,11 +3,6 @@ package keymanager
 import (
 	"context"
 	"crypto"
-	"crypto/ecdsa"
-	"crypto/elliptic"
-	"crypto/rand"
-	"crypto/rsa"
-	"fmt"
 
 	"github.com/spiffe/spire/pkg/common/catalog"
 )
@@ -49,33 +44,9 @@ const (
 
 // GenerateSigner generates a new key for the given key type
 func (keyType KeyType) GenerateSigner() (crypto.Signer, error) {
-	switch keyType {
-	case ECP256:
-		return ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	case ECP384:
-		return ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
-	case RSA2048:
-		return rsa.GenerateKey(rand.Reader, 2048)
-	case RSA4096:
-		return rsa.GenerateKey(rand.Reader, 4096)
-	}
-	return nil, fmt.Errorf("unknown key type %q", keyType)
+	_ = "STUB: not implemented"
+	return *new(crypto.Signer), nil
 }
 
 // String returns the string representation of the key type
-func (keyType KeyType) String() string {
-	switch keyType {
-	case KeyTypeUnset:
-		return "UNSET"
-	case ECP256:
-		return "ec-p256"
-	case ECP384:
-		return "ec-p384"
-	case RSA2048:
-		return "rsa-2048"
-	case RSA4096:
-		return "rsa-4096"
-	default:
-		return fmt.Sprintf("UNKNOWN(%d)", int(keyType))
-	}
-}
+func (keyType KeyType) String() string { _ = "STUB: not implemented"; return "" }

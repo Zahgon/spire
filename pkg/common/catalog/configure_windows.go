@@ -7,7 +7,7 @@ import (
 )
 
 func ReconfigureOnSignal(ctx context.Context, _ logrus.FieldLogger, _ Reconfigurer) error {
+	_ = "STUB: not implemented"
 	// TODO: maybe drive this using an event?
-	<-ctx.Done()
-	return ctx.Err()
+	return nil
 }

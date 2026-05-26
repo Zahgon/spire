@@ -1,12 +1,8 @@
 package nodeutil
 
 import (
-	"errors"
-
 	"github.com/spiffe/spire-api-sdk/proto/spire/api/types"
 	"github.com/spiffe/spire/proto/spire/common"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 var (
@@ -23,32 +19,15 @@ var (
 
 // IsAgentBanned determines if a given attested node is banned or not.
 // An agent is considered as "banned" if its X509 SVID serial number is empty.
-func IsAgentBanned(node *common.AttestedNode) bool {
-	return node.CertSerialNumber == ""
-}
+func IsAgentBanned(node *common.AttestedNode) bool { _ = "STUB: not implemented"; return false }
 
 // ShouldAgentReattest returns true if the Server returned an error worth rebooting the Agent
-func ShouldAgentReattest(err error) bool {
-	return isExpectedPermissionDenied(err, shouldReattest)
-}
+func ShouldAgentReattest(err error) bool { _ = "STUB: not implemented"; return false }
 
 // ShouldAgentShutdown returns true if the Server returned an error worth shutting down the Agent
-func ShouldAgentShutdown(err error) bool {
-	return isExpectedPermissionDenied(err, shouldShutDown)
-}
+func ShouldAgentShutdown(err error) bool { _ = "STUB: not implemented"; return false }
 
 func isExpectedPermissionDenied(err error, expectedReason map[types.PermissionDeniedDetails_Reason]struct{}) bool {
-	errStatus := status.Convert(errors.Unwrap(err))
-	if errStatus.Code() != codes.PermissionDenied {
-		return false
-	}
-
-	for _, errDetail := range errStatus.Details() {
-		if details, ok := errDetail.(*types.PermissionDeniedDetails); ok {
-			if _, ok := expectedReason[details.Reason]; ok {
-				return true
-			}
-		}
-	}
+	_ = "STUB: not implemented"
 	return false
 }

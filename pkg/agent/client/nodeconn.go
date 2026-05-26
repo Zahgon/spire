@@ -12,31 +12,10 @@ type nodeConn struct {
 	mu       sync.RWMutex
 }
 
-func newNodeConn(conn *grpc.ClientConn) *nodeConn {
-	return &nodeConn{
-		conn:     conn,
-		refcount: 1,
-	}
-}
+func newNodeConn(conn *grpc.ClientConn) *nodeConn { _ = "STUB: not implemented"; return nil }
 
-func (c *nodeConn) AddRef() {
-	c.mu.Lock()
-	c.refcount++
-	c.mu.Unlock()
-}
+func (c *nodeConn) AddRef() { _ = "STUB: not implemented"; return }
 
-func (c *nodeConn) Release() {
-	c.mu.Lock()
-	c.refcount--
-	if c.refcount == 0 && c.conn != nil {
-		c.conn.Close()
-		c.conn = nil
-	}
-	c.mu.Unlock()
-}
+func (c *nodeConn) Release() { _ = "STUB: not implemented"; return }
 
-func (c *nodeConn) Conn() *grpc.ClientConn {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	return c.conn
-}
+func (c *nodeConn) Conn() *grpc.ClientConn { _ = "STUB: not implemented"; return nil }

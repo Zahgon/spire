@@ -2,10 +2,6 @@ package profiling
 
 import (
 	"os"
-	"runtime"
-	"runtime/pprof"
-	"runtime/trace"
-	"strings"
 )
 
 const (
@@ -31,132 +27,45 @@ type traceDumper struct {
 	data *os.File
 }
 
-func (d *dumper) Prepare() error {
-	return createProfilesFolder()
-}
+func (d *dumper) Prepare() error { _ = "STUB: not implemented"; return nil }
 
-func (d *dumper) Dump(timestamp string, name string) error {
-	profile := pprof.Lookup(name)
-	if profile == nil {
-		return ErrUnknownProfile
-	}
-
-	filename := getFilename(timestamp, d.c.Tag, name)
-	f, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	return profile.WriteTo(f, d.c.DebugLevel)
-}
+func (d *dumper) Dump(timestamp string, name string) error { _ = "STUB: not implemented"; return nil }
 
 func (d *dumper) Release() error {
+	_ = "STUB: not implemented"
 	// Do nothing
 	return nil
 }
 
-func (d *heapDumper) Prepare() error {
-	return d.dumper.Prepare()
-}
+func (d *heapDumper) Prepare() error { _ = "STUB: not implemented"; return nil }
 
 func (d *heapDumper) Dump(timestamp string, name string) error {
-	if d.dumper.c.RunGCBeforeHeapProfile {
-		runtime.GC()
-	}
-	return d.dumper.Dump(timestamp, name)
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (d *heapDumper) Release() error {
-	return d.dumper.Release()
-}
+func (d *heapDumper) Release() error { _ = "STUB: not implemented"; return nil }
 
-func (d *traceDumper) Prepare() error {
-	err := createProfilesFolder()
-	if err != nil {
-		return err
-	}
-	f, err := os.Create(getTempFilename(d.c.Tag, traceProfTmpFilename))
-	if err != nil {
-		return err
-	}
-	d.data = f
-	return trace.Start(d.data)
-}
+func (d *traceDumper) Prepare() error { _ = "STUB: not implemented"; return nil }
 
 func (d *traceDumper) Dump(timestamp string, name string) error {
-	trace.Stop()
-	d.data.Close()
-	filename := getFilename(timestamp, d.c.Tag, name)
-	if err := os.Rename(getTempFilename(d.c.Tag, traceProfTmpFilename), filename); err != nil {
-		return err
-	}
-	return d.Prepare()
-}
-
-func (d *traceDumper) Release() error {
-	d.data.Close()
-	os.Remove(getTempFilename(d.c.Tag, traceProfTmpFilename))
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (d *cpuDumper) Prepare() error {
-	err := createProfilesFolder()
-	if err != nil {
-		return err
-	}
-	f, err := os.Create(getTempFilename(d.c.Tag, cpuProfTmpFilename))
-	if err != nil {
-		return err
-	}
-	d.data = f
-	err = pprof.StartCPUProfile(d.data)
-	if err != nil {
-		d.data.Close()
-		return err
-	}
-	return nil
-}
+func (d *traceDumper) Release() error { _ = "STUB: not implemented"; return nil }
+
+func (d *cpuDumper) Prepare() error { _ = "STUB: not implemented"; return nil }
 
 func (d *cpuDumper) Dump(timestamp string, name string) error {
-	pprof.StopCPUProfile()
-	d.data.Close()
-	filename := getFilename(timestamp, d.c.Tag, name)
-	if err := os.Rename(getTempFilename(d.c.Tag, cpuProfTmpFilename), filename); err != nil {
-		return err
-	}
-	return d.Prepare()
-}
-
-func (d *cpuDumper) Release() error {
-	d.data.Close()
-	os.Remove(getTempFilename(d.c.Tag, cpuProfTmpFilename))
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func getTempFilename(tag, name string) string {
-	filename := &strings.Builder{}
-	filename.WriteString(profilesDir)
-	filename.WriteString("/")
-	filename.WriteString(tag)
-	filename.WriteString("_")
-	filename.WriteString(name)
-	return filename.String()
-}
+func (d *cpuDumper) Release() error { _ = "STUB: not implemented"; return nil }
 
-func getFilename(timestamp, tag, name string) string {
-	filename := &strings.Builder{}
-	filename.WriteString(profilesDir)
-	filename.WriteString("/")
-	filename.WriteString(timestamp)
-	filename.WriteString("_")
-	filename.WriteString(tag)
-	filename.WriteString("_")
-	filename.WriteString(name)
-	filename.WriteString(".pb.gz")
-	return filename.String()
-}
+func getTempFilename(tag, name string) string { _ = "STUB: not implemented"; return "" }
 
-func createProfilesFolder() error {
-	return os.MkdirAll(profilesDir, os.ModePerm)
-}
+func getFilename(timestamp, tag, name string) string { _ = "STUB: not implemented"; return "" }
+
+func createProfilesFolder() error { _ = "STUB: not implemented"; return nil }
